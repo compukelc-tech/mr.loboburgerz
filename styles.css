@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEMA DE GESTIÓN EMPRESARIAL - ESTILOS ADAPTADOS
+   SISTEMA ERP: MR. LOBO BURGERZ - ESTILOS V4.2 (CON SIDEBAR RESTAURADO)
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Metal+Mania&family=Montserrat:wght@400;600;800&display=swap');
 
@@ -22,7 +22,6 @@
 
 * { box-sizing: border-box; }
 
-/* NUEVO: El body pasa a ser flexbox para organizar el sidebar y el main */
 body {
   display: flex;
   margin: 0;
@@ -32,21 +31,15 @@ body {
   min-height: 100vh;
 }
 
-h1, h2, h3, h4 { 
-  margin: 0; 
-  font-family: 'Metal Mania', cursive;
-  font-weight: normal;
-  letter-spacing: 2px;
-  text-align: center;
-}
+h1, h2, h3, h4 { margin: 0; font-family: 'Metal Mania', cursive; font-weight: normal; letter-spacing: 2px; text-align: center; }
 
 /* ==========================================================================
    BARRA LATERAL IZQUIERDA (SIDEBAR)
    ========================================================================== */
 .sidebar {
-  width: 260px;
+  width: 270px;
   background: rgba(5, 5, 5, 0.95);
-  border-right: 1px solid var(--border);
+  border-right: 1px solid var(--dark-red); /* Borde rojo oscuro temático */
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -58,102 +51,50 @@ h1, h2, h3, h4 {
   z-index: 100;
 }
 
-.sidebar-header {
+.sidebar-header { text-align: center; margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
+.sidebar-header h1 { font-size: 42px; color: var(--text); text-shadow: 2px 2px 5px rgba(0,0,0,0.8); line-height: 1; }
+
+/* Módulo de Promociones */
+.sidebar-promo {
+  margin: 0 0 15px 0;
+  padding: 10px;
+  background: rgba(227, 38, 46, 0.1);
+  border: 1px dashed var(--red);
+  border-radius: 12px;
   text-align: center;
-  margin-bottom: 25px;
-  border-bottom: 1px solid var(--border);
-  padding-bottom: 20px;
-}
-
-.sidebar-header h1 {
-  font-size: 38px;
-  color: var(--text);
-  text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
-  line-height: 1.1;
-}
-
-.sidebar-header .subtitle {
-  color: var(--gold);
-  font-size: 13px;
-  margin-top: 8px;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-.sidebar-nav {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  flex-grow: 1;
-  overflow-y: auto;
-}
-
-.sidebar-nav .nav-btn {
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 12px;
-  padding: 12px 15px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--muted);
-  text-align: left;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
   align-items: center;
+  justify-content: center;
 }
+.sidebar-promo img, .sidebar-promo video, .sidebar-promo iframe { max-width: 100%; border-radius: 8px; }
+.sidebar-promo p { font-size: 13px; color: var(--text); margin: 0; font-weight: 600; }
 
-.sidebar-nav .nav-btn:hover {
+.sidebar-nav { display: flex; flex-direction: column; gap: 8px; flex-grow: 1; overflow-y: auto; }
+.sidebar-nav .nav-btn { background: transparent; border: 1px solid transparent; border-radius: 12px; padding: 12px 15px; font-size: 14px; font-weight: 600; color: var(--muted); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; }
+.sidebar-nav .nav-btn:hover { background: var(--card-hover); color: var(--text); border-color: var(--gold); }
+.sidebar-nav .nav-btn.active { background: var(--red); color: var(--text); border-color: var(--dark-red); }
+
+.sidebar-footer { margin-top: auto; text-align: center; border-top: 1px solid var(--border); padding-top: 20px; }
+.btn-login { background: var(--card-hover); border: 1px solid var(--border); border-radius: 12px; width: 100%; padding: 12px; font-size: 14px; cursor: pointer; color: white; margin-bottom: 15px; font-weight: bold; transition: 0.3s; }
+.btn-login:hover { border-color: var(--red); }
+
+/* CAJA DE CONTACTO */
+.contact-info {
+  text-align: left;
   background: var(--card-hover);
-  color: var(--text);
-  border-color: var(--gold);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid #2a0000;
+  margin-top: 10px;
 }
-
-.sidebar-nav .nav-btn.active {
-  background: var(--red);
-  color: var(--text);
-  border-color: var(--dark-red);
-}
-
-.sidebar-footer {
-  margin-top: auto;
-  text-align: center;
-  border-top: 1px solid var(--border);
-  padding-top: 20px;
-}
-
-.btn-login {
-  background: var(--card-hover); 
-  border: 1px solid var(--border); 
-  border-radius: 12px; 
-  width: 100%; 
-  padding: 12px; 
-  font-size: 14px; 
-  cursor: pointer; 
-  color: white; 
-  margin-bottom: 15px; 
-  font-weight: bold;
-  transition: 0.3s;
-}
-.btn-login:hover { border-color: var(--gold); }
-
-.sidebar-footer p {
-  font-size: 11px;
-  color: var(--muted);
-  margin: 4px 0;
-  font-weight: 600;
-  letter-spacing: 0.5px;
-}
+.contact-info p { font-size: 11px; color: var(--muted); margin: 8px 0; line-height: 1.4; font-family: 'Montserrat', sans-serif; }
+.contact-info b { color: var(--gold); font-size: 12px; font-family: 'Montserrat', sans-serif; }
 
 /* ==========================================================================
    CONTENIDO PRINCIPAL Y COMPONENTES
    ========================================================================== */
-.main-content {
-  margin-left: 260px; /* Ancho de la barra lateral */
-  padding: 30px;
-  width: calc(100% - 260px);
-  min-height: 100vh;
-}
+.main-content { margin-left: 270px; padding: 30px; width: calc(100% - 270px); min-height: 100vh; }
 
 button { border: none; border-radius: 12px; padding: 12px 18px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; background: var(--card-hover); color: var(--text); }
 button:hover { filter: brightness(1.2); transform: translateY(-2px); }
@@ -174,8 +115,8 @@ button.text-btn { background: transparent; padding: 5px; text-decoration: underl
 
 .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
 .field label { font-size: 13px; color: var(--muted); font-weight: bold; }
-input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0a0a0a; color: #fff; font-size: 15px; outline: none; }
-input:focus, select:focus { border-color: var(--gold); }
+input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0a0a0a; color: #fff; font-size: 15px; outline: none; }
+input:focus, select:focus, textarea:focus { border-color: var(--gold); }
 .password-wrapper { position: relative; display: flex; }
 .password-wrapper input { padding-right: 50px; width: 100%; }
 .toggle-pass { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; font-size: 18px; padding: 5px 10px; }
@@ -185,11 +126,9 @@ input:focus, select:focus { border-color: var(--gold); }
 
 .product-card { background: var(--card-hover); border-radius: 18px; padding: 20px 15px; text-align: center; border: 1px solid var(--border); transition: transform 0.2s; }
 .product-card:hover { border-color: var(--gold); }
-
 .product-img-container { width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--border); background: #000; }
 .product-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
 .product-card:hover .product-img-container img { transform: scale(1.05); }
-
 .product-card h3 { color: var(--gold); font-size: 26px; margin-bottom: 10px; }
 .product-card p { color: var(--muted); font-size: 13px; margin-bottom: 15px; min-height: 40px; }
 .product-card .price { font-size: 24px; font-weight: bold; display: block; margin-bottom: 15px; color: #fff; }
@@ -226,42 +165,21 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
 .center { text-align: center; }
 .note { font-size: 13px; color: var(--muted); margin-bottom: 15px; text-align: center; }
 
+/* CRÉDITOS DE ESTUDIANTES RESTAURADOS */
+.creditos-estudiantes { background: #000; border-top: 1px solid var(--border); padding: 30px 20px; margin-top: 40px; text-align: center; border-radius: 15px; }
+.creditos-text { color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1.8; max-width: 900px; margin: 0 auto; }
+.creditos-text span { color: var(--gold); display: block; margin-bottom: 10px; font-size: 16px; font-family: 'Metal Mania', cursive; letter-spacing: 1px; }
+
 /* ==========================================================================
    DISEÑO RESPONSIVO (MÓVILES)
    ========================================================================== */
 @media (max-width: 768px) {
-  body {
-    flex-direction: column;
-  }
-  
-  /* El sidebar pasa a la parte superior en teléfonos */
-  .sidebar {
-    width: 100%;
-    height: auto;
-    position: relative;
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-    padding: 15px;
-  }
-  
-  .main-content {
-    margin-left: 0;
-    width: 100%;
-    padding: 15px;
-  }
-  
-  .sidebar-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .sidebar-nav .nav-btn {
-    text-align: center;
-    justify-content: center;
-  }
-
+  body { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); padding: 15px; }
+  .main-content { margin-left: 0; width: 100%; padding: 15px; }
+  .sidebar-nav { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .sidebar-nav .nav-btn { text-align: center; justify-content: center; }
   .vitrina-container { grid-template-columns: 1fr; }
   .carrito-panel { position: relative; top: 0; margin-top: 20px; border-top: 2px solid var(--border); }
-  h1 { font-size: 38px; }
+  .sidebar-header h1 { font-size: 38px; }
 }
