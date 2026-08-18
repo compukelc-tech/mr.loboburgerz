@@ -3,20 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Sr. Lobo Burgerz — Pedidos & Facturas</title>
+<link rel="stylesheet" href="styles.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-<!-- ==========================================================================
-     [PRODUCCIÓN: INYECCIÓN DE ESTILOS CSS DESDE GS]
-     Llama a tu archivo CSS.html para cargar los estilos
-     ========================================================================== -->
-<?!= include('CSS'); ?>
-
 </head>
 <body>
 
-<!-- ==========================================================================
-     [PRODUCCIÓN: HEADER PRINCIPAL]
-     ========================================================================== -->
 <header>
   <h1>🐺 <span style="color:#e3262e">SR. LOBO</span> BURGERZ</h1>
   <p style="font-weight:800;letter-spacing:1px">PEDIDOS & FACTURAS (vSheets)</p>
@@ -25,9 +16,6 @@
 <main>
   <p class="cloud-status" id="cloudStatus">☁️ Conectando con Google Sheets...</p>
 
-  <!-- ==========================================================================
-       [PRODUCCIÓN: BARRA DE NAVEGACIÓN]
-       ========================================================================== -->
   <nav>
     <button onclick="showTab('menu')">🍔 Menú</button>
     <button class="purple" onclick="showTab('nuevo')">➕ Nuevo pedido</button>
@@ -35,10 +23,6 @@
     <button onclick="showTab('panel')">📊 Resumen</button>
   </nav>
 
-  <!-- ==========================================================================
-       [PRODUCCIÓN: SECCIÓN - MENÚ DE PRODUCTOS]
-       Agrega o modifica los productos disponibles aquí.
-       ========================================================================== -->
   <section id="menu" class="tab active">
     <div class="card">
       <h2>Menú Principal</h2>
@@ -59,10 +43,6 @@
     </div>
   </section>
 
-  <!-- ==========================================================================
-       [PRODUCCIÓN: SECCIÓN - NUEVO PEDIDO]
-       Formulario de captura de datos del cliente.
-       ========================================================================== -->
   <section id="nuevo" class="tab">
     <div class="card">
       <h2>Registrar pedido</h2>
@@ -79,9 +59,6 @@
     </div>
   </section>
 
-  <!-- ==========================================================================
-       [PRODUCCIÓN: SECCIÓN - LISTA DE PEDIDOS]
-       ========================================================================== -->
   <section id="pedidos" class="tab">
     <div class="card">
       <h2>Pedidos</h2>
@@ -90,9 +67,6 @@
     </div>
   </section>
 
-  <!-- ==========================================================================
-       [PRODUCCIÓN: SECCIÓN - PANEL DE RESUMEN]
-       ========================================================================== -->
   <section id="panel" class="tab">
     <div class="card">
       <h2>Resumen</h2>
@@ -101,10 +75,6 @@
   </section>
 </main>
 
-<!-- ==========================================================================
-     [PRODUCCIÓN: MODALES]
-     Estructura visual de las facturas emergentes.
-     ========================================================================== -->
 <div class="modal" id="modal">
   <div class="invoice">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -136,11 +106,6 @@
   </div>
 </div>
 
-<!-- ==========================================================================
-     [PRODUCCIÓN: INYECCIÓN DE LÓGICA JS DESDE GS]
-     Llama a tu archivo JS.html para ejecutar los scripts
-     ========================================================================== -->
-<?!= include('JS'); ?>
-
+<script src="app.js"></script>
 </body>
 </html>
