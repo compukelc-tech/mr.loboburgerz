@@ -1,0 +1,212 @@
+<script>
+// ============================================================================
+// [FUNCIÓN: CONFIGURACIÓN INICIAL]
+// Variables globales y utilidades de formateo.
+// ============================================================================
+let pedidos = [];
+const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n || 0);
+
+// ============================================================================
+// [FUNCIÓN: INICIALIZACIÓN DE DATOS (ONLOAD)]
+// Se ejecuta al abrir la app. Llama a Apps Script para traer la base de datos.
+// ============================================================================
+window.onload = function() {
+  if (typeof google !== 'undefined' && google.script) {
+    google.script.run.withSuccessHandler(actualizarPantalla).obtenerPedidos();
+  } else {
+    document.getElementById('cloudStatus').textContent = '⚠️ Modo local - Sin conexión a Sheets';
+  }
+};
+
+function actualizarPantalla(data) {
+  pedidos = data || [];
+  document.getElementById('cloudStatus').textContent = '☁️ Conectado — ' + pedidos.length + ' pedidos en Sheets';
+  renderPedidos();
+  renderStats();
+}
+
+// ============================================================================
+// [FUNCIÓN: CONTROL DE NAVEGACIÓN (PESTAÑAS)]
+// Alterna entre Menú, Nuevo Pedido, Pedidos y Resumen.
+// ============================================================================
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id === 'pedidos') renderPedidos();
+  if(id === 'panel') renderStats();
+}
+
+// ============================================================================
+// [FUNCIÓN: SELECCIÓN RÁPIDA DESDE EL MENÚ]
+// Rellena automáticamente el formulario al elegir un producto.
+// ============================================================================
+function seleccionarDelMenu(prod, prec) {
+  showTab('nuevo');
+  document.getElementById('producto').value = prod;
+  document.getElementById('total').value = prec;
+  document.getElementById('nombre').focus();
+}
+
+// ============================================================================
+// [FUNCIÓN: GENERADOR DE CÓDIGOS]
+// Crea el consecutivo de la factura (ej. DOC-1014).
+// ============================================================================
+const nextCode = () => {
+  let max = 1013;
+  pedidos.forEach(p => { let n = parseInt((p.codigo || '').replace('DOC-', '')); if(n > max) max = n; });
+  return 'DOC-' + (max + 1);
+};
+
+// ============================================================================
+// [FUNCIÓN: CREAR Y GUARDAR PEDIDO NUEVO]
+// Construye el objeto y lo envía a Google Sheets.
+// ============================================================================
+function crearPedido() {
+  const p = {
+    codigo: nextCode(),
+    nombre: document.getElementById('nombre').value.trim(),
+    grado: document.getElementById('grado').value.trim(),
+    producto: document.getElementById('producto').value.trim(),
+    total: Number(document.getElementById('total').value),
+    abonos: [{ monto: Number(document.getElementById('montoApartado').value || 0), fecha: new Date().toLocaleString('es-CO') }],
+    fecha: new Date().toLocaleString('es-CO')
+  };
+
+  if(!p.nombre || !p.producto || !p.total) return alert('Faltan datos.');
+
+  document.getElementById('cloudStatus').textContent = '⏳ Guardando en Sheets...';
+  
+  if (typeof google !== 'undefined' && google.script) {
+    google.script.run.withSuccessHandler(function(data) {
+      actualizarPantalla(data);
+      abrirFactura(p);
+      limpiarFormulario();
+    }).guardarPedido(p);
+  } else {
+    // Simulación para entorno local
+    pedidos.push(p);
+    actualizarPantalla(pedidos);
+    abrirFactura(p);
+    limpiarFormulario();
+  }
+}
+
+function limpiarFormulario() {
+  document.getElementById('nombre').value = '';
+  document.getElementById('grado').value = '';
+  document.getElementById('producto').value = '';
+  document.getElementById('total').value = '';
+}
+
+// ============================================================================
+// [FUNCIÓN: CALCULADORES DE ESTADO]
+// Lógica para definir si está Pagado, Pendiente o Abonado.
+// ============================================================================
+const abonado = p => (p.abonos || []).reduce((s, a) => s + Number(a.monto), 0);
+const estado = p => abonado(p) >= p.total ? 'PAGADO' : (abonado(p) > 0 ? 'ABONADO' : 'PENDIENTE');
+const estadoClass = e => e === 'PAGADO' ? 'paid' : (e === 'ABONADO' ? 'abonado' : 'pending');
+
+// ============================================================================
+// [FUNCIÓN: GESTIÓN DE MODAL - FACTURAS]
+// Dibuja la factura en pantalla y genera el código QR.
+// ============================================================================
+function abrirFactura(p) {
+  document.getElementById('modal').classList.add('show');
+  document.getElementById('invCode').textContent = 'FACTURA N.º ' + p.codigo;
+  const a = abonado(p);
+  const saldo = Math.max(0, p.total - a);
+
+  document.getElementById('invData').innerHTML = `
+    <div class="line"><span>Cliente</span><b>${p.nombre}</b></div>
+    <div class="line"><span>Producto</span><b>${p.producto}</b></div>
+    <div class="line"><span>Total</span><b>${money(p.total)}</b></div>
+    <div class="line"><span>Abonado</span><b>${money(a)}</b></div>
+    <div class="line"><span>Saldo</span><b>${money(saldo)}</b></div>
+    <div class="line"><span>Estado</span><b class="status ${estadoClass(estado(p))}">${estado(p)}</b></div>
+  `;
+
+  document.getElementById('qrcode').innerHTML = '';
+  new QRCode(document.getElementById('qrcode'), { text: p.codigo, width: 210, height: 210 });
+  window.current = p.codigo;
+}
+
+function cerrarModal() { document.getElementById('modal').classList.remove('show'); cerrarAbono(); }
+
+// ============================================================================
+// [FUNCIÓN: RENDERIZADO - TABLA DE PEDIDOS]
+// Dibuja el listado de pedidos y aplica el filtro de búsqueda.
+// ============================================================================
+function renderPedidos() {
+  const q = (document.getElementById('busqueda')?.value || '').toLowerCase();
+  const arr = pedidos.filter(p => (p.nombre + ' ' + p.codigo).toLowerCase().includes(q)).slice().reverse();
+  
+  if(!arr.length) { document.getElementById('tabla').innerHTML = '<p class="note">No hay pedidos.</p>'; return; }
+  
+  document.getElementById('tabla').innerHTML = `<table>
+    <thead><tr><th>Código</th><th>Cliente</th><th>Estado</th><th>Saldo</th><th></th></tr></thead>
+    <tbody>
+      ${arr.map(p => `<tr>
+        <td>${p.codigo}</td><td>${p.nombre}</td>
+        <td><span class="status ${estadoClass(estado(p))}">${estado(p)}</span></td>
+        <td>${money(Math.max(0, p.total - abonado(p)))}</td>
+        <td>
+          <button class="small" onclick="abrirFactura(pedidos.find(x=>x.codigo==='${p.codigo}'))">Ver</button>
+          ${estado(p) !== 'PAGADO' ? `<button class="small primary" onclick="window.current='${p.codigo}'; abrirAbono('${p.codigo}')">Abonar</button>` : ''}
+        </td>
+      </tr>`).join('')}
+    </tbody></table>`;
+}
+
+// ============================================================================
+// [FUNCIÓN: RENDERIZADO - PANEL DE RESUMEN]
+// Calcula los totales en caja y saldos pendientes.
+// ============================================================================
+function renderStats() {
+  const total = pedidos.reduce((s, p) => s + p.total, 0);
+  const rec = pedidos.reduce((s, p) => s + abonado(p), 0);
+  document.getElementById('stats').innerHTML = `
+    <div class="stat"><small>Pedidos</small><b>${pedidos.length}</b></div>
+    <div class="stat"><small>En Caja</small><b>${money(rec)}</b></div>
+    <div class="stat"><small>Por cobrar</small><b>${money(total - rec)}</b></div>
+  `;
+}
+
+// ============================================================================
+// [FUNCIÓN: GESTIÓN DE MODAL - ABONOS]
+// Lógica para registrar nuevos pagos parciales en Sheets.
+// ============================================================================
+function abrirAbono(codigo) {
+  const p = pedidos.find(x => x.codigo === codigo);
+  if(!p) return;
+  document.getElementById('abonoCode').textContent = 'PEDIDO ' + p.codigo;
+  document.getElementById('nuevoAbono').max = Math.max(0, p.total - abonado(p));
+  window.current = p.codigo;
+  document.getElementById('abonoModal').classList.add('show');
+}
+
+function cerrarAbono() { document.getElementById('abonoModal').classList.remove('show'); }
+
+function guardarAbono() {
+  const codigo = window.current;
+  const valor = Number(document.getElementById('nuevoAbono').value || 0);
+  if(valor <= 0) return alert('Ingresa un valor.');
+
+  document.getElementById('cloudStatus').textContent = '⏳ Guardando abono en Sheets...';
+  
+  if (typeof google !== 'undefined' && google.script) {
+    google.script.run.withSuccessHandler(function(data) {
+      actualizarPantalla(data);
+      alert('Abono guardado.');
+      cerrarAbono();
+      cerrarModal();
+    }).guardarAbonoBackend(codigo, { monto: valor, fecha: new Date().toLocaleString('es-CO') });
+  } else {
+    // Simulación local
+    const p = pedidos.find(x => x.codigo === codigo);
+    p.abonos.push({ monto: valor, fecha: new Date().toLocaleString('es-CO') });
+    actualizarPantalla(pedidos);
+    cerrarAbono();
+    cerrarModal();
+  }
+}
+</script>
