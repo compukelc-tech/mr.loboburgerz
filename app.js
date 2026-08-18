@@ -1,8 +1,9 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V4.0
+// AUDITORÍA APLICADA: CORRECCIÓN DE CORS Y FALLO HTML
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwB41m6Dgxqg0ZGHdpNmtIfnO8vnu3xDk_TRMP6dJcVr_tbwz8JdjmVBaE_laWv3Nva7g/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwB41m6Dgxqg0ZGHdpNmtIfnO8vnu3xDk_TRMP6dJcVr_tbwz8JdjmVBaE_laWv3Nva7g/exec"; // <-- VERIFICA ESTE ENLACE
 
 let sesionActual = null; 
 let carrito = []; 
@@ -41,19 +42,36 @@ window.onload = async () => {
   }
 };
 
+// ----------------------------------------------------------------------------
+// INYECCIÓN: CORE API CALL REESCRITO (EVITA ERRORES CORS Y HTML DOCTYPE)
+// ----------------------------------------------------------------------------
 async function apiCall(accion, datos = {}) {
   try {
     const payload = JSON.stringify({ accion, datos });
+    
+    // Se envía como text/plain puro para evitar que Google bloquee la petición
     const response = await fetch(API_URL, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ data: payload })
+      body: payload
     });
-    const result = await response.json();
+    
+    const textResponse = await response.text();
+    
+    let result;
+    try {
+      result = JSON.parse(textResponse);
+    } catch (err) {
+      console.error("RESPUESTA ROTA DEL SERVIDOR:", textResponse);
+      throw new Error("Conexión rechazada. Verifica que la implementación esté en 'Cualquier persona' y la URL termine en /exec.");
+    }
+
     if (!result.exito) throw new Error(result.error);
     return result.data;
-  } catch (error) { throw error; }
+  } catch (error) { 
+    throw error; 
+  }
 }
+// ----------------------------------------------------------------------------
 
 function navegar(vistaID) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
@@ -122,7 +140,7 @@ async function iniciarSesion() {
     localStorage.setItem('lobo_session', JSON.stringify(sesionActual));
     mostrarAlerta('Acceso concedido', 'success');
     configurarInterfazPorRol();
-  } catch (e) { mostrarAlerta('Error de red.'); }
+  } catch (e) { mostrarAlerta(e.message || 'Error de red.'); }
 }
 
 async function registrarEmpleado() {
@@ -148,7 +166,7 @@ function mostrarAlerta(msg, tipo = 'error') {
   const alertBox = document.getElementById('alert-box');
   if(alertBox) {
     alertBox.textContent = msg; alertBox.className = `alert ${tipo}`;
-    setTimeout(() => alertBox.classList.add('hidden'), 3500);
+    setTimeout(() => alertBox.classList.add('hidden'), 5000);
   } else { alert(msg); }
 }
 
@@ -271,10 +289,12 @@ async function guardarProductoBackend() {
   try {
     if (fileInput) { datos.imagenBase64 = await comprimirImagen(fileInput, 'canvas-compresion-prod'); }
     await apiCall('guardarProducto', datos);
-    cerrarModal('modal-producto'); await cargarCatalogoGlobal(); cargarGestorMenu();
+    cerrarModal('modal-producto'); 
+    await cargarCatalogoGlobal(); 
+    cargarGestorMenu();
+    mostrarAlerta('Producto guardado correctamente', 'success');
   } catch (error) {
-    console.error("Error detallado:", error);
-    mostrarAlerta('Error: ' + error.message);
+    mostrarAlerta(error.message);
   } finally { 
     btn.disabled = false; btn.textContent = 'Guardar'; 
   }
@@ -291,7 +311,7 @@ async function eliminarProducto(id) {
     await apiCall('eliminarProducto', { idProducto: id }); 
     mostrarAlerta('Producto eliminado', 'success');
     await cargarCatalogoGlobal(); cargarGestorMenu(); 
-  } catch(e) { mostrarAlerta('Error al eliminar.'); }
+  } catch(e) { mostrarAlerta(e.message || 'Error al eliminar.'); }
 }
 
 function agregarAlCarrito(id) { const prod = CATALOGO.find(p => p.id === id); const item = carrito.find(i => i.id === id); if (item) item.cant++; else carrito.push({ ...prod, cant: 1 }); renderCarrito(); }
@@ -328,7 +348,7 @@ async function enviarPedido() {
     window.open(res.urlFactura, '_blank');
     
     carrito = []; renderCarrito(); cerrarModal('modal-checkout');
-  } catch (error) { mostrarAlerta('Error al procesar.'); } finally { btn.disabled = false; btn.textContent = 'Confirmar y Enviar Pedido'; }
+  } catch (error) { mostrarAlerta(error.message || 'Error al procesar.'); } finally { btn.disabled = false; btn.textContent = 'Confirmar y Enviar Pedido'; }
 }
 
 async function cargarEmpleados() {
@@ -434,8 +454,6 @@ async function cambiarEstadoPedido(idPedido, nuevoEstado) {
 // Registro del Service Worker para la PWA
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js')
-      .then(reg => console.log('Service Worker registrado:', reg))
-      .catch(err => console.log('Error al registrar SW:', err));
+    navigator.serviceWorker.register('./sw.js').catch(err => console.log('Error SW:', err));
   });
 }
