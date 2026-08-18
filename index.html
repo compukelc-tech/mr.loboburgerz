@@ -20,6 +20,7 @@
       <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
       <button onclick="navegar('produccion')" class="nav-btn" id="nav-produccion">🍳 Producción</button>
       <button onclick="navegar('despachados')" class="nav-btn" id="nav-despachados">✅ Despachos</button>
+      <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing (Menú)</button>
       <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 SúperAdmin</button>
       <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
     </nav>
@@ -80,6 +81,7 @@
             <option value="Cartera">Cartera (Pagos y Vouchers)</option>
             <option value="Producción">Producción (Cocina)</option>
             <option value="Pedidos">Pedidos (Logística)</option>
+            <option value="Marketing">Marketing (Gestión Menú)</option>
           </select>
         </div>
         <div class="field">
@@ -111,15 +113,16 @@
       <div class="vitrina-container">
         <!-- Menú de Productos -->
         <div class="menu-list">
-          <h2>🍔 Menú Principal</h2>
+          <h2>MENÚ</h2>
           <div class="grid" id="catalogo-productos">
             <!-- Los productos se inyectarán aquí con JS -->
+            <p class="note">Cargando menú desde la base de datos...</p>
           </div>
         </div>
 
         <!-- Carrito Flotante Lateral -->
         <div class="carrito-panel card">
-          <h2>🛒 Tu Pedido</h2>
+          <h2 style="font-family: 'Montserrat', sans-serif; font-size: 20px;">🛒 Tu Pedido</h2>
           <div id="carrito-items" class="carrito-items">
             <p class="note">Agrega productos con el botón +</p>
           </div>
@@ -150,46 +153,53 @@
                 <th>Acción</th>
               </tr>
             </thead>
-            <tbody id="lista-empleados">
-              <!-- Datos inyectados por JS -->
-            </tbody>
+            <tbody id="lista-empleados"></tbody>
           </table>
         </div>
       </div>
     </section>
 
     <!-- ==========================================
-         VISTA 5: CARTERA (Validación de pagos)
+         VISTA 5: MARKETING (Gestión del Menú)
+         ========================================== -->
+    <section id="view-marketing" class="view">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
+          <h2>📸 GESTOR DE MENÚ</h2>
+          <button class="primary" onclick="abrirModalProducto()">+ Añadir Producto</button>
+        </div>
+        <p class="note" style="text-align: left;">Sube fotos, cambia precios o marca productos como agotados. Los cambios se reflejarán instantáneamente en la Vitrina y en Google Sheets.</p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr><th>Imagen</th><th>Categoría</th><th>Nombre</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr>
+            </thead>
+            <tbody id="lista-marketing-productos"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VISTAS RESTANTES: CARTERA, PRODUCCIÓN, DESPACHOS
          ========================================== -->
     <section id="view-cartera" class="view">
       <div class="card">
         <h2>💰 Pedidos en Espera de Pago</h2>
-        <p class="note">Verifica los vouchers y cambia el estado a Producción cuando el pago esté completo.</p>
-        <div class="grid" id="lista-cartera">
-          <!-- Tarjetas de pedidos inyectadas por JS -->
-        </div>
+        <div class="grid" id="lista-cartera"></div>
       </div>
     </section>
 
-    <!-- ==========================================
-         VISTA 6: PRODUCCIÓN (Cocina)
-         ========================================== -->
     <section id="view-produccion" class="view">
       <div class="card">
         <h2>🍳 Comandas en Producción</h2>
-        <p class="note">Prepara estas órdenes y presiona 'Despachado' al entregarlas.</p>
-        <div class="grid" id="lista-produccion">
-          <!-- Tarjetas inyectadas por JS -->
-        </div>
+        <div class="grid" id="lista-produccion"></div>
       </div>
     </section>
 
-    <!-- ==========================================
-         VISTA 7: DESPACHADOS (Historial)
-         ========================================== -->
     <section id="view-despachados" class="view">
       <div class="card">
-        <h2>✅ Historial de Entregas del Día</h2>
+        <h2>✅ Historial de Entregas</h2>
         <div class="table-container">
           <table>
             <thead><tr><th>ID Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
@@ -207,10 +217,9 @@
   <div class="modal" id="modal-checkout">
     <div class="invoice">
       <div class="modal-header">
-        <span>Datos del Pedido</span>
+        <span style="font-family: 'Montserrat', sans-serif;">Datos del Pedido</span>
         <button onclick="cerrarModal('modal-checkout')">✕</button>
       </div>
-      
       <div class="field">
         <label>Tipo de Cliente</label>
         <select id="co-tipo" onchange="toggleCamposCliente()">
@@ -218,14 +227,11 @@
           <option value="Continuo">Cliente Continuo (Fidelizado)</option>
         </select>
       </div>
-      
       <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
       <div class="field"><label>Nombre Completo *</label><input type="text" id="co-nombre"></div>
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
       <div class="field hidden" id="co-correo-field"><label>Correo Electrónico *</label><input type="email" id="co-correo"></div>
-      
       <hr style="border-color: #333; margin: 15px 0;">
-      
       <div class="field">
         <label>Tipo de Pago</label>
         <select id="co-tipo-pago" onchange="toggleVoucherInput()">
@@ -233,23 +239,71 @@
           <option value="Abono">Abono Parcial</option>
         </select>
       </div>
-      
-      <div class="field hidden" id="co-monto-abono-field">
-        <label>Monto a Abonar</label>
-        <input type="number" id="co-monto-abono">
-      </div>
-
+      <div class="field hidden" id="co-monto-abono-field"><label>Monto a Abonar</label><input type="number" id="co-monto-abono"></div>
       <div class="field">
         <label>Subir Voucher / Comprobante (Imagen)</label>
         <input type="file" id="co-voucher" accept="image/*">
         <canvas id="canvas-compresion" style="display:none;"></canvas>
       </div>
-
       <div class="actions" style="margin-top: 20px;">
         <button class="primary full-width" onclick="enviarPedido()" id="btn-enviar-pedido">Confirmar y Enviar Pedido</button>
       </div>
     </div>
   </div>
+
+  <!-- ==========================================
+       MODAL: GESTOR DE PRODUCTO (Marketing)
+       ========================================== -->
+  <div class="modal" id="modal-producto">
+    <div class="invoice">
+      <div class="modal-header">
+        <span style="font-family: 'Montserrat', sans-serif;" id="modal-prod-titulo">Añadir Producto</span>
+        <button onclick="cerrarModal('modal-producto')">✕</button>
+      </div>
+      <input type="hidden" id="prod-id">
+      <input type="hidden" id="prod-img-existente">
+      
+      <div class="field">
+        <label>Categoría *</label>
+        <select id="prod-categoria">
+          <option value="~PRODUCTOS PRINCIPALES~">Productos Principales</option>
+          <option value="~BEBIDAS Y POSTRES~">Bebidas y Postres</option>
+          <option value="~COMBOS~">Combos</option>
+        </select>
+      </div>
+      <div class="field"><label>Nombre del Producto *</label><input type="text" id="prod-nombre"></div>
+      <div class="field"><label>Ingredientes / Descripción *</label><input type="text" id="prod-desc"></div>
+      <div class="field"><label>Precio ($ COP) *</label><input type="number" id="prod-precio"></div>
+      
+      <div class="field">
+        <label>Estado del Producto</label>
+        <select id="prod-agotado">
+          <option value="NO">Disponible para la venta</option>
+          <option value="SI">Agotado (Bloqueado)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label>Subir Foto del Producto (Opcional si ya tiene)</label>
+        <input type="file" id="prod-img" accept="image/*">
+      </div>
+
+      <div class="actions" style="margin-top: 20px;">
+        <button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar Producto</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       CRÉDITOS - EQUIPO DE TRABAJO
+       ========================================== -->
+  <footer class="creditos-estudiantes">
+    <div class="marquee-container">
+      <div class="marquee-text">
+        <span>🐺 PROYECTO DESARROLLADO POR:</span> Maria Fernanda Aragón | Naily Bustos | Shaira Nicoll Caballero | Hecna Thaliana | Gabriel Caceres | Mabel Celis | Gabriela Colmenares | Laura Contreras | Tatiana Florez | Jeimy Sabrina | Angie Elizabeth | Gabriela Gonzalez | Andrea Guerrero | Valeria Hernandez | Andres Felipe Latorre | Samuel Jimenez | Kelmer Andrey | Dorian Merino | Andres Felipe Meza | Roxana Miranda | Kevin Molina | Genesis Moncada | Maria Mora | Paula Gabriela | Juan Manuel Muñoz | Santiago Niño | Aaron Obeji | Gisell Palmero | Hasly Valeria | Lina Peña | Chelsea Ramirez | Sayhoa Rivera | Andry Rondon | Isabella Sarmiento | Sami Valeria | Mariangel Uribe | Natalia Velandia | Danna Salome Vera | Katherin Zambrano
+      </div>
+    </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>
