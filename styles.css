@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEMA ERP: MR. LOBO BURGERZ - ESTILOS V4.2 (CON SIDEBAR COMPLETO)
+   SISTEMA ERP: MR. LOBO BURGERZ - ESTILOS (CSS) V4.0 + LAYOUT DOS COLUMNAS
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Metal+Mania&family=Montserrat:wght@400;600;800&display=swap');
 
@@ -23,7 +23,6 @@
 * { box-sizing: border-box; }
 
 body {
-  display: flex; /* Transforma el cuerpo en Flexbox para la barra lateral */
   margin: 0;
   font-family: 'Montserrat', sans-serif;
   background: var(--bg-gradient);
@@ -39,121 +38,137 @@ h1, h2, h3, h4 {
   text-align: center;
 }
 
-/* ==========================================================================
-   BARRA LATERAL IZQUIERDA (SIDEBAR)
-   ========================================================================== */
-.sidebar {
-  width: 290px;
-  background: rgba(5, 5, 5, 0.98);
-  border-right: 1px solid var(--dark-red);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  position: fixed;
-  left: 0;
-  top: 0;
-  padding: 25px 15px;
-  box-shadow: 5px 0 20px rgba(0,0,0,0.8);
-  z-index: 100;
-  overflow-y: auto; /* Permite scroll si la pantalla es muy pequeña */
+h1 {
+  font-size: 48px; 
+  line-height: 1.1;
+  text-shadow: 2px 2px 5px rgba(0,0,0,0.8);
 }
 
-.sidebar::-webkit-scrollbar { width: 5px; }
-.sidebar::-webkit-scrollbar-thumb { background: var(--dark-red); border-radius: 10px; }
+header {
+  padding: 20px 15px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0, 0, 0, 0.5);
+}
 
-.sidebar-header { text-align: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 20px; }
-.sidebar-header h1 { font-size: 42px; color: var(--text); text-shadow: 2px 2px 5px rgba(0,0,0,0.8); line-height: 1.1; }
-
-/* Módulo de Promociones Lateral */
-.sidebar-promo {
-  margin: 0 0 15px 0;
-  padding: 10px;
-  background: rgba(227, 38, 46, 0.1);
-  border: 1px dashed var(--red);
-  border-radius: 12px;
+.subtitle {
+  color: var(--muted);
+  font-size: 16px;
+  margin-top: 10px;
+  font-weight: 600;
+  letter-spacing: 1px;
   text-align: center;
+}
+
+nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
+
+/* ==========================================================================
+   NUEVO LAYOUT A DOS COLUMNAS (BANNER IZQUIERDO + CONTENIDO DERECHO)
+   ========================================================================== */
+.app-layout {
+  display: flex;
+  max-width: 1400px;
+  margin: 0 auto;
+  gap: 30px;
+  padding: 25px 15px;
+  align-items: flex-start;
+}
+
+.left-banner {
+  width: 320px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 20px; /* Queda fijo al hacer scroll en pantallas grandes */
+}
+
+.main-content {
+  flex-grow: 1;
+  width: calc(100% - 350px);
+}
+
+/* ESTILOS DEL BANNER IZQUIERDO Y PROMOCIONES */
+.sidebar-promo {
+  margin: 0 0 20px 0;
+  padding: 15px;
+  background: var(--card);
+  border: 1px dashed var(--red);
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
 }
-.sidebar-promo img, .sidebar-promo video, .sidebar-promo iframe { max-width: 100%; border-radius: 8px; }
-.sidebar-promo p { font-size: 13px; color: var(--text); margin: 0; font-weight: 600; }
+.sidebar-promo img, .sidebar-promo video, .sidebar-promo iframe { max-width: 100%; border-radius: 12px; }
+.sidebar-promo p { font-size: 14px; color: var(--text); margin: 0; font-weight: 600; }
 
-.sidebar-nav { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; margin-bottom: 20px; }
-.sidebar-nav .nav-btn { background: transparent; border: 1px solid transparent; border-radius: 12px; padding: 12px 15px; font-size: 14px; font-weight: 600; color: var(--muted); text-align: left; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; }
-.sidebar-nav .nav-btn:hover { background: var(--card-hover); color: var(--text); border-color: var(--gold); }
-.sidebar-nav .nav-btn.active { background: var(--red); color: var(--text); border-color: var(--dark-red); }
-
-/* CAJA DE CONTACTO, MAPA Y REDES */
-.sidebar-footer { margin-top: auto; }
 .contact-info {
   text-align: left;
-  background: #0a0000;
-  padding: 15px;
-  border-radius: 12px;
-  border: 1px solid #330000;
-  box-shadow: inset 0 0 15px rgba(227, 38, 46, 0.1);
+  background: var(--card);
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid var(--dark-red);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-.contact-info p { 
-  font-size: 11px; 
-  color: var(--muted); 
-  margin: 0; 
-  line-height: 1.4; 
-}
-
-/* Configuración del iframe del mapa para que tome el 100% de la caja */
+/* Mapa y Enlace de Dirección Clickable */
 .map-container {
   width: 100%;
-  height: 120px;
-  border-radius: 8px;
+  height: 150px;
+  border-radius: 12px;
   overflow: hidden;
   border: 1px solid var(--border);
   background: #000;
-  margin-bottom: 10px;
+  transition: transform 0.3s;
 }
-
+.map-container:hover { transform: scale(1.02); border-color: var(--gold); }
 .map-container iframe { width: 100%; height: 100%; border: 0; }
+.map-container a { display: block; width: 100%; height: 100%; }
 
-/* Estilos de Iconos y Enlaces Sociales */
+.address-link {
+  color: var(--muted);
+  text-decoration: none;
+  display: block;
+  margin-top: 12px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+  font-size: 12px;
+  font-family: 'Montserrat', sans-serif;
+  transition: 0.3s;
+}
+.address-link:hover { color: var(--text); }
+.address-link b {
+  color: var(--gold);
+  display: block;
+  margin-top: 5px;
+  font-size: 11px;
+}
+.address-link:hover b { text-decoration: underline; }
+
 .social-links {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-top: 15px;
+  gap: 15px;
+  margin-top: 20px;
   border-top: 1px solid var(--border);
-  padding-top: 15px;
+  padding-top: 20px;
 }
 
-.social-item { display: flex; align-items: center; gap: 12px; }
-.social-icon { display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #141414; border-radius: 8px; border: 1px solid var(--border); }
+.social-item { 
+  display: flex; 
+  align-items: center; 
+  gap: 15px; 
+  transition: transform 0.2s; 
+}
+.social-item:hover { transform: translateX(5px); }
+.social-icon { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: #0a0a0a; border-radius: 10px; border: 1px solid var(--border); }
 .social-text { display: flex; flex-direction: column; }
-.social-text b { font-family: 'Metal Mania', cursive; color: var(--text); font-size: 14px; letter-spacing: 1px; }
-.social-text span { font-family: 'Montserrat', sans-serif; color: var(--muted); font-size: 11px; font-weight: 600; }
-
-/* Botón de login sutil en la barra lateral */
-.login-subtle {
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  font-size: 11px;
-  width: 100%;
-  padding: 10px;
-  margin-top: 15px;
-  cursor: pointer;
-  text-align: center;
-  text-decoration: underline;
-  opacity: 0.5;
-  transition: 0.3s;
-}
-.login-subtle:hover { opacity: 1; color: var(--red); }
+.social-text b { font-family: 'Metal Mania', cursive; color: var(--text); font-size: 15px; letter-spacing: 1px; }
+.social-text span { font-family: 'Montserrat', sans-serif; color: var(--muted); font-size: 12px; font-weight: 600; }
 
 /* ==========================================================================
-   CONTENIDO PRINCIPAL Y COMPONENTES
+   COMPONENTES EXISTENTES
    ========================================================================== */
-.main-content { margin-left: 290px; padding: 25px 15px; width: calc(100% - 290px); min-height: 100vh; }
-
 button { border: none; border-radius: 12px; padding: 12px 18px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; background: var(--card-hover); color: var(--text); }
 button:hover { filter: brightness(1.2); transform: translateY(-2px); }
 button:active { transform: translateY(0); }
@@ -184,9 +199,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--gold); }
 
 .product-card { background: var(--card-hover); border-radius: 18px; padding: 20px 15px; text-align: center; border: 1px solid var(--border); transition: transform 0.2s; }
 .product-card:hover { border-color: var(--gold); }
+
 .product-img-container { width: 100%; height: 200px; border-radius: 12px; overflow: hidden; margin-bottom: 12px; border: 1px solid var(--border); background: #000; }
 .product-img-container img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
 .product-card:hover .product-img-container img { transform: scale(1.05); }
+
 .product-card h3 { color: var(--gold); font-size: 26px; margin-bottom: 10px; }
 .product-card p { color: var(--muted); font-size: 13px; margin-bottom: 15px; min-height: 40px; }
 .product-card .price { font-size: 24px; font-weight: bold; display: block; margin-bottom: 15px; color: #fff; }
@@ -227,22 +244,56 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
   background: #000;
   border-top: 1px solid var(--border);
   padding: 30px 20px;
-  margin-top: 40px;
+  margin: 20px 15px 20px 15px;
   text-align: center;
-  border-radius: 15px;
+  border-radius: 20px;
+  max-width: 1400px;
 }
 .creditos-text { color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1.8; max-width: 900px; margin: 0 auto; }
 .creditos-text span { color: var(--gold); display: block; margin-bottom: 10px; font-size: 16px; font-family: 'Metal Mania', cursive; letter-spacing: 1px; }
 
 /* ==========================================================================
-   DISEÑO RESPONSIVO (MÓVILES)
+   DISEÑO RESPONSIVO Y REORDENAMIENTO EN MÓVILES
    ========================================================================== */
-@media (max-width: 768px) {
-  body { flex-direction: column; }
-  .sidebar { width: 100%; height: auto; position: relative; border-right: none; border-bottom: 1px solid var(--border); padding: 15px; }
-  .main-content { margin-left: 0; width: 100%; padding: 15px; }
-  .sidebar-nav { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-  .sidebar-nav .nav-btn { text-align: center; justify-content: center; }
+@media (max-width: 900px) {
+  /* Al cambiar flex-direction a column, usamos display: contents para liberar los hijos
+     de left-banner y que actúen como columnas individuales, pudiendo reordenarlas */
+  .app-layout { 
+    display: flex; 
+    flex-direction: column; 
+    padding: 15px; 
+  }
+  
+  .left-banner { 
+    display: contents; 
+  }
+  
+  /* 1. La promoción queda de primera */
+  #sidebar-promo { 
+    order: 1; 
+    width: 100%; 
+  }
+  
+  /* 2. El contenido principal (catálogo, carrito) queda en el medio */
+  .main-content { 
+    order: 2; 
+    width: 100%; 
+    padding: 0; 
+  }
+  
+  /* 3. La caja de contacto (ubicación y redes) queda al final, ANTES del pie de página */
+  .contact-info { 
+    order: 3; 
+    width: 100%; 
+    margin-top: 25px; 
+    margin-bottom: 25px; 
+  }
+  
+  .creditos-estudiantes {
+    margin: 10px 15px;
+  }
+  
   .vitrina-container { grid-template-columns: 1fr; }
   .carrito-panel { position: relative; top: 0; margin-top: 20px; border-top: 2px solid var(--border); }
+  h1 { font-size: 38px; }
 }
