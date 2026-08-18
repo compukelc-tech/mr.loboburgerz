@@ -1,111 +1,256 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Sr. Lobo Burgerz — Pedidos & Facturas</title>
-<link rel="stylesheet" href="styles.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mr. Lobo Burgerz - ERP</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<header>
-  <h1>🐺 <span style="color:#e3262e">SR. LOBO</span> BURGERZ</h1>
-  <p style="font-weight:800;letter-spacing:1px">PEDIDOS & FACTURAS (vSheets)</p>
-</header>
+  <!-- ==========================================
+       CABECERA Y NAVEGACIÓN DINÁMICA
+       ========================================== -->
+  <header>
+    <h1>🐺 <span class="text-red">MR. LOBO</span> BURGERZ</h1>
+    <p class="subtitle" id="user-greeting">Bienvenido al Sistema</p>
+    
+    <nav id="main-nav" style="display: none;">
+      <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
+      <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
+      <button onclick="navegar('produccion')" class="nav-btn" id="nav-produccion">🍳 Producción</button>
+      <button onclick="navegar('despachados')" class="nav-btn" id="nav-despachados">✅ Despachos</button>
+      <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 SúperAdmin</button>
+      <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
+    </nav>
+  </header>
 
-<main>
-  <p class="cloud-status" id="cloudStatus">☁️ Conectando con Google Sheets...</p>
+  <main>
+    <div id="alert-box" class="alert hidden"></div>
 
-  <nav>
-    <button onclick="showTab('menu')">🍔 Menú</button>
-    <button class="purple" onclick="showTab('nuevo')">➕ Nuevo pedido</button>
-    <button onclick="showTab('pedidos')">📋 Pedidos</button>
-    <button onclick="showTab('panel')">📊 Resumen</button>
-  </nav>
-
-  <section id="menu" class="tab active">
-    <div class="card">
-      <h2>Menú Principal</h2>
-      <div class="grid">
-        <div class="stat" style="text-align: center;">
-          <h3 style="color: var(--gold); margin: 5px 0;">La Lobo Clásica</h3>
-          <p style="font-size: 13px; color: var(--muted);">Carne 150g, queso cheddar, tocino.</p>
-          <b style="font-size: 18px; display: block; margin-bottom: 10px;">$25.000</b>
-          <button class="primary small" onclick="seleccionarDelMenu('La Lobo Clásica', 25000)">Pedir esta</button>
+    <!-- ==========================================
+         VISTA 1: LOGIN (Inicio de sesión)
+         ========================================== -->
+    <section id="view-login" class="view active">
+      <div class="card card-center">
+        <h2>Iniciar Sesión</h2>
+        <div class="field">
+          <label>Documento de Identidad (Usuario)</label>
+          <input type="number" id="login-doc" placeholder="Ej: 1005000123">
         </div>
-        <div class="stat" style="text-align: center;">
-          <h3 style="color: var(--gold); margin: 5px 0;">Doble Aullido</h3>
-          <p style="font-size: 13px; color: var(--muted);">Doble carne, doble queso.</p>
-          <b style="font-size: 18px; display: block; margin-bottom: 10px;">$32.000</b>
-          <button class="primary small" onclick="seleccionarDelMenu('Doble Aullido', 32000)">Pedir esta</button>
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="password-wrapper">
+            <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
+            <button class="toggle-pass" onclick="togglePassword('login-pass', this)">👁️</button>
+          </div>
+        </div>
+        <div class="actions center">
+          <button class="primary full-width" onclick="iniciarSesion()">Entrar</button>
+          <button class="text-btn" onclick="navegar('registro')">¿Eres empleado nuevo? Regístrate aquí</button>
+          <button class="text-btn text-gold" onclick="entrarComoCliente()">Soy cliente (Hacer pedido)</button>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="nuevo" class="tab">
-    <div class="card">
-      <h2>Registrar pedido</h2>
-      <div class="grid">
-        <div class="field"><label>Cliente *</label><input id="nombre"></div>
-        <div class="field"><label>Grado</label><input id="grado"></div>
-        <div class="field"><label>Producto *</label><input id="producto"></div>
-        <div class="field"><label>Precio total *</label><input id="total" type="number"></div>
-        <div class="field"><label>Abono inicial</label><input id="montoApartado" type="number" value="2000"></div>
+    <!-- ==========================================
+         VISTA 2: REGISTRO DE EMPLEADOS
+         ========================================== -->
+    <section id="view-registro" class="view">
+      <div class="card card-center">
+        <h2>Registro de Personal</h2>
+        <p class="note">Tu usuario de acceso será tu Documento de Identidad.</p>
+        
+        <div class="field">
+          <label>Nombre Completo *</label>
+          <input type="text" id="reg-nombre" placeholder="Nombres y Apellidos">
+        </div>
+        <div class="field">
+          <label>Documento de Identidad (Este será tu usuario) *</label>
+          <input type="number" id="reg-doc" placeholder="Número de documento">
+        </div>
+        <div class="field">
+          <label>Grado Escolar *</label>
+          <input type="text" id="reg-grado" placeholder="Ej: 10A, 11B">
+        </div>
+        <div class="field">
+          <label>Área a la que aspiras *</label>
+          <select id="reg-area">
+            <option value="Vitrina">Vitrina (Atención al cliente)</option>
+            <option value="Cartera">Cartera (Pagos y Vouchers)</option>
+            <option value="Producción">Producción (Cocina)</option>
+            <option value="Pedidos">Pedidos (Logística)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Crea una Contraseña (Mín. 8 caracteres, 1 Mayúscula, 1 Número, 1 Símbolo) *</label>
+          <div class="password-wrapper">
+            <input type="password" id="reg-pass" placeholder="Tu contraseña">
+            <button class="toggle-pass" onclick="togglePassword('reg-pass', this)">👁️</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Repite tu Contraseña *</label>
+          <div class="password-wrapper">
+            <input type="password" id="reg-pass2" placeholder="Confirma tu contraseña">
+            <button class="toggle-pass" onclick="togglePassword('reg-pass2', this)">👁️</button>
+          </div>
+        </div>
+        
+        <div class="actions center">
+          <button class="primary full-width" onclick="registrarEmpleado()">Enviar Solicitud</button>
+          <button class="text-btn" onclick="navegar('login')">Volver al inicio de sesión</button>
+        </div>
       </div>
-      <div class="actions">
-        <button class="primary" onclick="crearPedido()">Guardar y generar factura</button>
+    </section>
+
+    <!-- ==========================================
+         VISTA 3: VITRINA / MENÚ INTERACTIVO
+         ========================================== -->
+    <section id="view-vitrina" class="view">
+      <div class="vitrina-container">
+        <!-- Menú de Productos -->
+        <div class="menu-list">
+          <h2>🍔 Menú Principal</h2>
+          <div class="grid" id="catalogo-productos">
+            <!-- Los productos se inyectarán aquí con JS -->
+          </div>
+        </div>
+
+        <!-- Carrito Flotante Lateral -->
+        <div class="carrito-panel card">
+          <h2>🛒 Tu Pedido</h2>
+          <div id="carrito-items" class="carrito-items">
+            <p class="note">Agrega productos con el botón +</p>
+          </div>
+          <div class="carrito-total">
+            <span>Total:</span>
+            <b id="carrito-total-precio" class="text-gold">$0</b>
+          </div>
+          <button class="primary full-width" onclick="abrirModalCheckout()" id="btn-procesar" disabled>Procesar Pedido</button>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="pedidos" class="tab">
-    <div class="card">
-      <h2>Pedidos</h2>
-      <input class="search" id="busqueda" placeholder="🔍 Buscar..." oninput="renderPedidos()">
-      <div id="tabla"></div>
-    </div>
-  </section>
+    <!-- ==========================================
+         VISTA 4: SÚPER ADMINISTRADOR
+         ========================================== -->
+    <section id="view-admin" class="view">
+      <div class="card">
+        <h2>👑 Panel de Control - Empleados</h2>
+        <div class="table-container">
+          <table id="tabla-empleados">
+            <thead>
+              <tr>
+                <th>Documento</th>
+                <th>Nombre</th>
+                <th>Aspiración</th>
+                <th>Estado</th>
+                <th>Asignar Rol</th>
+                <th>Acción</th>
+              </tr>
+            </thead>
+            <tbody id="lista-empleados">
+              <!-- Datos inyectados por JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
 
-  <section id="panel" class="tab">
-    <div class="card">
-      <h2>Resumen</h2>
-      <div class="stats" id="stats"></div>
-    </div>
-  </section>
-</main>
+    <!-- ==========================================
+         VISTA 5: CARTERA (Validación de pagos)
+         ========================================== -->
+    <section id="view-cartera" class="view">
+      <div class="card">
+        <h2>💰 Pedidos en Espera de Pago</h2>
+        <p class="note">Verifica los vouchers y cambia el estado a Producción cuando el pago esté completo.</p>
+        <div class="grid" id="lista-cartera">
+          <!-- Tarjetas de pedidos inyectadas por JS -->
+        </div>
+      </div>
+    </section>
 
-<div class="modal" id="modal">
-  <div class="invoice">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <span>FACTURA</span><button onclick="cerrarModal()">✕</button>
-    </div>
-    <div class="invoice-brand"><div class="name">🐺 SR. LOBO BURGERZ</div></div>
-    <h2 id="invCode"></h2>
-    <div id="invData"></div>
-    <div class="qr" id="qrcode"></div>
-    <div class="actions">
-      <button class="primary" onclick="abrirAbono(window.current)">💵 Registrar abono</button>
-      <button onclick="cerrarModal()">Listo</button>
+    <!-- ==========================================
+         VISTA 6: PRODUCCIÓN (Cocina)
+         ========================================== -->
+    <section id="view-produccion" class="view">
+      <div class="card">
+        <h2>🍳 Comandas en Producción</h2>
+        <p class="note">Prepara estas órdenes y presiona 'Despachado' al entregarlas.</p>
+        <div class="grid" id="lista-produccion">
+          <!-- Tarjetas inyectadas por JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VISTA 7: DESPACHADOS (Historial)
+         ========================================== -->
+    <section id="view-despachados" class="view">
+      <div class="card">
+        <h2>✅ Historial de Entregas del Día</h2>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>ID Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
+            <tbody id="lista-despachados"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODAL: FINALIZAR PEDIDO (Checkout)
+       ========================================== -->
+  <div class="modal" id="modal-checkout">
+    <div class="invoice">
+      <div class="modal-header">
+        <span>Datos del Pedido</span>
+        <button onclick="cerrarModal('modal-checkout')">✕</button>
+      </div>
+      
+      <div class="field">
+        <label>Tipo de Cliente</label>
+        <select id="co-tipo" onchange="toggleCamposCliente()">
+          <option value="Ocasional">Cliente Vitrina (Ocasional)</option>
+          <option value="Continuo">Cliente Continuo (Fidelizado)</option>
+        </select>
+      </div>
+      
+      <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
+      <div class="field"><label>Nombre Completo *</label><input type="text" id="co-nombre"></div>
+      <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
+      <div class="field hidden" id="co-correo-field"><label>Correo Electrónico *</label><input type="email" id="co-correo"></div>
+      
+      <hr style="border-color: #333; margin: 15px 0;">
+      
+      <div class="field">
+        <label>Tipo de Pago</label>
+        <select id="co-tipo-pago" onchange="toggleVoucherInput()">
+          <option value="Completo">Pago Completo (De contado)</option>
+          <option value="Abono">Abono Parcial</option>
+        </select>
+      </div>
+      
+      <div class="field hidden" id="co-monto-abono-field">
+        <label>Monto a Abonar</label>
+        <input type="number" id="co-monto-abono">
+      </div>
+
+      <div class="field">
+        <label>Subir Voucher / Comprobante (Imagen)</label>
+        <input type="file" id="co-voucher" accept="image/*">
+        <canvas id="canvas-compresion" style="display:none;"></canvas>
+      </div>
+
+      <div class="actions" style="margin-top: 20px;">
+        <button class="primary full-width" onclick="enviarPedido()" id="btn-enviar-pedido">Confirmar y Enviar Pedido</button>
+      </div>
     </div>
   </div>
-</div>
 
-<div class="modal" id="abonoModal">
-  <div class="invoice">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <span>REGISTRAR ABONO</span><button onclick="cerrarAbono()">✕</button>
-    </div>
-    <h2 id="abonoCode"></h2>
-    <p id="abonoResumen" class="note"></p>
-    <div class="field"><label>Valor</label><input id="nuevoAbono" type="number"></div>
-    <div class="actions">
-      <button class="primary" onclick="guardarAbono()">Guardar abono</button>
-      <button onclick="cerrarAbono()">Cancelar</button>
-    </div>
-  </div>
-</div>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
