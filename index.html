@@ -27,8 +27,9 @@
     <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
     <button onclick="navegar('produccion')" class="nav-btn" id="nav-produccion">🍳 Producción</button>
     <button onclick="navegar('despachados')" class="nav-btn" id="nav-despachados">✅ Despachos</button>
-    <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing (Menú)</button>
-    <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 SúperAdmin</button>
+    <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing</button>
+    <button onclick="navegar('facturas')" class="nav-btn" id="nav-facturas">🧾 Facturas</button>
+    <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 Panel Maestro</button>
     <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
   </nav>
 
@@ -119,7 +120,7 @@
 
     <section id="view-admin" class="view">
       <div class="card">
-        <h2>👑 Panel de Control - Empleados</h2>
+        <h2>👑 Panel Maestro - Personal</h2>
         <div class="table-container">
           <table id="tabla-empleados">
             <thead><tr><th>Documento</th><th>Nombre</th><th>Aspiración</th><th>Estado</th><th>Rol</th><th>Acción</th></tr></thead>
@@ -139,6 +140,22 @@
           <table>
             <thead><tr><th>Imagen</th><th>Categoría</th><th>Nombre</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
             <tbody id="lista-marketing-productos"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-facturas" class="view">
+      <div class="card">
+        <h2>🧾 Buscador de Facturas</h2>
+        <p class="note" style="text-align:left;">Busca copias de seguridad de las facturas por Documento o Ticket.</p>
+        <div class="field">
+          <input type="text" id="buscador-facturas" placeholder="🔍 Escribe Documento o ID de Pedido (Ej: ORD-123)..." oninput="filtrarFacturas()">
+        </div>
+        <div class="table-container">
+          <table>
+            <thead><tr><th>Factura ID</th><th>Ticket Pedido</th><th>Documento</th><th>Fecha</th><th>Acción</th></tr></thead>
+            <tbody id="lista-facturas"></tbody>
           </table>
         </div>
       </div>
