@@ -1,0 +1,21 @@
+{
+  "name": "Mr. Lobo Burgerz ERP",
+  "short_name": "LoboERP",
+  "description": "Sistema de gestión para Mr. Lobo Burgerz",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#050505",
+  "theme_color": "#e3262e",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3063/3063177.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3063/3063177.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
