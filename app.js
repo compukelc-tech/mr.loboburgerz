@@ -1,5 +1,5 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V3.2 (Fusión de Datos)
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V4.0
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwB41m6Dgxqg0ZGHdpNmtIfnO8vnu3xDk_TRMP6dJcVr_tbwz8JdjmVBaE_laWv3Nva7g/exec";
@@ -9,7 +9,6 @@ let carrito = [];
 let CATALOGO = []; 
 let FACTURAS_GLOBAL = []; 
 
-// CATÁLOGO BASE (Actúa como semilla inmutable)
 const CATALOGO_BASE = [
   { id: 'p1', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Sangrienta', desc: 'Pan brioche, Carne de res, Tocineta, Jamón, Queso, Vegetales.', precio: 18000, agotado: false, urlImagen: '' },
   { id: 'p2', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Luna Llena', desc: 'Pan brioche negro, Pollo desmechado en salsa, Tocineta, Jamon, Queso, Vegetales.', precio: 17000, agotado: false, urlImagen: '' },
@@ -27,9 +26,8 @@ const CATALOGO_BASE = [
   { id: 'c6', categoria: '~COMBOS~', nombre: 'Lobo Solitario', desc: '1 Manada, 1 postre a elección, 1 gaseosa a elección.', precio: 24000, agotado: false, urlImagen: '' }
 ];
 
-const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
+const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n || 0);
 
-// --- 1. INICIALIZACIÓN ---
 window.onload = async () => {
   try {
     const savedSession = localStorage.getItem('lobo_session');
@@ -40,7 +38,6 @@ window.onload = async () => {
     await cargarCatalogoGlobal();
   } catch (error) {
     console.error("Error crítico en inicialización:", error);
-    document.getElementById('catalogo-productos').innerHTML = `<div style="text-align:center; color: var(--red); padding: 20px;"><h3>Error de sistema</h3><p>${error.message}</p><button class="primary" onclick="window.location.reload()">Recargar Página</button></div>`;
   }
 };
 
@@ -160,15 +157,11 @@ function togglePassword(inputId, btn) {
   if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; } else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
-// --- 6. GESTIÓN CATÁLOGO: ARQUITECTURA DE FUSIÓN (MERGE) ---
 async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
-    
-    // 1. Cargamos el catálogo base como punto de partida
     let catalogoFusionado = [...CATALOGO_BASE];
 
-    // 2. Si Google Sheets responde con datos, aplicamos la fusión
     if (data && data.length > 0) {
       const productosNube = data.map(p => ({ 
         id: p['ID Producto'], 
@@ -180,22 +173,17 @@ async function cargarCatalogoGlobal() {
         urlImagen: p['URL Imagen'] 
       }));
 
-      // 3. Fusionamos los datos de la Nube con los del Código Base
       productosNube.forEach(prodNube => {
         const index = catalogoFusionado.findIndex(base => base.id === prodNube.id);
         if (index !== -1) {
-          // Si el producto de Sheets coincide con uno base, lo sobreescribe (Actualización)
           catalogoFusionado[index] = prodNube;
         } else {
-          // Si es un producto completamente nuevo creado en Sheets, lo agrega
           catalogoFusionado.push(prodNube);
         }
       });
     }
-    
     CATALOGO = catalogoFusionado;
   } catch (error) { 
-    console.warn("Fallo al conectar con Sheets, cargando menú base puro.", error);
     CATALOGO = [...CATALOGO_BASE]; 
   }
   
@@ -271,25 +259,18 @@ async function guardarProductoBackend() {
 
 async function eliminarProducto(id) {
   if (!confirm('¿Seguro que deseas eliminar este producto permanentemente?')) return;
-  
-  // REGLA DE SEGURIDAD: Previene que eliminen los productos base que están incrustados en el código.
   const esProductoBase = CATALOGO_BASE.some(base => base.id === id);
   if (esProductoBase) {
-    mostrarAlerta('No se puede eliminar un producto base. Si no quieres venderlo, presiona "Editar" y ponlo en AGOTADO.', 'warning');
+    mostrarAlerta('No se puede eliminar un producto base. Ponlo en AGOTADO.', 'warning');
     return;
   }
-
   try { 
     await apiCall('eliminarProducto', { idProducto: id }); 
     mostrarAlerta('Producto eliminado', 'success');
-    await cargarCatalogoGlobal(); 
-    cargarGestorMenu(); 
-  } catch(e) { 
-    mostrarAlerta('Hubo un error al eliminar de la nube.');
-  }
+    await cargarCatalogoGlobal(); cargarGestorMenu(); 
+  } catch(e) { mostrarAlerta('Error al eliminar.'); }
 }
 
-// --- 7. CARRITO DE COMPRAS ---
 function agregarAlCarrito(id) { const prod = CATALOGO.find(p => p.id === id); const item = carrito.find(i => i.id === id); if (item) item.cant++; else carrito.push({ ...prod, cant: 1 }); renderCarrito(); }
 function quitarDelCarrito(id) { carrito = carrito.filter(i => { if (i.id === id) i.cant--; return i.cant > 0; }); renderCarrito(); }
 function renderCarrito() {
@@ -307,14 +288,17 @@ function toggleVoucherInput() { document.getElementById('co-monto-abono-field').
 
 function comprimirImagen(file) {
   return new Promise((resolve) => {
+    if (!file) return resolve(null);
     const reader = new FileReader(); reader.readAsDataURL(file);
     reader.onload = event => {
       const img = new Image(); img.src = event.target.result;
       img.onload = () => {
         const canvas = document.getElementById('canvas-compresion'); const ctx = canvas.getContext('2d');
-        let width = img.width; let height = img.height; if (width > 800) { height *= 800 / width; width = 800; }
+        const MAX_WIDTH = 600;
+        let width = img.width; let height = img.height; 
+        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
         canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.6).split(',')[1]); 
+        resolve(canvas.toDataURL('image/jpeg', 0.5).split(',')[1]); 
       };
     };
   });
@@ -342,13 +326,11 @@ async function enviarPedido() {
   } catch (error) { mostrarAlerta('Error al procesar.'); } finally { btn.disabled = false; btn.textContent = 'Confirmar y Enviar Pedido'; }
 }
 
-// --- 8. LOGICA DE ROLES: GERENTE Y SUPERADMIN ---
 async function cargarEmpleados() {
   const tbody = document.getElementById('lista-empleados'); tbody.innerHTML = '<tr><td colspan="6" class="center">Cargando...</td></tr>';
   try {
     const empleados = await apiCall('obtenerEmpleados');
     tbody.innerHTML = '';
-    
     let empleadosVisibles = empleados;
     if (sesionActual.rol === 'Gerente') {
       empleadosVisibles = empleados.filter(e => e['Rol Asignado'] !== 'Superadmin');
@@ -389,7 +371,6 @@ async function cambiarRol(documento) {
   try { await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); cargarEmpleados(); } catch(e) {}
 }
 
-// --- 9. BUSCADOR DE FACTURAS ---
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas');
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando facturas en la nube...</td></tr>';
