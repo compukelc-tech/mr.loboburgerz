@@ -7,6 +7,15 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
+  
+  <!-- Configuración PWA -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#e3262e">
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063177.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="LoboERP">
+
   <script>
     document.write('<link rel="stylesheet" href="styles.css?v=' + new Date().getTime() + '">');
   </script>
@@ -229,7 +238,12 @@
       <div class="field"><label>Ingredientes / Descripción *</label><input type="text" id="prod-desc"></div>
       <div class="field"><label>Precio ($ COP) *</label><input type="number" id="prod-precio"></div>
       <div class="field"><label>Estado</label><select id="prod-agotado"><option value="NO">Disponible</option><option value="SI">Agotado</option></select></div>
-      <div class="field"><label>Subir Foto</label><input type="file" id="prod-img" accept="image/*"></div>
+      <div class="field">
+        <label>Subir Foto</label>
+        <input type="file" id="prod-img" accept="image/*">
+        <!-- Canvas para comprimir imágenes de marketing -->
+        <canvas id="canvas-compresion-prod" style="display:none;"></canvas>
+      </div>
       <div class="actions" style="margin-top: 20px;"><button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button></div>
     </div>
   </div>
