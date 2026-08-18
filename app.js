@@ -192,7 +192,6 @@ async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
     if (data && data.length > 0) {
-      // Si Sheets responde y tiene datos, los combinamos
       CATALOGO = data.map(p => ({
         id: p['ID Producto'],
         categoria: p['Categoría'],
@@ -203,11 +202,9 @@ async function cargarCatalogoGlobal() {
         urlImagen: p['URL Imagen']
       }));
     } else {
-      // Si la base de datos está vacía, cargamos la base
       CATALOGO = [...CATALOGO_BASE];
     }
   } catch (error) {
-    // Si hay error de red (Ej. Apps Script no actualizado), cargamos la base
     CATALOGO = [...CATALOGO_BASE];
   }
   
@@ -222,7 +219,8 @@ function renderCatalogo() {
   let html = '';
   
   categorias.forEach(cat => {
-    html += `<h3 style="grid-column: 1 / -1; margin-top: 20px; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 5px; font-family: 'Creepster', cursive; font-size: 28px;">${cat}</h3>`;
+    // AQUÍ SE CENTRAN LOS SUBTÍTULOS DE LAS CATEGORÍAS CON LA FUENTE DE METAL
+    html += `<h3 style="grid-column: 1 / -1; margin-top: 40px; margin-bottom: 10px; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 10px; font-family: 'Metal Mania', cursive; font-size: 38px; text-align: center;">${cat}</h3>`;
     
     const productos = CATALOGO.filter(p => p.categoria === cat);
     productos.forEach(prod => {
@@ -534,7 +532,7 @@ async function cargarPedidos(estado, contenedorID) {
 
         return `
           <div class="card product-card" style="text-align:left;">
-            <h3 style="margin-bottom:0; font-family:'Montserrat', sans-serif;">${p['ID Pedido']}</h3>
+            <h3 style="margin-bottom:0; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>
             <p class="note" style="text-align:left; margin-bottom: 10px;">Cliente: ${p['Nombre']}</p>
             <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
               ${itemsCart.map(i => `<li>${i.cant}x ${i.nombre}</li>`).join('')}
