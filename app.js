@@ -4,7 +4,7 @@
 // ARQUITECTURA: MOTOR CANVAS EN MEMORIA (DATA URI) SIN DRIVE
 // ============================================================================
 
-const API_URL = "AQUI_TU_NUEVO_ENLACE_DE_IMPLEMENTACION"; // <-- PEGA TU URL AQUÍ
+const API_URL = "https://script.google.com/macros/s/AKfycbwKwtWBXjwaP9TJ9ucc-_2GCJUSRFIR5mxT1xnE99S8TjNqFn7AzWAZKwo33u4m2zJj0A/exec"; // <-- PEGA TU URL AQUÍ
 
 let sesionActual = null; 
 let carrito = []; 
