@@ -4,15 +4,27 @@
 <meta charset="UTF-8">
 <title>Sr. Lobo Burgerz — Pedidos & Facturas</title>
 <style>
+/* ==========================================================================
+   [PRODUCCIÓN: VARIABLES GLOBALES Y ESTILOS BASE]
+   Modifica aquí los colores principales, fondos y tipografías.
+   ========================================================================== */
 :root { --bg: #080808; --card: #171717; --card2: #242424; --purple: #b51f2a; --green: #d4af37; --gold: #d4af37; --text: #ffffff; --muted: #c8c8c8; --red: #e32636; }
 * { box-sizing: border-box; }
 body { margin: 0; font-family: Trebuchet MS, Arial, sans-serif; background: linear-gradient(160deg, #050505, #180707); color: var(--text); }
+
+/* ==========================================================================
+   [PRODUCCIÓN: CABECERA Y NAVEGACIÓN]
+   ========================================================================== */
 header { padding: 24px 18px 12px; text-align: center; }
 h1 { margin: 0; font-size: 28px; letter-spacing: 2px; color: #fff; }
 header p { color: var(--muted); margin: 8px 0; }
 main { max-width: 900px; margin: auto; padding: 14px; }
 nav { display: flex; gap: 8px; overflow: auto; margin-bottom: 14px; }
 nav button { white-space: nowrap; }
+
+/* ==========================================================================
+   [PRODUCCIÓN: COMPONENTES UI (Botones, Tarjetas, Inputs)]
+   ========================================================================== */
 button { border: 0; border-radius: 14px; padding: 13px 16px; font-weight: 700; cursor: pointer; background: var(--card2); color: var(--text); }
 button.primary { background: var(--red); color: #ffffff; }
 button.purple { background: #8f1821; color: white; }
@@ -26,6 +38,10 @@ input, select { width: 100%; padding: 13px; border-radius: 12px; border: 1px sol
 input:focus, select:focus { border-color: var(--gold); }
 .actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 16px; }
 .small { padding: 9px 11px; font-size: 13px; }
+
+/* ==========================================================================
+   [PRODUCCIÓN: ESTADÍSTICAS Y TABLAS]
+   ========================================================================== */
 .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .stat { background: #0d0d0d; border-radius: 15px; padding: 15px; }
 .stat small { color: var(--muted); }
@@ -33,6 +49,10 @@ input:focus, select:focus { border-color: var(--gold); }
 table { width: 100%; border-collapse: collapse; }
 th, td { text-align: left; padding: 10px; border-bottom: 1px solid #3a3a3a; }
 th { color: var(--muted); font-size: 13px; }
+
+/* ==========================================================================
+   [PRODUCCIÓN: ESTADOS Y MODALES (Facturas)]
+   ========================================================================== */
 .status { padding: 6px 10px; border-radius: 99px; font-size: 12px; font-weight: 800; display: inline-block; }
 .paid { background: #173016; color: #e6d27a; }
 .pending { background: #3b2410; color: #f2c96b; }
@@ -49,12 +69,19 @@ th { color: var(--muted); font-size: 13px; }
 .invoice-brand .name { font-size: 24px; font-weight: 900; letter-spacing: 1px; }
 .invoice-brand .sub { font-size: 12px; color: #d4af37; letter-spacing: 2px; }
 .cloud-status { text-align: center; font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+
+/* ==========================================================================
+   [PRODUCCIÓN: RESPONSIVE DESIGN]
+   ========================================================================== */
 @media(max-width: 520px){ .stats { grid-template-columns: 1fr 1fr; } .hide-mobile { display: none; } }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
+<!-- ==========================================================================
+     [PRODUCCIÓN: HEADER PRINCIPAL]
+     ========================================================================== -->
 <header>
   <h1>🐺 <span style="color:#e3262e">SR. LOBO</span> BURGERZ</h1>
   <p style="font-weight:800;letter-spacing:1px">PEDIDOS & FACTURAS (vSheets)</p>
@@ -63,6 +90,9 @@ th { color: var(--muted); font-size: 13px; }
 <main>
   <p class="cloud-status" id="cloudStatus">☁️ Conectando con Google Sheets...</p>
 
+  <!-- ==========================================================================
+       [PRODUCCIÓN: BARRA DE NAVEGACIÓN]
+       ========================================================================== -->
   <nav>
     <button onclick="showTab('menu')">🍔 Menú</button>
     <button class="purple" onclick="showTab('nuevo')">➕ Nuevo pedido</button>
@@ -70,7 +100,10 @@ th { color: var(--muted); font-size: 13px; }
     <button onclick="showTab('panel')">📊 Resumen</button>
   </nav>
 
-  <!-- SECCIÓN MENÚ -->
+  <!-- ==========================================================================
+       [PRODUCCIÓN: SECCIÓN - MENÚ DE PRODUCTOS]
+       Agrega o modifica los productos disponibles aquí.
+       ========================================================================== -->
   <section id="menu" class="tab active">
     <div class="card">
       <h2>Menú Principal</h2>
@@ -91,7 +124,10 @@ th { color: var(--muted); font-size: 13px; }
     </div>
   </section>
 
-  <!-- SECCIÓN NUEVO PEDIDO -->
+  <!-- ==========================================================================
+       [PRODUCCIÓN: SECCIÓN - NUEVO PEDIDO]
+       Formulario de captura de datos del cliente.
+       ========================================================================== -->
   <section id="nuevo" class="tab">
     <div class="card">
       <h2>Registrar pedido</h2>
@@ -108,7 +144,9 @@ th { color: var(--muted); font-size: 13px; }
     </div>
   </section>
 
-  <!-- SECCIÓN PEDIDOS -->
+  <!-- ==========================================================================
+       [PRODUCCIÓN: SECCIÓN - LISTA DE PEDIDOS]
+       ========================================================================== -->
   <section id="pedidos" class="tab">
     <div class="card">
       <h2>Pedidos</h2>
@@ -117,7 +155,9 @@ th { color: var(--muted); font-size: 13px; }
     </div>
   </section>
 
-  <!-- SECCIÓN PANEL -->
+  <!-- ==========================================================================
+       [PRODUCCIÓN: SECCIÓN - PANEL DE RESUMEN]
+       ========================================================================== -->
   <section id="panel" class="tab">
     <div class="card">
       <h2>Resumen</h2>
@@ -126,7 +166,10 @@ th { color: var(--muted); font-size: 13px; }
   </section>
 </main>
 
-<!-- MODALES -->
+<!-- ==========================================================================
+     [PRODUCCIÓN: MODALES]
+     Estructura visual de las facturas emergentes.
+     ========================================================================== -->
 <div class="modal" id="modal">
   <div class="invoice">
     <div style="display:flex;justify-content:space-between;align-items:center">
@@ -159,10 +202,17 @@ th { color: var(--muted); font-size: 13px; }
 </div>
 
 <script>
+// ============================================================================
+// [FUNCIÓN: CONFIGURACIÓN INICIAL]
+// Variables globales y utilidades de formateo.
+// ============================================================================
 let pedidos = [];
 const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n || 0);
 
-// Cargar datos al iniciar usando Google Scripts
+// ============================================================================
+// [FUNCIÓN: INICIALIZACIÓN DE DATOS (ONLOAD)]
+// Se ejecuta al abrir la app. Llama a Apps Script para traer la base de datos.
+// ============================================================================
 window.onload = function() {
   google.script.run.withSuccessHandler(actualizarPantalla).obtenerPedidos();
 };
@@ -174,6 +224,10 @@ function actualizarPantalla(data) {
   renderStats();
 }
 
+// ============================================================================
+// [FUNCIÓN: CONTROL DE NAVEGACIÓN (PESTAÑAS)]
+// Alterna entre Menú, Nuevo Pedido, Pedidos y Resumen.
+// ============================================================================
 function showTab(id) {
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
   document.getElementById(id).classList.add('active');
@@ -181,6 +235,10 @@ function showTab(id) {
   if(id === 'panel') renderStats();
 }
 
+// ============================================================================
+// [FUNCIÓN: SELECCIÓN RÁPIDA DESDE EL MENÚ]
+// Rellena automáticamente el formulario al elegir un producto.
+// ============================================================================
 function seleccionarDelMenu(prod, prec) {
   showTab('nuevo');
   document.getElementById('producto').value = prod;
@@ -188,12 +246,20 @@ function seleccionarDelMenu(prod, prec) {
   document.getElementById('nombre').focus();
 }
 
+// ============================================================================
+// [FUNCIÓN: GENERADOR DE CÓDIGOS]
+// Crea el consecutivo de la factura (ej. DOC-1014).
+// ============================================================================
 const nextCode = () => {
   let max = 1013;
   pedidos.forEach(p => { let n = parseInt((p.codigo || '').replace('DOC-', '')); if(n > max) max = n; });
   return 'DOC-' + (max + 1);
 };
 
+// ============================================================================
+// [FUNCIÓN: CREAR Y GUARDAR PEDIDO NUEVO]
+// Construye el objeto y lo envía a Google Sheets.
+// ============================================================================
 function crearPedido() {
   const p = {
     codigo: nextCode(),
@@ -220,10 +286,18 @@ function crearPedido() {
   }).guardarPedido(p);
 }
 
+// ============================================================================
+// [FUNCIÓN: CALCULADORES DE ESTADO]
+// Lógica para definir si está Pagado, Pendiente o Abonado.
+// ============================================================================
 const abonado = p => (p.abonos || []).reduce((s, a) => s + Number(a.monto), 0);
 const estado = p => abonado(p) >= p.total ? 'PAGADO' : (abonado(p) > 0 ? 'ABONADO' : 'PENDIENTE');
 const estadoClass = e => e === 'PAGADO' ? 'paid' : (e === 'ABONADO' ? 'abonado' : 'pending');
 
+// ============================================================================
+// [FUNCIÓN: GESTIÓN DE MODAL - FACTURAS]
+// Dibuja la factura en pantalla y genera el código QR.
+// ============================================================================
 function abrirFactura(p) {
   document.getElementById('modal').classList.add('show');
   document.getElementById('invCode').textContent = 'FACTURA N.º ' + p.codigo;
@@ -246,6 +320,10 @@ function abrirFactura(p) {
 
 function cerrarModal() { document.getElementById('modal').classList.remove('show'); cerrarAbono(); }
 
+// ============================================================================
+// [FUNCIÓN: RENDERIZADO - TABLA DE PEDIDOS]
+// Dibuja el listado de pedidos y aplica el filtro de búsqueda.
+// ============================================================================
 function renderPedidos() {
   const q = (document.getElementById('busqueda')?.value || '').toLowerCase();
   const arr = pedidos.filter(p => (p.nombre + ' ' + p.codigo).toLowerCase().includes(q)).slice().reverse();
@@ -267,6 +345,10 @@ function renderPedidos() {
     </tbody></table>`;
 }
 
+// ============================================================================
+// [FUNCIÓN: RENDERIZADO - PANEL DE RESUMEN]
+// Calcula los totales en caja y saldos pendientes.
+// ============================================================================
 function renderStats() {
   const total = pedidos.reduce((s, p) => s + p.total, 0);
   const rec = pedidos.reduce((s, p) => s + abonado(p), 0);
@@ -277,6 +359,10 @@ function renderStats() {
   `;
 }
 
+// ============================================================================
+// [FUNCIÓN: GESTIÓN DE MODAL - ABONOS]
+// Lógica para registrar nuevos pagos parciales en Sheets.
+// ============================================================================
 function abrirAbono(codigo) {
   const p = pedidos.find(x => x.codigo === codigo);
   if(!p) return;
