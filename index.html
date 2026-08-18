@@ -4,7 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mr. Lobo Burgerz - ERP</title>
-  <link rel="stylesheet" href="styles.css">
+  
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <script>
+    // Genera una estampa de tiempo única y obliga a descargar el CSS fresco
+    document.write('<link rel="stylesheet" href="styles.css?v=' + new Date().getTime() + '">');
+  </script>
 </head>
 <body>
 
@@ -236,6 +243,9 @@
     </div>
   </footer>
 
-  <script src="app.js"></script>
+  <script>
+    // Inyecta el script principal con una marca de tiempo para eludir la caché global
+    document.write('<script src="app.js?v=' + new Date().getTime() + '"><\/script>');
+  </script>
 </body>
 </html>
