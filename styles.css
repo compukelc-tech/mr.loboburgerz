@@ -149,24 +149,8 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
   margin-top: 40px;
   text-align: center;
 }
-
-.creditos-text {
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 1.8;
-  max-width: 900px;
-  margin: 0 auto;
-}
-
-.creditos-text span {
-  color: var(--gold);
-  display: block;
-  margin-bottom: 10px;
-  font-size: 16px;
-  font-family: 'Metal Mania', cursive;
-  letter-spacing: 1px;
-}
+.creditos-text { color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1.8; max-width: 900px; margin: 0 auto; }
+.creditos-text span { color: var(--gold); display: block; margin-bottom: 10px; font-size: 16px; font-family: 'Metal Mania', cursive; letter-spacing: 1px; }
 
 /* --- RESPONSIVE --- */
 @media (max-width: 768px) {
