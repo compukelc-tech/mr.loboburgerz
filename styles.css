@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEMA ERP: MR. LOBO BURGERZ - ESTILOS (CSS)
+   SISTEMA ERP: MR. LOBO BURGERZ - ESTILOS (CSS) V4.0
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Metal+Mania&family=Montserrat:wght@400;600;800&display=swap');
 
@@ -30,7 +30,6 @@ body {
   min-height: 100vh;
 }
 
-/* --- FUENTE METAL MANIA Y TÍTULOS CENTRADOS --- */
 h1, h2, h3, h4 { 
   margin: 0; 
   font-family: 'Metal Mania', cursive;
@@ -62,7 +61,6 @@ header {
 
 nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
 
-/* --- BOTONES --- */
 button { border: none; border-radius: 12px; padding: 12px 18px; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s ease; background: var(--card-hover); color: var(--text); }
 button:hover { filter: brightness(1.2); transform: translateY(-2px); }
 button:active { transform: translateY(0); }
@@ -73,7 +71,6 @@ button.btn-outline { background: transparent; border: 1px solid var(--border); }
 button.text-btn { background: transparent; padding: 5px; text-decoration: underline; color: var(--muted); }
 .full-width { width: 100%; }
 
-/* --- LAYOUT Y TARJETAS --- */
 main { max-width: 1200px; margin: 0 auto; padding: 25px 15px; }
 .view { display: none; animation: fadeIn 0.4s ease-out; }
 .view.active { display: block; }
@@ -82,7 +79,6 @@ main { max-width: 1200px; margin: 0 auto; padding: 25px 15px; }
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
 .card-center { max-width: 450px; margin: 0 auto; }
 
-/* --- FORMULARIOS --- */
 .field { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
 .field label { font-size: 13px; color: var(--muted); font-weight: bold; }
 input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border); background: #0a0a0a; color: #fff; font-size: 15px; outline: none; }
@@ -91,7 +87,6 @@ input:focus, select:focus { border-color: var(--gold); }
 .password-wrapper input { padding-right: 50px; width: 100%; }
 .toggle-pass { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; font-size: 18px; padding: 5px 10px; }
 
-/* --- VITRINA Y PRODUCTOS --- */
 .vitrina-container { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; align-items: start; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
 
@@ -114,7 +109,6 @@ input:focus, select:focus { border-color: var(--gold); }
 .cart-item .del-btn { background: transparent; color: var(--muted); padding: 5px; font-size: 16px; }
 .carrito-total { display: flex; justify-content: space-between; font-size: 24px; font-weight: bold; margin-bottom: 20px; padding-top: 15px; border-top: 1px solid var(--border); }
 
-/* --- TABLAS Y BADGES --- */
 .table-container { overflow-x: auto; margin-top: 20px; }
 table { width: 100%; border-collapse: collapse; min-width: 650px; }
 th, td { text-align: left; padding: 14px; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -125,7 +119,6 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
 .badge.produccion { background: #4a154b; color: #e8b0ea; }
 .badge.denegado { background: #3b1010; color: #f26b6b; }
 
-/* --- MODALES Y ALERTAS --- */
 .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 15px; backdrop-filter: blur(4px); }
 .modal.active { display: flex; }
 .invoice { background: #0d0d0d; border: 1px solid var(--dark-red); border-top: 5px solid var(--red); border-radius: 16px; padding: 30px; width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
@@ -134,14 +127,12 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
 .alert.hidden { top: -100px; opacity: 0; }
 .alert.success { border-left-color: var(--success-text); }
 
-/* --- UTILIDADES --- */
 .hidden { display: none !important; }
 .text-red { color: var(--red); }
 .text-gold { color: var(--gold); }
 .center { text-align: center; }
 .note { font-size: 13px; color: var(--muted); margin-bottom: 15px; text-align: center; }
 
-/* --- PIE DE PÁGINA CENTRADO ESTÁTICO --- */
 .creditos-estudiantes {
   background: #000;
   border-top: 1px solid var(--border);
@@ -152,7 +143,6 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
 .creditos-text { color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1.8; max-width: 900px; margin: 0 auto; }
 .creditos-text span { color: var(--gold); display: block; margin-bottom: 10px; font-size: 16px; font-family: 'Metal Mania', cursive; letter-spacing: 1px; }
 
-/* --- RESPONSIVE --- */
 @media (max-width: 768px) {
   .vitrina-container { grid-template-columns: 1fr; }
   .carrito-panel { position: relative; top: 0; margin-top: 20px; border-top: 2px solid var(--border); }
