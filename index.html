@@ -11,118 +11,44 @@
   <!-- ==========================================
        CABECERA Y NAVEGACIÓN DINÁMICA
        ========================================== -->
-  <header>
-    <h1>🐺 <span class="text-red">MR. LOBO</span> BURGERZ</h1>
-    <p class="subtitle" id="user-greeting">Bienvenido al Sistema</p>
-    
-    <nav id="main-nav" style="display: none;">
-      <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
-      <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
-      <button onclick="navegar('produccion')" class="nav-btn" id="nav-produccion">🍳 Producción</button>
-      <button onclick="navegar('despachados')" class="nav-btn" id="nav-despachados">✅ Despachos</button>
-      <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing (Menú)</button>
-      <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 SúperAdmin</button>
-      <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
-    </nav>
+  <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+    <div style="flex: 1;"></div>
+    <div style="flex: 2; text-align: center;">
+      <h1>🐺 <span class="text-red">MR. LOBO</span> BURGERZ</h1>
+      <p class="subtitle" id="user-greeting">Menú Principal</p>
+    </div>
+    <div style="flex: 1; text-align: right;">
+      <!-- ICONO PARA EMPLEADOS -->
+      <button onclick="navegar('login')" id="btn-login-icon" style="background: var(--card-hover); border: 1px solid var(--border); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; color: white;" title="Acceso Empleados">👤</button>
+    </div>
   </header>
+  
+  <nav id="main-nav" style="display: none; justify-content: center; margin-top: 10px;">
+    <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
+    <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
+    <button onclick="navegar('produccion')" class="nav-btn" id="nav-produccion">🍳 Producción</button>
+    <button onclick="navegar('despachados')" class="nav-btn" id="nav-despachados">✅ Despachos</button>
+    <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing (Menú)</button>
+    <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 SúperAdmin</button>
+    <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
+  </nav>
 
   <main>
     <div id="alert-box" class="alert hidden"></div>
 
     <!-- ==========================================
-         VISTA 1: LOGIN (Inicio de sesión)
+         VISTA 1: VITRINA / MENÚ (PANTALLA POR DEFECTO)
          ========================================== -->
-    <section id="view-login" class="view active">
-      <div class="card card-center">
-        <h2>Iniciar Sesión</h2>
-        <div class="field">
-          <label>Documento de Identidad (Usuario)</label>
-          <input type="number" id="login-doc" placeholder="Ej: 1005000123">
-        </div>
-        <div class="field">
-          <label>Contraseña</label>
-          <div class="password-wrapper">
-            <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
-            <button class="toggle-pass" onclick="togglePassword('login-pass', this)">👁️</button>
-          </div>
-        </div>
-        <div class="actions center">
-          <button class="primary full-width" onclick="iniciarSesion()">Entrar</button>
-          <button class="text-btn" onclick="navegar('registro')">¿Eres empleado nuevo? Regístrate aquí</button>
-          <button class="text-btn text-gold" onclick="entrarComoCliente()">Soy cliente (Hacer pedido)</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================
-         VISTA 2: REGISTRO DE EMPLEADOS
-         ========================================== -->
-    <section id="view-registro" class="view">
-      <div class="card card-center">
-        <h2>Registro de Personal</h2>
-        <p class="note">Tu usuario de acceso será tu Documento de Identidad.</p>
-        
-        <div class="field">
-          <label>Nombre Completo *</label>
-          <input type="text" id="reg-nombre" placeholder="Nombres y Apellidos">
-        </div>
-        <div class="field">
-          <label>Documento de Identidad (Este será tu usuario) *</label>
-          <input type="number" id="reg-doc" placeholder="Número de documento">
-        </div>
-        <div class="field">
-          <label>Grado Escolar *</label>
-          <input type="text" id="reg-grado" placeholder="Ej: 10A, 11B">
-        </div>
-        <div class="field">
-          <label>Área a la que aspiras *</label>
-          <select id="reg-area">
-            <option value="Vitrina">Vitrina (Atención al cliente)</option>
-            <option value="Cartera">Cartera (Pagos y Vouchers)</option>
-            <option value="Producción">Producción (Cocina)</option>
-            <option value="Pedidos">Pedidos (Logística)</option>
-            <option value="Marketing">Marketing (Gestión Menú)</option>
-          </select>
-        </div>
-        <div class="field">
-          <label>Crea una Contraseña (Mín. 8 caracteres, 1 Mayúscula, 1 Número, 1 Símbolo) *</label>
-          <div class="password-wrapper">
-            <input type="password" id="reg-pass" placeholder="Tu contraseña">
-            <button class="toggle-pass" onclick="togglePassword('reg-pass', this)">👁️</button>
-          </div>
-        </div>
-        <div class="field">
-          <label>Repite tu Contraseña *</label>
-          <div class="password-wrapper">
-            <input type="password" id="reg-pass2" placeholder="Confirma tu contraseña">
-            <button class="toggle-pass" onclick="togglePassword('reg-pass2', this)">👁️</button>
-          </div>
-        </div>
-        
-        <div class="actions center">
-          <button class="primary full-width" onclick="registrarEmpleado()">Enviar Solicitud</button>
-          <button class="text-btn" onclick="navegar('login')">Volver al inicio de sesión</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- ==========================================
-         VISTA 3: VITRINA / MENÚ INTERACTIVO
-         ========================================== -->
-    <section id="view-vitrina" class="view">
+    <section id="view-vitrina" class="view active">
       <div class="vitrina-container">
-        <!-- Menú de Productos -->
         <div class="menu-list">
-          <h2>MENÚ</h2>
           <div class="grid" id="catalogo-productos">
-            <!-- Los productos se inyectarán aquí con JS -->
-            <p class="note">Cargando menú desde la base de datos...</p>
+            <p class="note">Cargando menú...</p>
           </div>
         </div>
 
-        <!-- Carrito Flotante Lateral -->
         <div class="carrito-panel card">
-          <h2 style="font-family: 'Montserrat', sans-serif; font-size: 20px;">🛒 Tu Pedido</h2>
+          <h2 style="font-family: 'Montserrat', sans-serif; font-size: 20px; color: var(--gold);">🛒 Tu Pedido</h2>
           <div id="carrito-items" class="carrito-items">
             <p class="note">Agrega productos con el botón +</p>
           </div>
@@ -136,90 +62,117 @@
     </section>
 
     <!-- ==========================================
-         VISTA 4: SÚPER ADMINISTRADOR
+         VISTA 2: LOGIN DE EMPLEADOS (Oculto en el icono)
+         ========================================== -->
+    <section id="view-login" class="view">
+      <div class="card card-center">
+        <h2>Acceso Empleados</h2>
+        <div class="field">
+          <label>Documento de Identidad (Usuario)</label>
+          <input type="number" id="login-doc" placeholder="Ej: 1005000123">
+        </div>
+        <div class="field">
+          <label>Contraseña</label>
+          <div class="password-wrapper">
+            <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
+            <button class="toggle-pass" onclick="togglePassword('login-pass', this)">👁️</button>
+          </div>
+        </div>
+        <div class="actions center">
+          <button class="primary full-width" onclick="iniciarSesion()">Entrar</button>
+          <button class="text-btn" onclick="navegar('registro')">Solicitar cuenta de empleado</button>
+          <button class="text-btn text-gold" onclick="entrarComoCliente()">Volver al Menú</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VISTA 3: REGISTRO DE EMPLEADOS
+         ========================================== -->
+    <section id="view-registro" class="view">
+      <div class="card card-center">
+        <h2>Registro de Personal</h2>
+        <p class="note">Tu usuario de acceso será tu Documento de Identidad.</p>
+        <div class="field"><label>Nombre Completo *</label><input type="text" id="reg-nombre"></div>
+        <div class="field"><label>Documento de Identidad *</label><input type="number" id="reg-doc"></div>
+        <div class="field"><label>Grado Escolar *</label><input type="text" id="reg-grado"></div>
+        <div class="field">
+          <label>Área a la que aspiras *</label>
+          <select id="reg-area">
+            <option value="Vitrina">Vitrina (Atención)</option>
+            <option value="Cartera">Cartera (Pagos)</option>
+            <option value="Producción">Producción (Cocina)</option>
+            <option value="Pedidos">Pedidos (Logística)</option>
+            <option value="Marketing">Marketing (Menú)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Crea una Contraseña *</label>
+          <div class="password-wrapper">
+            <input type="password" id="reg-pass">
+            <button class="toggle-pass" onclick="togglePassword('reg-pass', this)">👁️</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Repite tu Contraseña *</label>
+          <div class="password-wrapper">
+            <input type="password" id="reg-pass2">
+            <button class="toggle-pass" onclick="togglePassword('reg-pass2', this)">👁️</button>
+          </div>
+        </div>
+        <div class="actions center">
+          <button class="primary full-width" onclick="registrarEmpleado()">Enviar Solicitud</button>
+          <button class="text-btn" onclick="navegar('login')">Volver al login</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VISTAS ADMINISTRATIVAS
          ========================================== -->
     <section id="view-admin" class="view">
       <div class="card">
         <h2>👑 Panel de Control - Empleados</h2>
         <div class="table-container">
           <table id="tabla-empleados">
-            <thead>
-              <tr>
-                <th>Documento</th>
-                <th>Nombre</th>
-                <th>Aspiración</th>
-                <th>Estado</th>
-                <th>Asignar Rol</th>
-                <th>Acción</th>
-              </tr>
-            </thead>
+            <thead><tr><th>Documento</th><th>Nombre</th><th>Aspiración</th><th>Estado</th><th>Rol</th><th>Acción</th></tr></thead>
             <tbody id="lista-empleados"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ==========================================
-         VISTA 5: MARKETING (Gestión del Menú)
-         ========================================== -->
     <section id="view-marketing" class="view">
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
           <h2>📸 GESTOR DE MENÚ</h2>
           <button class="primary" onclick="abrirModalProducto()">+ Añadir Producto</button>
         </div>
-        <p class="note" style="text-align: left;">Sube fotos, cambia precios o marca productos como agotados. Los cambios se reflejarán instantáneamente en la Vitrina y en Google Sheets.</p>
         <div class="table-container">
           <table>
-            <thead>
-              <tr><th>Imagen</th><th>Categoría</th><th>Nombre</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr>
-            </thead>
+            <thead><tr><th>Imagen</th><th>Categoría</th><th>Nombre</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
             <tbody id="lista-marketing-productos"></tbody>
           </table>
         </div>
       </div>
     </section>
 
-    <!-- ==========================================
-         VISTAS RESTANTES: CARTERA, PRODUCCIÓN, DESPACHOS
-         ========================================== -->
-    <section id="view-cartera" class="view">
-      <div class="card">
-        <h2>💰 Pedidos en Espera de Pago</h2>
-        <div class="grid" id="lista-cartera"></div>
-      </div>
-    </section>
-
-    <section id="view-produccion" class="view">
-      <div class="card">
-        <h2>🍳 Comandas en Producción</h2>
-        <div class="grid" id="lista-produccion"></div>
-      </div>
-    </section>
-
-    <section id="view-despachados" class="view">
-      <div class="card">
-        <h2>✅ Historial de Entregas</h2>
-        <div class="table-container">
-          <table>
-            <thead><tr><th>ID Pedido</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead>
-            <tbody id="lista-despachados"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
+    <section id="view-cartera" class="view"><div class="card"><h2>💰 Pedidos (En Espera de Pago)</h2><div class="grid" id="lista-cartera"></div></div></section>
+    <section id="view-produccion" class="view"><div class="card"><h2>🍳 Comandas en Producción</h2><div class="grid" id="lista-produccion"></div></div></section>
+    <section id="view-despachados" class="view"><div class="card"><h2>✅ Historial de Entregas</h2><div class="table-container"><table><thead><tr><th>ID</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead><tbody id="lista-despachados"></tbody></table></div></div></section>
 
   </main>
 
   <!-- ==========================================
-       MODAL: FINALIZAR PEDIDO (Checkout)
+       MODAL: FINALIZAR PEDIDO (El login del cliente está aquí)
        ========================================== -->
   <div class="modal" id="modal-checkout">
     <div class="invoice">
       <div class="modal-header">
-        <span style="font-family: 'Montserrat', sans-serif;">Datos del Pedido</span>
+        <span style="font-family: 'Montserrat', sans-serif;">Completar Pedido</span>
         <button onclick="cerrarModal('modal-checkout')">✕</button>
       </div>
+      <p class="note" style="text-align: left;">Ingresa tus datos para registrar la orden.</p>
       <div class="field">
         <label>Tipo de Cliente</label>
         <select id="co-tipo" onchange="toggleCamposCliente()">
@@ -251,18 +204,14 @@
     </div>
   </div>
 
-  <!-- ==========================================
-       MODAL: GESTOR DE PRODUCTO (Marketing)
-       ========================================== -->
+  <!-- MODAL: MARKETING -->
   <div class="modal" id="modal-producto">
     <div class="invoice">
       <div class="modal-header">
         <span style="font-family: 'Montserrat', sans-serif;" id="modal-prod-titulo">Añadir Producto</span>
         <button onclick="cerrarModal('modal-producto')">✕</button>
       </div>
-      <input type="hidden" id="prod-id">
-      <input type="hidden" id="prod-img-existente">
-      
+      <input type="hidden" id="prod-id"><input type="hidden" id="prod-img-existente">
       <div class="field">
         <label>Categoría *</label>
         <select id="prod-categoria">
@@ -274,29 +223,12 @@
       <div class="field"><label>Nombre del Producto *</label><input type="text" id="prod-nombre"></div>
       <div class="field"><label>Ingredientes / Descripción *</label><input type="text" id="prod-desc"></div>
       <div class="field"><label>Precio ($ COP) *</label><input type="number" id="prod-precio"></div>
-      
-      <div class="field">
-        <label>Estado del Producto</label>
-        <select id="prod-agotado">
-          <option value="NO">Disponible para la venta</option>
-          <option value="SI">Agotado (Bloqueado)</option>
-        </select>
-      </div>
-
-      <div class="field">
-        <label>Subir Foto del Producto (Opcional si ya tiene)</label>
-        <input type="file" id="prod-img" accept="image/*">
-      </div>
-
-      <div class="actions" style="margin-top: 20px;">
-        <button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar Producto</button>
-      </div>
+      <div class="field"><label>Estado</label><select id="prod-agotado"><option value="NO">Disponible</option><option value="SI">Agotado</option></select></div>
+      <div class="field"><label>Subir Foto</label><input type="file" id="prod-img" accept="image/*"></div>
+      <div class="actions" style="margin-top: 20px;"><button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button></div>
     </div>
   </div>
 
-  <!-- ==========================================
-       CRÉDITOS - EQUIPO DE TRABAJO
-       ========================================== -->
   <footer class="creditos-estudiantes">
     <div class="marquee-container">
       <div class="marquee-text">
