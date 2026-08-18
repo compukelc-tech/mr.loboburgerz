@@ -1,13 +1,30 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT)
-// Módulo: Conexión dinámica con Google Sheets (Catálogo, Pedidos, Usuarios)
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwB41m6Dgxqg0ZGHdpNmtIfnO8vnu3xDk_TRMP6dJcVr_tbwz8JdjmVBaE_laWv3Nva7g/exec";
 
 let sesionActual = null; 
 let carrito = []; 
-let CATALOGO = []; // Ahora el catálogo se llena dinámicamente desde Sheets
+let CATALOGO = []; 
+
+// [NUEVO] CATÁLOGO BASE DE RESPALDO: Garantiza que el menú nunca quede vacío.
+const CATALOGO_BASE = [
+  { id: 'p1', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Sangrienta', desc: 'Pan brioche, Carne de res, Tocineta, Jamón, Queso, Vegetales.', precio: 18000, agotado: false, urlImagen: '' },
+  { id: 'p2', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Luna Llena', desc: 'Pan brioche negro, Pollo desmechado en salsa, Tocineta, Jamon, Queso, Vegetales.', precio: 17000, agotado: false, urlImagen: '' },
+  { id: 'p3', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Manada', desc: 'Pan brioche, Pollo, Carne, Tocineta, Chorizo, Jamón, Queso, Cebolla caramelizada, Vegetales.', precio: 20000, agotado: false, urlImagen: '' },
+  { id: 'p4', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'DoriLobo', desc: 'Doritos, Carne molida, Maicitos, Queso mozzarella, Guacamole, Pico de gallo, Limón.', precio: 15000, agotado: false, urlImagen: '' },
+  { id: 'b1', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Sangre De Alfa', desc: 'Sprite, Cereza, Zumo de limón, Borde de azúcar con limón, Gomita de Ojos.', precio: 8000, agotado: false, urlImagen: '' },
+  { id: 'b2', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Legado De Plata', desc: 'Sprite, Zumo de Limón, Polvo Plateado, Borde de Azúcar negro con Limón, Menta Fresca.', precio: 8000, agotado: false, urlImagen: '' },
+  { id: 'b3', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Noche Azul', desc: 'Sprite, Arándanos, Zumo de Limón, Borde de Azúcar con Limón, Menta Fresca.', precio: 8000, agotado: false, urlImagen: '' },
+  { id: 'po1', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Exilir De Maracuya', desc: 'Postre Cremoso de Maracuyá, Base de Galleta dulce y Salsa de Maracuyá.', precio: 7000, agotado: false, urlImagen: '' },
+  { id: 'c1', categoria: '~COMBOS~', nombre: 'Mr. Lobo El Alfa', desc: '1 Manada, 1 Luna Llena, 1 Dorilobo, 1 Michelada a elección, 2 postres a elección, 2 gaseosas a elección.', precio: 60000, agotado: false, urlImagen: '' },
+  { id: 'c2', categoria: '~COMBOS~', nombre: 'La Caceria', desc: '1 Manada, 1 Sangrienta, 1 Dorilobo, 1 Michelada a elección, 2 gaseosas a elección.', precio: 50000, agotado: false, urlImagen: '' },
+  { id: 'c3', categoria: '~COMBOS~', nombre: 'Manada Feroz', desc: '1 Luna Llena, 1 Sangrienta, 2 micheladas a elección, 1 postre a elección.', precio: 40000, agotado: false, urlImagen: '' },
+  { id: 'c4', categoria: '~COMBOS~', nombre: 'Eclipse Lunar', desc: '1 Luna Llena, 1 Sangrienta, 1 michelada a elección, 1 gaseosa a elección.', precio: 32000, agotado: false, urlImagen: '' },
+  { id: 'c5', categoria: '~COMBOS~', nombre: 'MegaLobito Hambriento', desc: '1 Sangrienta, 1 postre a elección, 1 michelada a elección.', precio: 28000, agotado: false, urlImagen: '' },
+  { id: 'c6', categoria: '~COMBOS~', nombre: 'Lobo Solitario', desc: '1 Manada, 1 postre a elección, 1 gaseosa a elección.', precio: 24000, agotado: false, urlImagen: '' }
+];
 
 const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
 
@@ -16,14 +33,16 @@ window.onload = async () => {
   const savedSession = localStorage.getItem('lobo_session');
   if (savedSession) {
     sesionActual = JSON.parse(savedSession);
-    configurarInterfazPorRol();
   } else {
-    navegar('login');
+    // Por defecto, todos entran como Clientes a la Vitrina
+    sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
   }
+  
+  configurarInterfazPorRol();
   await cargarCatalogoGlobal();
 };
 
-// --- 2. CONEXIÓN AL BACKEND (API) ---
+// --- 2. CONEXIÓN AL BACKEND ---
 async function apiCall(accion, datos = {}) {
   try {
     const payload = JSON.stringify({ accion, datos });
@@ -37,7 +56,7 @@ async function apiCall(accion, datos = {}) {
     if (!result.exito) throw new Error(result.error);
     return result.data;
   } catch (error) {
-    mostrarAlerta('Error: ' + error.message, 'error');
+    console.error(error);
     throw error;
   }
 }
@@ -56,26 +75,40 @@ function navegar(vistaID) {
 
 function cerrarSesion() {
   localStorage.removeItem('lobo_session');
-  sesionActual = null;
-  document.getElementById('main-nav').style.display = 'none';
-  document.getElementById('user-greeting').textContent = 'Bienvenido al Sistema';
-  navegar('login');
+  // Al cerrar sesión, lo devolvemos a ser un cliente normal en la vitrina
+  sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
+  configurarInterfazPorRol();
+  mostrarAlerta('Sesión cerrada correctamente', 'info');
+}
+
+function entrarComoCliente() {
+  cerrarSesion();
 }
 
 function configurarInterfazPorRol() {
-  document.getElementById('main-nav').style.display = 'flex';
-  document.getElementById('user-greeting').textContent = `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
+  const isCliente = sesionActual.rol === 'Cliente';
   
+  // Control de la barra de navegación de empleados
+  document.getElementById('main-nav').style.display = isCliente ? 'none' : 'flex';
+  document.getElementById('btn-login-icon').style.display = isCliente ? 'block' : 'none';
+  
+  // Saludo en la cabecera
+  document.getElementById('user-greeting').textContent = isCliente 
+    ? 'Menú Principal' 
+    : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
+
+  if (isCliente) {
+    navegar('vitrina');
+    return;
+  }
+
   document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
   document.querySelector('.btn-outline').style.display = 'block'; 
 
   if (sesionActual.rol === 'Superadmin') {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'block');
     navegar('admin');
-    return;
-  }
-
-  if (sesionActual.rol === 'Vitrina' || sesionActual.rol === 'Cliente') {
+  } else if (sesionActual.rol === 'Vitrina') {
     document.getElementById('nav-vitrina').style.display = 'block';
     navegar('vitrina');
   } else if (sesionActual.rol === 'Cartera') {
@@ -100,23 +133,22 @@ async function iniciarSesion() {
   if (!doc || !pass) return mostrarAlerta('Ingresa documento y contraseña');
   
   mostrarAlerta('Verificando credenciales...', 'info');
-  const empleados = await apiCall('obtenerEmpleados');
-  const usuario = empleados.find(e => e['Documento (Usuario)'] == doc && e['Contraseña'] == pass);
-  
-  if (!usuario) return mostrarAlerta('Credenciales incorrectas');
-  if (usuario['Estado'] !== 'ACTIVO' && usuario['Rol Asignado'] !== 'Superadmin') {
-    return mostrarAlerta('Tu cuenta aún no ha sido activada.');
+  try {
+    const empleados = await apiCall('obtenerEmpleados');
+    const usuario = empleados.find(e => e['Documento (Usuario)'] == doc && e['Contraseña'] == pass);
+    
+    if (!usuario) return mostrarAlerta('Credenciales incorrectas');
+    if (usuario['Estado'] !== 'ACTIVO' && usuario['Rol Asignado'] !== 'Superadmin') {
+      return mostrarAlerta('Tu cuenta aún no ha sido activada.');
+    }
+
+    sesionActual = { documento: doc, nombre: usuario['Nombre Completo'], rol: usuario['Rol Asignado'] };
+    localStorage.setItem('lobo_session', JSON.stringify(sesionActual));
+    mostrarAlerta('Acceso concedido', 'success');
+    configurarInterfazPorRol();
+  } catch (e) {
+    mostrarAlerta('Error de red al intentar iniciar sesión.');
   }
-
-  sesionActual = { documento: doc, nombre: usuario['Nombre Completo'], rol: usuario['Rol Asignado'] };
-  localStorage.setItem('lobo_session', JSON.stringify(sesionActual));
-  mostrarAlerta('Acceso concedido', 'success');
-  configurarInterfazPorRol();
-}
-
-function entrarComoCliente() {
-  sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
-  configurarInterfazPorRol();
 }
 
 async function registrarEmpleado() {
@@ -133,9 +165,13 @@ async function registrarEmpleado() {
   if (datos.contrasena !== datos.contrasena2) return mostrarAlerta('Las contraseñas no coinciden');
   
   mostrarAlerta('Enviando solicitud...', 'info');
-  await apiCall('registrarEmpleado', datos);
-  mostrarAlerta('Registro exitoso. Espera activación.', 'success');
-  navegar('login');
+  try {
+    await apiCall('registrarEmpleado', datos);
+    mostrarAlerta('Registro exitoso. Espera activación.', 'success');
+    navegar('login');
+  } catch (e) {
+    mostrarAlerta('Error al registrar.');
+  }
 }
 
 // --- 5. UTILIDADES UI ---
@@ -151,34 +187,37 @@ function togglePassword(inputId, btn) {
   else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
-// --- 6. GESTIÓN CATÁLOGO (MARKETING) ---
+// --- 6. GESTIÓN CATÁLOGO ---
 async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
-    CATALOGO = data.map(p => ({
-      id: p['ID Producto'],
-      categoria: p['Categoría'],
-      nombre: p['Nombre'],
-      desc: p['Descripción'],
-      precio: Number(p['Precio']),
-      agotado: p['Agotado (SI/NO)'] === 'SI',
-      urlImagen: p['URL Imagen']
-    }));
-    if(document.getElementById('view-vitrina').classList.contains('active') || sesionActual?.rol === 'Cliente') {
-      renderCatalogo();
+    if (data && data.length > 0) {
+      // Si Sheets responde y tiene datos, los combinamos
+      CATALOGO = data.map(p => ({
+        id: p['ID Producto'],
+        categoria: p['Categoría'],
+        nombre: p['Nombre'],
+        desc: p['Descripción'],
+        precio: Number(p['Precio']),
+        agotado: p['Agotado (SI/NO)'] === 'SI',
+        urlImagen: p['URL Imagen']
+      }));
+    } else {
+      // Si la base de datos está vacía, cargamos la base
+      CATALOGO = [...CATALOGO_BASE];
     }
   } catch (error) {
-    document.getElementById('catalogo-productos').innerHTML = '<p class="note">Error al cargar el menú.</p>';
+    // Si hay error de red (Ej. Apps Script no actualizado), cargamos la base
+    CATALOGO = [...CATALOGO_BASE];
+  }
+  
+  if(document.getElementById('view-vitrina').classList.contains('active') || sesionActual?.rol === 'Cliente') {
+    renderCatalogo();
   }
 }
 
 function renderCatalogo() {
   const container = document.getElementById('catalogo-productos');
-  if (CATALOGO.length === 0) {
-    container.innerHTML = '<p class="note">El menú está vacío. Marketing debe agregar productos.</p>';
-    return;
-  }
-
   const categorias = [...new Set(CATALOGO.map(p => p.categoria))];
   let html = '';
   
@@ -254,7 +293,7 @@ function abrirModalProducto(id = null) {
     document.getElementById('prod-precio').value = '';
     document.getElementById('prod-img-existente').value = '';
   }
-  document.getElementById('prod-img').value = ''; // Limpiar input file
+  document.getElementById('prod-img').value = ''; 
 }
 
 async function guardarProductoBackend() {
@@ -298,10 +337,14 @@ async function guardarProductoBackend() {
 async function eliminarProducto(id) {
   if (!confirm('¿Seguro que deseas eliminar este producto permanentemente?')) return;
   mostrarAlerta('Eliminando...', 'info');
-  await apiCall('eliminarProducto', { idProducto: id });
-  mostrarAlerta('Producto eliminado', 'success');
-  await cargarCatalogoGlobal();
-  cargarGestorMenu();
+  try {
+    await apiCall('eliminarProducto', { idProducto: id });
+    mostrarAlerta('Producto eliminado', 'success');
+    await cargarCatalogoGlobal();
+    cargarGestorMenu();
+  } catch(e) {
+    mostrarAlerta('No se pudo eliminar de la base de datos.');
+  }
 }
 
 // --- 7. CARRITO DE COMPRAS ---
@@ -415,93 +458,108 @@ async function enviarPedido() {
     mostrarAlerta('Pedido registrado', 'success');
     carrito = []; renderCarrito(); cerrarModal('modal-checkout');
   } catch (error) {
-    mostrarAlerta('Error al procesar el pedido.');
+    mostrarAlerta('Error al procesar el pedido. Intenta nuevamente.');
   } finally {
     btn.disabled = false; btn.textContent = 'Confirmar y Enviar Pedido';
   }
 }
 
-// --- 9. GESTIÓN SUPERADMIN (EMPLEADOS Y PEDIDOS) ---
+// --- 9. GESTIÓN SUPERADMIN Y DEPENDENCIAS ---
 async function cargarEmpleados() {
   const tbody = document.getElementById('lista-empleados');
   tbody.innerHTML = '<tr><td colspan="6" class="center">Cargando personal...</td></tr>';
-  const empleados = await apiCall('obtenerEmpleados');
-  tbody.innerHTML = '';
-  
-  empleados.forEach(emp => {
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${emp['Documento (Usuario)']}</td>
-      <td>${emp['Nombre Completo']}</td>
-      <td>${emp['Área Aspirada']}</td>
-      <td><span class="badge ${emp['Estado'].toLowerCase()}">${emp['Estado']}</span></td>
-      <td>
-        <select id="rol-${emp['Documento (Usuario)']}" ${sesionActual.rol !== 'Superadmin' ? 'disabled' : ''}>
-          <option value="Pendiente" ${emp['Rol Asignado'] === 'Ninguno' ? 'selected' : ''}>Sin Rol</option>
-          <option value="Vitrina" ${emp['Rol Asignado'] === 'Vitrina' ? 'selected' : ''}>Vitrina</option>
-          <option value="Cartera" ${emp['Rol Asignado'] === 'Cartera' ? 'selected' : ''}>Cartera</option>
-          <option value="Producción" ${emp['Rol Asignado'] === 'Producción' ? 'selected' : ''}>Producción</option>
-          <option value="Marketing" ${emp['Rol Asignado'] === 'Marketing' ? 'selected' : ''}>Marketing</option>
-          <option value="Pedidos" ${emp['Rol Asignado'] === 'Pedidos' ? 'selected' : ''}>Pedidos</option>
-          <option value="Superadmin" ${emp['Rol Asignado'] === 'Superadmin' ? 'selected' : ''}>Superadmin</option>
-        </select>
-      </td>
-      <td><button class="primary small" onclick="cambiarRol('${emp['Documento (Usuario)']}')">Guardar</button></td>
-    `;
-    tbody.appendChild(row);
-  });
+  try {
+    const empleados = await apiCall('obtenerEmpleados');
+    tbody.innerHTML = '';
+    empleados.forEach(emp => {
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${emp['Documento (Usuario)']}</td>
+        <td>${emp['Nombre Completo']}</td>
+        <td>${emp['Área Aspirada']}</td>
+        <td><span class="badge ${emp['Estado'].toLowerCase()}">${emp['Estado']}</span></td>
+        <td>
+          <select id="rol-${emp['Documento (Usuario)']}" ${sesionActual.rol !== 'Superadmin' ? 'disabled' : ''}>
+            <option value="Pendiente" ${emp['Rol Asignado'] === 'Ninguno' ? 'selected' : ''}>Sin Rol</option>
+            <option value="Vitrina" ${emp['Rol Asignado'] === 'Vitrina' ? 'selected' : ''}>Vitrina</option>
+            <option value="Cartera" ${emp['Rol Asignado'] === 'Cartera' ? 'selected' : ''}>Cartera</option>
+            <option value="Producción" ${emp['Rol Asignado'] === 'Producción' ? 'selected' : ''}>Producción</option>
+            <option value="Marketing" ${emp['Rol Asignado'] === 'Marketing' ? 'selected' : ''}>Marketing</option>
+            <option value="Pedidos" ${emp['Rol Asignado'] === 'Pedidos' ? 'selected' : ''}>Pedidos</option>
+            <option value="Superadmin" ${emp['Rol Asignado'] === 'Superadmin' ? 'selected' : ''}>Superadmin</option>
+          </select>
+        </td>
+        <td><button class="primary small" onclick="cambiarRol('${emp['Documento (Usuario)']}')">Guardar</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="6" class="center">Error al cargar empleados.</td></tr>';
+  }
 }
 
 async function cambiarRol(documento) {
   const nuevoRol = document.getElementById(`rol-${documento}`).value;
   const nuevoEstado = nuevoRol === 'Pendiente' ? 'PENDIENTE' : 'ACTIVO';
   mostrarAlerta('Actualizando empleado...', 'info');
-  await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado });
-  mostrarAlerta('Rol actualizado', 'success');
-  cargarEmpleados();
+  try {
+    await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado });
+    mostrarAlerta('Rol actualizado', 'success');
+    cargarEmpleados();
+  } catch(e) {
+    mostrarAlerta('Error al actualizar rol');
+  }
 }
 
 async function cargarPedidos(estado, contenedorID) {
   const container = document.getElementById(contenedorID);
   container.innerHTML = '<p class="note">Cargando...</p>';
-  const pedidos = await apiCall('obtenerPedidos');
-  const filtrados = pedidos.filter(p => p['Estado'] === estado);
-  
-  if (filtrados.length === 0) {
-    container.innerHTML = '<p class="note">No hay pedidos en este estado.</p>';
-    return;
-  }
+  try {
+    const pedidos = await apiCall('obtenerPedidos');
+    const filtrados = pedidos.filter(p => p['Estado'] === estado);
+    
+    if (filtrados.length === 0) {
+      container.innerHTML = '<p class="note">No hay pedidos en este estado.</p>';
+      return;
+    }
 
-  if (contenedorID === 'lista-despachados') {
-    container.innerHTML = filtrados.map(p => `<tr><td><b>${p['ID Pedido']}</b></td><td>${p['Nombre']}</td><td>${money(p['Total'])}</td><td><span class="badge despachado">${p['Estado']}</span></td></tr>`).join('');
-  } else {
-    container.innerHTML = filtrados.map(p => {
-      const itemsCart = JSON.parse(p['Carrito (JSON)']);
-      let botonAccion = estado === 'ESPERA DE PAGO' 
-        ? `<button class="primary full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'EN PRODUCCIÓN')">Aprobar Pago -> Cocina</button>`
-        : `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Despachado</button>`;
+    if (contenedorID === 'lista-despachados') {
+      container.innerHTML = filtrados.map(p => `<tr><td><b>${p['ID Pedido']}</b></td><td>${p['Nombre']}</td><td>${money(p['Total'])}</td><td><span class="badge despachado">${p['Estado']}</span></td></tr>`).join('');
+    } else {
+      container.innerHTML = filtrados.map(p => {
+        const itemsCart = JSON.parse(p['Carrito (JSON)']);
+        let botonAccion = estado === 'ESPERA DE PAGO' 
+          ? `<button class="primary full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'EN PRODUCCIÓN')">Aprobar Pago -> Cocina</button>`
+          : `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Despachado</button>`;
 
-      return `
-        <div class="card product-card" style="text-align:left;">
-          <h3 style="margin-bottom:0; font-family:'Montserrat', sans-serif;">${p['ID Pedido']}</h3>
-          <p class="note" style="text-align:left; margin-bottom: 10px;">Cliente: ${p['Nombre']}</p>
-          <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
-            ${itemsCart.map(i => `<li>${i.cant}x ${i.nombre}</li>`).join('')}
-          </ul>
-          <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
-            <span>Total:</span><span class="text-gold">${money(p['Total'])}</span>
+        return `
+          <div class="card product-card" style="text-align:left;">
+            <h3 style="margin-bottom:0; font-family:'Montserrat', sans-serif;">${p['ID Pedido']}</h3>
+            <p class="note" style="text-align:left; margin-bottom: 10px;">Cliente: ${p['Nombre']}</p>
+            <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
+              ${itemsCart.map(i => `<li>${i.cant}x ${i.nombre}</li>`).join('')}
+            </ul>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
+              <span>Total:</span><span class="text-gold">${money(p['Total'])}</span>
+            </div>
+            ${botonAccion}
           </div>
-          ${botonAccion}
-        </div>
-      `;
-    }).join('');
+        `;
+      }).join('');
+    }
+  } catch(e) {
+    container.innerHTML = '<p class="note">Error al cargar comandas.</p>';
   }
 }
 
 async function cambiarEstadoPedido(idPedido, nuevoEstado) {
   mostrarAlerta(`Moviendo pedido...`, 'info');
-  await apiCall('cambiarEstadoPedido', { idPedido, nuevoEstado });
-  if (sesionActual.rol === 'Cartera' || sesionActual.rol === 'Superadmin') cargarPedidos('ESPERA DE PAGO', 'lista-cartera');
-  if (sesionActual.rol === 'Producción' || sesionActual.rol === 'Superadmin') cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
-  mostrarAlerta('Pedido actualizado', 'success');
+  try {
+    await apiCall('cambiarEstadoPedido', { idPedido, nuevoEstado });
+    if (sesionActual.rol === 'Cartera' || sesionActual.rol === 'Superadmin') cargarPedidos('ESPERA DE PAGO', 'lista-cartera');
+    if (sesionActual.rol === 'Producción' || sesionActual.rol === 'Superadmin') cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
+    mostrarAlerta('Pedido actualizado', 'success');
+  } catch(e) {
+    mostrarAlerta('Error al mover el pedido');
+  }
 }
