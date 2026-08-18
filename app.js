@@ -1,21 +1,23 @@
 // ============================================================================
-// [FUNCIÓN: CONFIGURACIÓN INICIAL]
-// Variables globales y utilidades de formateo.
+// [FUNCIÓN: CONFIGURACIÓN INICIAL Y API]
 // ============================================================================
+const API_URL = "https://script.google.com/macros/s/AKfycbzgDF60bd19VZ-L2zF9x-VJW9XRzo1I3XvNQLXrOiE1hOsMjQdfNFjMI64_8y-SY2aKhQ/exec";
 let pedidos = [];
 const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n || 0);
 
 // ============================================================================
-// [FUNCIÓN: INICIALIZACIÓN DE DATOS (ONLOAD)]
-// Se ejecuta al abrir la app. Llama a Apps Script para traer la base de datos.
+// [FUNCIÓN: LECTURA DE DATOS VÍA FETCH API]
 // ============================================================================
 window.onload = function() {
-  // Asegúrate de que este entorno soporte google.script.run
-  if (typeof google !== 'undefined' && google.script) {
-    google.script.run.withSuccessHandler(actualizarPantalla).obtenerPedidos();
-  } else {
-    document.getElementById('cloudStatus').textContent = '⚠️ Modo local - Sin conexión a Sheets';
-  }
+  document.getElementById('cloudStatus').textContent = '☁️ Conectando con Google Sheets...';
+  
+  fetch(API_URL)
+    .then(respuesta => respuesta.json())
+    .then(data => actualizarPantalla(data))
+    .catch(err => {
+      document.getElementById('cloudStatus').textContent = '⚠️ Error de conexión con Sheets';
+      console.error('Error cargando pedidos:', err);
+    });
 };
 
 function actualizarPantalla(data) {
@@ -26,40 +28,19 @@ function actualizarPantalla(data) {
 }
 
 // ============================================================================
-// [FUNCIÓN: CONTROL DE NAVEGACIÓN (PESTAÑAS)]
-// Alterna entre Menú, Nuevo Pedido, Pedidos y Resumen.
+// [FUNCIÓN: ESCRITURA DE DATOS VÍA FETCH API (POST)]
 // ============================================================================
-function showTab(id) {
-  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  if(id === 'pedidos') renderPedidos();
-  if(id === 'panel') renderStats();
+function enviarDatosASheets(payload) {
+  // Se usa text/plain para evitar el bloqueo de CORS en Google Apps Script
+  return fetch(API_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify(payload)
+  }).then(res => res.json());
 }
-
-// ============================================================================
-// [FUNCIÓN: SELECCIÓN RÁPIDA DESDE EL MENÚ]
-// Rellena automáticamente el formulario al elegir un producto.
-// ============================================================================
-function seleccionarDelMenu(prod, prec) {
-  showTab('nuevo');
-  document.getElementById('producto').value = prod;
-  document.getElementById('total').value = prec;
-  document.getElementById('nombre').focus();
-}
-
-// ============================================================================
-// [FUNCIÓN: GENERADOR DE CÓDIGOS]
-// Crea el consecutivo de la factura (ej. DOC-1014).
-// ============================================================================
-const nextCode = () => {
-  let max = 1013;
-  pedidos.forEach(p => { let n = parseInt((p.codigo || '').replace('DOC-', '')); if(n > max) max = n; });
-  return 'DOC-' + (max + 1);
-};
 
 // ============================================================================
 // [FUNCIÓN: CREAR Y GUARDAR PEDIDO NUEVO]
-// Construye el objeto y lo envía a Google Sheets.
 // ============================================================================
 function crearPedido() {
   const p = {
@@ -76,20 +57,13 @@ function crearPedido() {
 
   document.getElementById('cloudStatus').textContent = '⏳ Guardando en Sheets...';
   
-  // Enviar a Google Apps Script
-  if (typeof google !== 'undefined' && google.script) {
-    google.script.run.withSuccessHandler(function(data) {
+  enviarDatosASheets({ accion: 'guardarPedido', datos: p })
+    .then(data => {
       actualizarPantalla(data);
       abrirFactura(p);
       limpiarFormulario();
-    }).guardarPedido(p);
-  } else {
-    // Simulación para entorno local
-    pedidos.push(p);
-    actualizarPantalla(pedidos);
-    abrirFactura(p);
-    limpiarFormulario();
-  }
+    })
+    .catch(err => alert('Error de red al guardar el pedido.'));
 }
 
 function limpiarFormulario() {
@@ -100,17 +74,59 @@ function limpiarFormulario() {
 }
 
 // ============================================================================
-// [FUNCIÓN: CALCULADORES DE ESTADO]
-// Lógica para definir si está Pagado, Pendiente o Abonado.
+// [FUNCIÓN: GESTIÓN DE MODAL - ABONOS]
 // ============================================================================
+function guardarAbono() {
+  const codigo = window.current;
+  const valor = Number(document.getElementById('nuevoAbono').value || 0);
+  if(valor <= 0) return alert('Ingresa un valor.');
+
+  document.getElementById('cloudStatus').textContent = '⏳ Guardando abono en Sheets...';
+  
+  const payload = {
+    accion: 'guardarAbono',
+    codigo: codigo,
+    datos: { monto: valor, fecha: new Date().toLocaleString('es-CO') }
+  };
+
+  enviarDatosASheets(payload)
+    .then(data => {
+      actualizarPantalla(data);
+      alert('Abono guardado.');
+      cerrarAbono();
+      cerrarModal();
+      document.getElementById('nuevoAbono').value = '';
+    })
+    .catch(err => alert('Error de red al guardar el abono.'));
+}
+
+// ============================================================================
+// [FUNCIONES DE UI Y CALCULADORES] (Se mantienen igual)
+// ============================================================================
+function showTab(id) {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id === 'pedidos') renderPedidos();
+  if(id === 'panel') renderStats();
+}
+
+function seleccionarDelMenu(prod, prec) {
+  showTab('nuevo');
+  document.getElementById('producto').value = prod;
+  document.getElementById('total').value = prec;
+  document.getElementById('nombre').focus();
+}
+
+const nextCode = () => {
+  let max = 1013;
+  pedidos.forEach(p => { let n = parseInt((p.codigo || '').replace('DOC-', '')); if(n > max) max = n; });
+  return 'DOC-' + (max + 1);
+};
+
 const abonado = p => (p.abonos || []).reduce((s, a) => s + Number(a.monto), 0);
 const estado = p => abonado(p) >= p.total ? 'PAGADO' : (abonado(p) > 0 ? 'ABONADO' : 'PENDIENTE');
 const estadoClass = e => e === 'PAGADO' ? 'paid' : (e === 'ABONADO' ? 'abonado' : 'pending');
 
-// ============================================================================
-// [FUNCIÓN: GESTIÓN DE MODAL - FACTURAS]
-// Dibuja la factura en pantalla y genera el código QR.
-// ============================================================================
 function abrirFactura(p) {
   document.getElementById('modal').classList.add('show');
   document.getElementById('invCode').textContent = 'FACTURA N.º ' + p.codigo;
@@ -133,10 +149,6 @@ function abrirFactura(p) {
 
 function cerrarModal() { document.getElementById('modal').classList.remove('show'); cerrarAbono(); }
 
-// ============================================================================
-// [FUNCIÓN: RENDERIZADO - TABLA DE PEDIDOS]
-// Dibuja el listado de pedidos y aplica el filtro de búsqueda.
-// ============================================================================
 function renderPedidos() {
   const q = (document.getElementById('busqueda')?.value || '').toLowerCase();
   const arr = pedidos.filter(p => (p.nombre + ' ' + p.codigo).toLowerCase().includes(q)).slice().reverse();
@@ -158,10 +170,6 @@ function renderPedidos() {
     </tbody></table>`;
 }
 
-// ============================================================================
-// [FUNCIÓN: RENDERIZADO - PANEL DE RESUMEN]
-// Calcula los totales en caja y saldos pendientes.
-// ============================================================================
 function renderStats() {
   const total = pedidos.reduce((s, p) => s + p.total, 0);
   const rec = pedidos.reduce((s, p) => s + abonado(p), 0);
@@ -172,10 +180,6 @@ function renderStats() {
   `;
 }
 
-// ============================================================================
-// [FUNCIÓN: GESTIÓN DE MODAL - ABONOS]
-// Lógica para registrar nuevos pagos parciales en Sheets.
-// ============================================================================
 function abrirAbono(codigo) {
   const p = pedidos.find(x => x.codigo === codigo);
   if(!p) return;
@@ -186,27 +190,3 @@ function abrirAbono(codigo) {
 }
 
 function cerrarAbono() { document.getElementById('abonoModal').classList.remove('show'); }
-
-function guardarAbono() {
-  const codigo = window.current;
-  const valor = Number(document.getElementById('nuevoAbono').value || 0);
-  if(valor <= 0) return alert('Ingresa un valor.');
-
-  document.getElementById('cloudStatus').textContent = '⏳ Guardando abono en Sheets...';
-  
-  if (typeof google !== 'undefined' && google.script) {
-    google.script.run.withSuccessHandler(function(data) {
-      actualizarPantalla(data);
-      alert('Abono guardado.');
-      cerrarAbono();
-      cerrarModal();
-    }).guardarAbonoBackend(codigo, { monto: valor, fecha: new Date().toLocaleString('es-CO') });
-  } else {
-    // Simulación local
-    const p = pedidos.find(x => x.codigo === codigo);
-    p.abonos.push({ monto: valor, fecha: new Date().toLocaleString('es-CO') });
-    actualizarPantalla(pedidos);
-    cerrarAbono();
-    cerrarModal();
-  }
-}
