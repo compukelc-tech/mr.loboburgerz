@@ -3,12 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>compukelc - ERP</title>
+  <title>Mr. Lobo Burgerz - ERP</title>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <!-- Configuración PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#e3262e">
   <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3063/3063177.png">
@@ -22,15 +21,17 @@
 </head>
 <body>
 
-  <!-- BANNER LATERAL IZQUIERDO -->
+  <!-- BANNER LATERAL IZQUIERDO (MR. LOBO BURGERZ) -->
   <aside class="sidebar">
     <div class="sidebar-header">
-      <div style="font-size: 35px; margin-bottom: 5px; text-align: center;">💻</div>
-      <h1>compukelc</h1>
-      <p class="subtitle" id="user-greeting">Menú Principal</p>
+      <div style="font-size: 45px; margin-bottom: 5px; text-align: center; text-shadow: 0 0 10px rgba(227,38,46,0.5);">🐺</div>
+      <h1 style="color: white;"><span class="text-red">MR.<br>LOBO</span></h1>
+      <p class="subtitle" style="color: var(--gold); letter-spacing: 3px; font-size: 16px;">BURGERZ</p>
     </div>
 
-    <!-- Navegación: Mantiene los mismos IDs para que app.js funcione -->
+    <!-- CONTENEDOR DE PROMOCIÓN TEMPORAL -->
+    <div id="sidebar-promo" class="sidebar-promo hidden"></div>
+
     <nav id="main-nav" class="sidebar-nav" style="display: none;">
       <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
       <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
@@ -44,8 +45,13 @@
 
     <div class="sidebar-footer">
       <button onclick="navegar('login')" id="btn-login-icon" class="btn-login">👤 Acceso Empleados</button>
-      <p>compukelc@hotmail.com</p>
-      <p>cel. 3507973351</p>
+      
+      <!-- DATOS DE CONTACTO Y UBICACIÓN (Basados en la imagen) -->
+      <div class="contact-info">
+        <p><b>📍 ¿DÓNDE ESTAMOS?</b><br>Av 2E # 13 - 10 B. Caobos<br>Cúcuta, Norte de Santander</p>
+        <p><b>📸 INSTAGRAM</b><br>@mr.lobo.burgerz</p>
+        <p><b>💬 WHATSAPP</b><br>+57 3170949928</p>
+      </div>
     </div>
   </aside>
 
@@ -56,20 +62,12 @@
     <section id="view-vitrina" class="view active">
       <div class="vitrina-container">
         <div class="menu-list">
-          <div class="grid" id="catalogo-productos">
-            <p class="note">Cargando menú...</p>
-          </div>
+          <div class="grid" id="catalogo-productos"><p class="note">Cargando menú...</p></div>
         </div>
-
         <div class="carrito-panel card">
           <h2 style="font-family: 'Montserrat', sans-serif; font-size: 20px; color: var(--gold);">🛒 Tu Pedido</h2>
-          <div id="carrito-items" class="carrito-items">
-            <p class="note">Agrega productos con el botón +</p>
-          </div>
-          <div class="carrito-total">
-            <span>Total:</span>
-            <b id="carrito-total-precio" class="text-gold">$0</b>
-          </div>
+          <div id="carrito-items" class="carrito-items"><p class="note">Agrega productos con el botón +</p></div>
+          <div class="carrito-total"><span>Total:</span><b id="carrito-total-precio" class="text-gold">$0</b></div>
           <button class="primary full-width" onclick="abrirModalCheckout()" id="btn-procesar" disabled>Procesar Pedido</button>
         </div>
       </div>
@@ -78,17 +76,8 @@
     <section id="view-login" class="view">
       <div class="card card-center">
         <h2>Acceso Empleados</h2>
-        <div class="field">
-          <label>Documento de Identidad (Usuario)</label>
-          <input type="number" id="login-doc" placeholder="Ej: 1005000123">
-        </div>
-        <div class="field">
-          <label>Contraseña</label>
-          <div class="password-wrapper">
-            <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
-            <button class="toggle-pass" onclick="togglePassword('login-pass', this)">👁️</button>
-          </div>
-        </div>
+        <div class="field"><label>Documento de Identidad (Usuario)</label><input type="number" id="login-doc" placeholder="Ej: 1005000123"></div>
+        <div class="field"><label>Contraseña</label><div class="password-wrapper"><input type="password" id="login-pass" placeholder="Ingresa tu contraseña"><button class="toggle-pass" onclick="togglePassword('login-pass', this)">👁️</button></div></div>
         <div class="actions center">
           <button class="primary full-width" onclick="iniciarSesion()">Entrar</button>
           <button class="text-btn" onclick="navegar('registro')">Solicitar cuenta de empleado</button>
@@ -106,32 +95,11 @@
         <div class="field"><label>Grado Escolar *</label><input type="text" id="reg-grado"></div>
         <div class="field">
           <label>Área a la que aspiras *</label>
-          <select id="reg-area">
-            <option value="Vitrina">Vitrina (Atención)</option>
-            <option value="Cartera">Cartera (Pagos)</option>
-            <option value="Producción">Producción (Cocina)</option>
-            <option value="Pedidos">Pedidos (Logística)</option>
-            <option value="Marketing">Marketing (Menú)</option>
-          </select>
+          <select id="reg-area"><option value="Vitrina">Vitrina (Atención)</option><option value="Cartera">Cartera (Pagos)</option><option value="Producción">Producción (Cocina)</option><option value="Pedidos">Pedidos (Logística)</option><option value="Marketing">Marketing (Menú)</option></select>
         </div>
-        <div class="field">
-          <label>Crea una Contraseña *</label>
-          <div class="password-wrapper">
-            <input type="password" id="reg-pass">
-            <button class="toggle-pass" onclick="togglePassword('reg-pass', this)">👁️</button>
-          </div>
-        </div>
-        <div class="field">
-          <label>Repite tu Contraseña *</label>
-          <div class="password-wrapper">
-            <input type="password" id="reg-pass2">
-            <button class="toggle-pass" onclick="togglePassword('reg-pass2', this)">👁️</button>
-          </div>
-        </div>
-        <div class="actions center">
-          <button class="primary full-width" onclick="registrarEmpleado()">Enviar Solicitud</button>
-          <button class="text-btn" onclick="navegar('login')">Volver al login</button>
-        </div>
+        <div class="field"><label>Crea una Contraseña *</label><div class="password-wrapper"><input type="password" id="reg-pass"><button class="toggle-pass" onclick="togglePassword('reg-pass', this)">👁️</button></div></div>
+        <div class="field"><label>Repite tu Contraseña *</label><div class="password-wrapper"><input type="password" id="reg-pass2"><button class="toggle-pass" onclick="togglePassword('reg-pass2', this)">👁️</button></div></div>
+        <div class="actions center"><button class="primary full-width" onclick="registrarEmpleado()">Enviar Solicitud</button><button class="text-btn" onclick="navegar('login')">Volver al login</button></div>
       </div>
     </section>
 
@@ -139,25 +107,49 @@
       <div class="card">
         <h2>👑 Panel Maestro - Personal</h2>
         <div class="table-container">
-          <table id="tabla-empleados">
-            <thead><tr><th>Documento</th><th>Nombre</th><th>Aspiración</th><th>Estado</th><th>Rol</th><th>Acción</th></tr></thead>
-            <tbody id="lista-empleados"></tbody>
-          </table>
+          <table id="tabla-empleados"><thead><tr><th>Documento</th><th>Nombre</th><th>Aspiración</th><th>Estado</th><th>Rol</th><th>Acción</th></tr></thead><tbody id="lista-empleados"></tbody></table>
         </div>
       </div>
     </section>
 
     <section id="view-marketing" class="view">
+      
+      <!-- GESTOR DE PROMOCIÓN -->
+      <div class="card" style="margin-bottom: 25px;">
+        <h2>📣 Gestor de Promoción Lateral</h2>
+        <p class="note">Configura un anuncio que aparecerá en el menú izquierdo para todos los usuarios.</p>
+        <div class="field">
+          <label>Estado del Anuncio</label>
+          <select id="promo-activa">
+            <option value="NO">Inactivo (Oculto)</option>
+            <option value="SI">Activo (Visible)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Tipo de Contenido</label>
+          <select id="promo-tipo" onchange="cambiarTipoPromo()">
+            <option value="texto">Texto / Mensaje</option>
+            <option value="imagen">Imagen Promocional</option>
+            <option value="video">Video (Enlace de YouTube o MP4)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Contenido</label>
+          <textarea id="promo-contenido" rows="3" placeholder="Escribe tu mensaje o pega el enlace..."></textarea>
+          <input type="file" id="promo-img-file" accept="image/*" class="hidden">
+        </div>
+        <div class="actions">
+          <button class="primary full-width" onclick="guardarPromocion()" id="btn-guardar-promo">Guardar Promoción</button>
+        </div>
+      </div>
+
       <div class="card">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
           <h2>📸 GESTOR DE MENÚ</h2>
           <button class="primary" onclick="abrirModalProducto()">+ Añadir Producto</button>
         </div>
         <div class="table-container">
-          <table>
-            <thead><tr><th>Imagen</th><th>Categoría</th><th>Nombre</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
-            <tbody id="lista-marketing-productos"></tbody>
-          </table>
+          <table><thead><tr><th>Imagen</th><th>Categoría</th><th>Nombre</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead><tbody id="lista-marketing-productos"></tbody></table>
         </div>
       </div>
     </section>
@@ -166,15 +158,8 @@
       <div class="card">
         <h2>🧾 Buscador de Facturas</h2>
         <p class="note" style="text-align:left;">Busca copias de seguridad de las facturas por Documento o Ticket.</p>
-        <div class="field">
-          <input type="text" id="buscador-facturas" placeholder="🔍 Escribe Documento o ID de Pedido..." oninput="filtrarFacturas()">
-        </div>
-        <div class="table-container">
-          <table>
-            <thead><tr><th>Factura ID</th><th>Ticket Pedido</th><th>Documento</th><th>Fecha</th><th>Acción</th></tr></thead>
-            <tbody id="lista-facturas"></tbody>
-          </table>
-        </div>
+        <div class="field"><input type="text" id="buscador-facturas" placeholder="🔍 Escribe Documento o ID de Pedido..." oninput="filtrarFacturas()"></div>
+        <div class="table-container"><table><thead><tr><th>Factura ID</th><th>Ticket Pedido</th><th>Documento</th><th>Fecha</th><th>Acción</th></tr></thead><tbody id="lista-facturas"></tbody></table></div>
       </div>
     </section>
 
@@ -182,72 +167,43 @@
     <section id="view-produccion" class="view"><div class="card"><h2>🍳 Comandas en Producción</h2><div class="grid" id="lista-produccion"></div></div></section>
     <section id="view-despachados" class="view"><div class="card"><h2>✅ Historial de Entregas</h2><div class="table-container"><table><thead><tr><th>ID</th><th>Cliente</th><th>Total</th><th>Estado</th></tr></thead><tbody id="lista-despachados"></tbody></table></div></div></section>
 
+    <!-- CRÉDITOS DE LOS ESTUDIANTES RESTAURADOS -->
+    <footer class="creditos-estudiantes">
+      <div class="creditos-text">
+        <span>🐺 PROYECTO DESARROLLADO POR:</span> 
+        Maria Fernanda Aragón | Naily Bustos | Shaira Nicoll Caballero | Hecna Thaliana | Gabriel Caceres | Mabel Celis | Gabriela Colmenares | Laura Contreras | Tatiana Florez | Jeimy Sabrina | Angie Elizabeth | Gabriela Gonzalez | Andrea Guerrero | Valeria Hernandez | Andres Felipe Latorre | Samuel Jimenez | Kelmer Andrey | Dorian Merino | Andres Felipe Meza | Roxana Miranda | Kevin Molina | Genesis Moncada | Maria Mora | Paula Gabriela | Juan Manuel Muñoz | Santiago Niño | Aaron Obeji | Gisell Palmero | Hasly Valeria | Lina Peña | Chelsea Ramirez | Sayhoa Rivera | Andry Rondon | Isabella Sarmiento | Sami Valeria | Mariangel Uribe | Natalia Velandia | Danna Salome Vera | Katherin Zambrano
+      </div>
+    </footer>
   </main>
 
   <!-- MODALES -->
   <div class="modal" id="modal-checkout">
     <div class="invoice">
-      <div class="modal-header">
-        <span style="font-family: 'Montserrat', sans-serif;">Completar Pedido</span>
-        <button onclick="cerrarModal('modal-checkout')" style="background:transparent; color:white; font-size:20px;">✕</button>
-      </div>
+      <div class="modal-header"><span style="font-family: 'Montserrat', sans-serif;">Completar Pedido</span><button onclick="cerrarModal('modal-checkout')" style="background:transparent; color:white; font-size:20px;">✕</button></div>
       <p class="note" style="text-align: left;">Ingresa tus datos para registrar la orden.</p>
-      <div class="field">
-        <label>Tipo de Cliente</label>
-        <select id="co-tipo" onchange="toggleCamposCliente()">
-          <option value="Ocasional">Cliente Vitrina (Ocasional)</option>
-          <option value="Continuo">Cliente Continuo (Fidelizado)</option>
-        </select>
-      </div>
+      <div class="field"><label>Tipo de Cliente</label><select id="co-tipo" onchange="toggleCamposCliente()"><option value="Ocasional">Cliente Vitrina (Ocasional)</option><option value="Continuo">Cliente Continuo (Fidelizado)</option></select></div>
       <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
       <div class="field"><label>Nombre Completo *</label><input type="text" id="co-nombre"></div>
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
       <div class="field hidden" id="co-correo-field"><label>Correo Electrónico *</label><input type="email" id="co-correo"></div>
       <hr style="border-color: #333; margin: 15px 0;">
-      <div class="field">
-        <label>Tipo de Pago</label>
-        <select id="co-tipo-pago" onchange="toggleVoucherInput()">
-          <option value="Completo">Pago Completo (De contado)</option>
-          <option value="Abono">Abono Parcial</option>
-        </select>
-      </div>
+      <div class="field"><label>Tipo de Pago</label><select id="co-tipo-pago" onchange="toggleVoucherInput()"><option value="Completo">Pago Completo (De contado)</option><option value="Abono">Abono Parcial</option></select></div>
       <div class="field hidden" id="co-monto-abono-field"><label>Monto a Abonar</label><input type="number" id="co-monto-abono"></div>
-      <div class="field">
-        <label>Subir Voucher / Comprobante (Imagen)</label>
-        <input type="file" id="co-voucher" accept="image/*">
-        <canvas id="canvas-compresion" style="display:none;"></canvas>
-      </div>
-      <div class="actions" style="margin-top: 20px;">
-        <button class="primary full-width" onclick="enviarPedido()" id="btn-enviar-pedido">Confirmar y Enviar Pedido</button>
-      </div>
+      <div class="field"><label>Subir Voucher / Comprobante (Imagen)</label><input type="file" id="co-voucher" accept="image/*"><canvas id="canvas-compresion" style="display:none;"></canvas></div>
+      <div class="actions" style="margin-top: 20px;"><button class="primary full-width" onclick="enviarPedido()" id="btn-enviar-pedido">Confirmar y Enviar Pedido</button></div>
     </div>
   </div>
 
   <div class="modal" id="modal-producto">
     <div class="invoice">
-      <div class="modal-header">
-        <span style="font-family: 'Montserrat', sans-serif;" id="modal-prod-titulo">Añadir Producto</span>
-        <button onclick="cerrarModal('modal-producto')" style="background:transparent; color:white; font-size:20px;">✕</button>
-      </div>
+      <div class="modal-header"><span style="font-family: 'Montserrat', sans-serif;" id="modal-prod-titulo">Añadir Producto</span><button onclick="cerrarModal('modal-producto')" style="background:transparent; color:white; font-size:20px;">✕</button></div>
       <input type="hidden" id="prod-id"><input type="hidden" id="prod-img-existente">
-      <div class="field">
-        <label>Categoría *</label>
-        <select id="prod-categoria">
-          <option value="~PRODUCTOS PRINCIPALES~">Productos Principales</option>
-          <option value="~BEBIDAS Y POSTRES~">Bebidas y Postres</option>
-          <option value="~COMBOS~">Combos</option>
-        </select>
-      </div>
+      <div class="field"><label>Categoría *</label><select id="prod-categoria"><option value="~PRODUCTOS PRINCIPALES~">Productos Principales</option><option value="~BEBIDAS Y POSTRES~">Bebidas y Postres</option><option value="~COMBOS~">Combos</option></select></div>
       <div class="field"><label>Nombre del Producto *</label><input type="text" id="prod-nombre"></div>
       <div class="field"><label>Ingredientes / Descripción *</label><input type="text" id="prod-desc"></div>
       <div class="field"><label>Precio ($ COP) *</label><input type="number" id="prod-precio"></div>
       <div class="field"><label>Estado</label><select id="prod-agotado"><option value="NO">Disponible</option><option value="SI">Agotado</option></select></div>
-      <div class="field">
-        <label>Subir Foto</label>
-        <input type="file" id="prod-img" accept="image/*">
-        <!-- Canvas para comprimir imágenes de marketing -->
-        <canvas id="canvas-compresion-prod" style="display:none;"></canvas>
-      </div>
+      <div class="field"><label>Subir Foto</label><input type="file" id="prod-img" accept="image/*"><canvas id="canvas-compresion-prod" style="display:none;"></canvas></div>
       <div class="actions" style="margin-top: 20px;"><button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button></div>
     </div>
   </div>
