@@ -1,9 +1,10 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V4.0
-// AUDITORÍA APLICADA: CORRECCIÓN DE CORS Y FALLO HTML
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V4.1
+// EMPRESA: compukelc
+// ARQUITECTURA: MOTOR CANVAS EN MEMORIA (DATA URI) SIN DRIVE
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwB41m6Dgxqg0ZGHdpNmtIfnO8vnu3xDk_TRMP6dJcVr_tbwz8JdjmVBaE_laWv3Nva7g/exec"; // <-- VERIFICA ESTE ENLACE
+const API_URL = "AQUI_TU_NUEVO_ENLACE_DE_IMPLEMENTACION"; // <-- PEGA TU URL AQUÍ
 
 let sesionActual = null; 
 let carrito = []; 
@@ -32,8 +33,11 @@ const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency:
 window.onload = async () => {
   try {
     const savedSession = localStorage.getItem('lobo_session');
-    if (savedSession) sesionActual = JSON.parse(savedSession);
-    else sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
+    if (savedSession) {
+      sesionActual = JSON.parse(savedSession);
+    } else {
+      sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
+    }
     
     configurarInterfazPorRol();
     await cargarCatalogoGlobal();
@@ -43,13 +47,12 @@ window.onload = async () => {
 };
 
 // ----------------------------------------------------------------------------
-// INYECCIÓN: CORE API CALL REESCRITO (EVITA ERRORES CORS Y HTML DOCTYPE)
+// LLAMADA A LA API
 // ----------------------------------------------------------------------------
 async function apiCall(accion, datos = {}) {
   try {
     const payload = JSON.stringify({ accion, datos });
     
-    // Se envía como text/plain puro para evitar que Google bloquee la petición
     const response = await fetch(API_URL, {
       method: 'POST',
       body: payload
@@ -71,8 +74,10 @@ async function apiCall(accion, datos = {}) {
     throw error; 
   }
 }
-// ----------------------------------------------------------------------------
 
+// ----------------------------------------------------------------------------
+// NAVEGACIÓN Y SESIÓN
+// ----------------------------------------------------------------------------
 function navegar(vistaID) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(`view-${vistaID}`).classList.add('active');
@@ -114,33 +119,47 @@ function configurarInterfazPorRol() {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'block');
     navegar('admin');
   } else if (sesionActual.rol === 'Vitrina') {
-    const navVit = document.getElementById('nav-vitrina'); if (navVit) navVit.style.display = 'block'; navegar('vitrina');
+    const navVit = document.getElementById('nav-vitrina'); 
+    if (navVit) navVit.style.display = 'block'; 
+    navegar('vitrina');
   } else if (sesionActual.rol === 'Cartera') {
-    const navCart = document.getElementById('nav-cartera'); if (navCart) navCart.style.display = 'block'; navegar('cartera');
+    const navCart = document.getElementById('nav-cartera'); 
+    if (navCart) navCart.style.display = 'block'; 
+    navegar('cartera');
   } else if (sesionActual.rol === 'Producción') {
-    const navProd = document.getElementById('nav-produccion'); if (navProd) navProd.style.display = 'block'; navegar('produccion');
+    const navProd = document.getElementById('nav-produccion'); 
+    if (navProd) navProd.style.display = 'block'; 
+    navegar('produccion');
   } else if (sesionActual.rol === 'Marketing') {
-    const navMark = document.getElementById('nav-marketing'); if (navMark) navMark.style.display = 'block'; navegar('marketing');
+    const navMark = document.getElementById('nav-marketing'); 
+    if (navMark) navMark.style.display = 'block'; 
+    navegar('marketing');
   }
 }
 
 async function iniciarSesion() {
   const doc = document.getElementById('login-doc').value;
   const pass = document.getElementById('login-pass').value;
+  
   if (!doc || !pass) return mostrarAlerta('Ingresa documento y contraseña');
   mostrarAlerta('Verificando...', 'info');
+  
   try {
     const empleados = await apiCall('obtenerEmpleados');
     const usuario = empleados.find(e => e['Documento (Usuario)'] == doc && e['Contraseña'] == pass);
+    
     if (!usuario) return mostrarAlerta('Credenciales incorrectas');
     if (usuario['Estado'] !== 'ACTIVO' && usuario['Rol Asignado'] !== 'Superadmin' && usuario['Rol Asignado'] !== 'Gerente') {
       return mostrarAlerta('Cuenta no activada.');
     }
+    
     sesionActual = { documento: doc, nombre: usuario['Nombre Completo'], rol: usuario['Rol Asignado'] };
     localStorage.setItem('lobo_session', JSON.stringify(sesionActual));
     mostrarAlerta('Acceso concedido', 'success');
     configurarInterfazPorRol();
-  } catch (e) { mostrarAlerta(e.message || 'Error de red.'); }
+  } catch (e) { 
+    mostrarAlerta(e.message || 'Error de red.'); 
+  }
 }
 
 async function registrarEmpleado() {
@@ -152,6 +171,7 @@ async function registrarEmpleado() {
     contrasena: document.getElementById('reg-pass').value,
     contrasena2: document.getElementById('reg-pass2').value
   };
+  
   if (Object.values(datos).some(x => !x)) return mostrarAlerta('Todos los campos son obligatorios');
   if (datos.contrasena !== datos.contrasena2) return mostrarAlerta('Las contraseñas no coinciden');
   
@@ -159,22 +179,36 @@ async function registrarEmpleado() {
     await apiCall('registrarEmpleado', datos);
     mostrarAlerta('Registro exitoso.', 'success');
     navegar('login');
-  } catch (e) { mostrarAlerta('Error al registrar.'); }
+  } catch (e) { 
+    mostrarAlerta('Error al registrar.'); 
+  }
 }
 
 function mostrarAlerta(msg, tipo = 'error') {
   const alertBox = document.getElementById('alert-box');
   if(alertBox) {
-    alertBox.textContent = msg; alertBox.className = `alert ${tipo}`;
+    alertBox.textContent = msg; 
+    alertBox.className = `alert ${tipo}`;
     setTimeout(() => alertBox.classList.add('hidden'), 5000);
-  } else { alert(msg); }
+  } else { 
+    alert(msg); 
+  }
 }
 
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId);
-  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; } else { input.type = 'password'; btn.textContent = '👁️'; }
+  if (input.type === 'password') { 
+    input.type = 'text'; 
+    btn.textContent = '🙈'; 
+  } else { 
+    input.type = 'password'; 
+    btn.textContent = '👁️'; 
+  }
 }
 
+// ----------------------------------------------------------------------------
+// CATÁLOGO Y CARRITO
+// ----------------------------------------------------------------------------
 async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
@@ -226,11 +260,23 @@ function renderCatalogo() {
   categorias.forEach(cat => {
     html += `<h3 style="grid-column: 1 / -1; margin-top: 40px; margin-bottom: 10px; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 10px; font-family: 'Metal Mania', cursive; font-size: 38px; text-align: center;">${cat}</h3>`;
     const productos = CATALOGO.filter(p => p.categoria === cat);
+    
     productos.forEach(prod => {
-      const botonHTML = prod.agotado ? `<button class="btn-outline full-width" disabled>Agotado</button>` : `<button class="primary full-width" onclick="agregarAlCarrito('${prod.id}')">+ Añadir a pedido</button>`;
+      const botonHTML = prod.agotado 
+        ? `<button class="btn-outline full-width" disabled>Agotado</button>` 
+        : `<button class="primary full-width" onclick="agregarAlCarrito('${prod.id}')">+ Añadir a pedido</button>`;
+        
       const estiloAgotado = prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : '';
       const imgHTML = prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : '';
-      html += `<div class="product-card" style="${estiloAgotado}">${imgHTML}<h3>${prod.nombre}</h3><p>${prod.desc}</p><span class="price">${money(prod.precio)}</span>${botonHTML}</div>`;
+      
+      html += `
+        <div class="product-card" style="${estiloAgotado}">
+          ${imgHTML}
+          <h3>${prod.nombre}</h3>
+          <p>${prod.desc}</p>
+          <span class="price">${money(prod.precio)}</span>
+          ${botonHTML}
+        </div>`;
     });
   });
   
@@ -238,11 +284,22 @@ function renderCatalogo() {
 }
 
 function cargarGestorMenu() {
-  const tbody = document.getElementById('lista-marketing-productos'); tbody.innerHTML = '';
+  const tbody = document.getElementById('lista-marketing-productos'); 
+  tbody.innerHTML = '';
+  
   CATALOGO.forEach(p => {
     const imgThumb = p.urlImagen ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">` : 'Sin foto';
     const row = document.createElement('tr');
-    row.innerHTML = `<td>${imgThumb}</td><td>${p.categoria}</td><td><b>${p.nombre}</b></td><td>${money(p.precio)}</td><td><span class="badge ${p.agotado ? 'denegado' : 'activo'}">${p.agotado ? 'AGOTADO' : 'DISPONIBLE'}</span></td><td><button class="primary small" onclick="abrirModalProducto('${p.id}')">Editar</button> <button class="small" style="background:var(--dark-red);" onclick="eliminarProducto('${p.id}')">Eliminar</button></td>`;
+    row.innerHTML = `
+      <td>${imgThumb}</td>
+      <td>${p.categoria}</td>
+      <td><b>${p.nombre}</b></td>
+      <td>${money(p.precio)}</td>
+      <td><span class="badge ${p.agotado ? 'denegado' : 'activo'}">${p.agotado ? 'AGOTADO' : 'DISPONIBLE'}</span></td>
+      <td>
+        <button class="primary small" onclick="abrirModalProducto('${p.id}')">Editar</button> 
+        <button class="small" style="background:var(--dark-red);" onclick="eliminarProducto('${p.id}')">Eliminar</button>
+      </td>`;
     tbody.appendChild(row);
   });
 }
@@ -252,42 +309,91 @@ function abrirModalProducto(id = null) {
   if (id) {
     const p = CATALOGO.find(x => x.id === id);
     document.getElementById('modal-prod-titulo').textContent = 'Editar Producto';
-    document.getElementById('prod-id').value = p.id; document.getElementById('prod-categoria').value = p.categoria; document.getElementById('prod-nombre').value = p.nombre; document.getElementById('prod-desc').value = p.desc; document.getElementById('prod-precio').value = p.precio; document.getElementById('prod-agotado').value = p.agotado ? 'SI' : 'NO'; document.getElementById('prod-img-existente').value = p.urlImagen || '';
+    document.getElementById('prod-id').value = p.id; 
+    document.getElementById('prod-categoria').value = p.categoria; 
+    document.getElementById('prod-nombre').value = p.nombre; 
+    document.getElementById('prod-desc').value = p.desc; 
+    document.getElementById('prod-precio').value = p.precio; 
+    document.getElementById('prod-agotado').value = p.agotado ? 'SI' : 'NO'; 
+    document.getElementById('prod-img-existente').value = p.urlImagen || '';
   } else {
     document.getElementById('modal-prod-titulo').textContent = 'Añadir Producto';
-    document.getElementById('prod-id').value = ''; document.getElementById('prod-nombre').value = ''; document.getElementById('prod-desc').value = ''; document.getElementById('prod-precio').value = ''; document.getElementById('prod-img-existente').value = '';
+    document.getElementById('prod-id').value = ''; 
+    document.getElementById('prod-nombre').value = ''; 
+    document.getElementById('prod-desc').value = ''; 
+    document.getElementById('prod-precio').value = ''; 
+    document.getElementById('prod-img-existente').value = '';
   }
   document.getElementById('prod-img').value = ''; 
 }
 
-function comprimirImagen(file, canvasId = 'canvas-compresion') {
-  return new Promise((resolve) => {
+// ----------------------------------------------------------------------------
+// COMPRESOR CANVAS (DATA URI) SIN DRIVE
+// ----------------------------------------------------------------------------
+function comprimirEnCanvas(file) {
+  return new Promise((resolve, reject) => {
     if (!file) return resolve(null);
-    const reader = new FileReader(); reader.readAsDataURL(file);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    
     reader.onload = event => {
-      const img = new Image(); img.src = event.target.result;
+      const img = new Image();
+      img.src = event.target.result;
+      
       img.onload = () => {
-        const canvas = document.getElementById(canvasId); const ctx = canvas.getContext('2d');
-        const MAX_WIDTH = 600;
-        let width = img.width; let height = img.height; 
-        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-        canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.5).split(',')[1]); 
+        const canvas = document.createElement('canvas'); 
+        const ctx = canvas.getContext('2d');
+        
+        const MAX_WIDTH = 250;
+        let width = img.width; 
+        let height = img.height; 
+        
+        if (width > MAX_WIDTH) { 
+          height = Math.round((height * MAX_WIDTH) / width); 
+          width = MAX_WIDTH; 
+        }
+        
+        canvas.width = width; 
+        canvas.height = height; 
+        
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        const dataURI = canvas.toDataURL('image/jpeg', 0.5); 
+        resolve(dataURI); 
       };
+      
+      img.onerror = () => reject("Error cargando la imagen para compresión.");
     };
+    reader.onerror = () => reject("Error leyendo el archivo.");
   });
 }
 
 async function guardarProductoBackend() {
   const btn = document.getElementById('btn-guardar-prod');
   const fileInput = document.getElementById('prod-img').files[0];
-  const datos = { idProducto: document.getElementById('prod-id').value, categoria: document.getElementById('prod-categoria').value, nombre: document.getElementById('prod-nombre').value, descripcion: document.getElementById('prod-desc').value, precio: document.getElementById('prod-precio').value, agotado: document.getElementById('prod-agotado').value === 'SI', urlImagenExistente: document.getElementById('prod-img-existente').value };
+  
+  const datos = { 
+    idProducto: document.getElementById('prod-id').value, 
+    categoria: document.getElementById('prod-categoria').value, 
+    nombre: document.getElementById('prod-nombre').value, 
+    descripcion: document.getElementById('prod-desc').value, 
+    precio: document.getElementById('prod-precio').value, 
+    agotado: document.getElementById('prod-agotado').value === 'SI', 
+    urlImagenExistente: document.getElementById('prod-img-existente').value 
+  };
   
   if (!datos.nombre || !datos.descripcion || !datos.precio) return mostrarAlerta('Faltan campos obligatorios');
 
-  btn.disabled = true; btn.textContent = 'Guardando...';
+  btn.disabled = true; 
+  btn.textContent = 'Guardando en BD...';
+  
   try {
-    if (fileInput) { datos.imagenBase64 = await comprimirImagen(fileInput, 'canvas-compresion-prod'); }
+    if (fileInput) { 
+      datos.imagenBase64 = await comprimirEnCanvas(fileInput); 
+    }
+    
     await apiCall('guardarProducto', datos);
     cerrarModal('modal-producto'); 
     await cargarCatalogoGlobal(); 
@@ -296,31 +402,81 @@ async function guardarProductoBackend() {
   } catch (error) {
     mostrarAlerta(error.message);
   } finally { 
-    btn.disabled = false; btn.textContent = 'Guardar'; 
+    btn.disabled = false; 
+    btn.textContent = 'Guardar'; 
   }
 }
 
 async function eliminarProducto(id) {
   if (!confirm('¿Seguro que deseas eliminar este producto permanentemente?')) return;
+  
   const esProductoBase = CATALOGO_BASE.some(base => base.id === id);
   if (esProductoBase) {
     mostrarAlerta('No se puede eliminar un producto base. Ponlo en AGOTADO.', 'warning');
     return;
   }
+  
   try { 
     await apiCall('eliminarProducto', { idProducto: id }); 
     mostrarAlerta('Producto eliminado', 'success');
-    await cargarCatalogoGlobal(); cargarGestorMenu(); 
-  } catch(e) { mostrarAlerta(e.message || 'Error al eliminar.'); }
+    await cargarCatalogoGlobal(); 
+    cargarGestorMenu(); 
+  } catch(e) { 
+    mostrarAlerta(e.message || 'Error al eliminar.'); 
+  }
 }
 
-function agregarAlCarrito(id) { const prod = CATALOGO.find(p => p.id === id); const item = carrito.find(i => i.id === id); if (item) item.cant++; else carrito.push({ ...prod, cant: 1 }); renderCarrito(); }
-function quitarDelCarrito(id) { carrito = carrito.filter(i => { if (i.id === id) i.cant--; return i.cant > 0; }); renderCarrito(); }
+// ----------------------------------------------------------------------------
+// CARRITO DE COMPRAS Y PEDIDOS
+// ----------------------------------------------------------------------------
+function agregarAlCarrito(id) { 
+  const prod = CATALOGO.find(p => p.id === id); 
+  const item = carrito.find(i => i.id === id); 
+  
+  if (item) item.cant++; 
+  else carrito.push({ ...prod, cant: 1 }); 
+  
+  renderCarrito(); 
+}
+
+function quitarDelCarrito(id) { 
+  carrito = carrito.filter(i => { 
+    if (i.id === id) i.cant--; 
+    return i.cant > 0; 
+  }); 
+  renderCarrito(); 
+}
+
 function renderCarrito() {
-  const container = document.getElementById('carrito-items'); const btnProcesar = document.getElementById('btn-procesar'); const displayTotal = document.getElementById('carrito-total-precio');
-  if (carrito.length === 0) { container.innerHTML = '<p class="note">Carrito vacío</p>'; displayTotal.textContent = '$0'; btnProcesar.disabled = true; return; }
-  btnProcesar.disabled = false; let total = 0;
-  container.innerHTML = carrito.map(item => { total += item.precio * item.cant; return `<div class="cart-item"><div class="cart-item-info"><span class="qty" style="background:var(--red);">${item.cant}</span><span>${item.nombre}</span></div><div><span>${money(item.precio * item.cant)}</span><button class="del-btn" onclick="quitarDelCarrito('${item.id}')">✕</button></div></div>`; }).join('');
+  const container = document.getElementById('carrito-items'); 
+  const btnProcesar = document.getElementById('btn-procesar'); 
+  const displayTotal = document.getElementById('carrito-total-precio');
+  
+  if (carrito.length === 0) { 
+    container.innerHTML = '<p class="note">Carrito vacío</p>'; 
+    displayTotal.textContent = '$0'; 
+    btnProcesar.disabled = true; 
+    return; 
+  }
+  
+  btnProcesar.disabled = false; 
+  let total = 0;
+  
+  container.innerHTML = carrito.map(item => { 
+    total += item.precio * item.cant; 
+    return `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <span class="qty" style="background:var(--red);">${item.cant}</span>
+          <span>${item.nombre}</span>
+        </div>
+        <div>
+          <span>${money(item.precio * item.cant)}</span>
+          <button class="del-btn" onclick="quitarDelCarrito('${item.id}')">✕</button>
+        </div>
+      </div>`; 
+  }).join('');
+  
   displayTotal.textContent = money(total);
 }
 
@@ -331,31 +487,55 @@ function toggleVoucherInput() { document.getElementById('co-monto-abono-field').
 
 async function enviarPedido() {
   const btn = document.getElementById('btn-enviar-pedido');
-  const tipoCliente = document.getElementById('co-tipo').value; const documento = document.getElementById('co-doc').value; const nombre = document.getElementById('co-nombre').value; const celular = document.getElementById('co-celular').value; const correo = document.getElementById('co-correo').value; const tipoPago = document.getElementById('co-tipo-pago').value; const voucherInput = document.getElementById('co-voucher').files[0];
+  
+  const tipoCliente = document.getElementById('co-tipo').value; 
+  const documento = document.getElementById('co-doc').value; 
+  const nombre = document.getElementById('co-nombre').value; 
+  const celular = document.getElementById('co-celular').value; 
+  const correo = document.getElementById('co-correo').value; 
+  const tipoPago = document.getElementById('co-tipo-pago').value; 
+  const voucherInput = document.getElementById('co-voucher').files[0];
+  
   if (!documento || !nombre || !celular || !voucherInput) return mostrarAlerta('Faltan datos o voucher');
 
-  btn.disabled = true; btn.textContent = 'Procesando pago y factura...';
+  btn.disabled = true; 
+  btn.textContent = 'Procesando...';
+  
   try {
     const idPedido = 'ORD-' + new Date().getTime().toString().slice(-6);
     const totalVenta = carrito.reduce((acc, i) => acc + (i.precio * i.cant), 0);
     const montoAbono = tipoPago === 'Completo' ? totalVenta : Number(document.getElementById('co-monto-abono').value);
 
-    const base64Voucher = await comprimirImagen(voucherInput);
-    await apiCall('subirVoucher', { idPedido, montoAbono, imagenBase64: base64Voucher, mimeType: 'image/jpeg' });
+    const base64Voucher = await comprimirEnCanvas(voucherInput);
+    await apiCall('subirVoucher', { idPedido, montoAbono, imagenBase64: base64Voucher });
+    
     const res = await apiCall('crearPedido', { idPedido, documento, nombre, celular, tipoCliente, correo, carrito, total: totalVenta });
 
-    mostrarAlerta('Pedido y Factura Generados', 'success');
-    window.open(res.urlFactura, '_blank');
+    mostrarAlerta('Pedido Generado', 'success');
+    if (res.urlFactura && res.urlFactura.includes('http')) window.open(res.urlFactura, '_blank');
     
-    carrito = []; renderCarrito(); cerrarModal('modal-checkout');
-  } catch (error) { mostrarAlerta(error.message || 'Error al procesar.'); } finally { btn.disabled = false; btn.textContent = 'Confirmar y Enviar Pedido'; }
+    carrito = []; 
+    renderCarrito(); 
+    cerrarModal('modal-checkout');
+  } catch (error) { 
+    mostrarAlerta(error.message || 'Error al procesar.'); 
+  } finally { 
+    btn.disabled = false; 
+    btn.textContent = 'Confirmar y Enviar Pedido'; 
+  }
 }
 
+// ----------------------------------------------------------------------------
+// GESTIÓN DE EMPLEADOS Y FACTURAS
+// ----------------------------------------------------------------------------
 async function cargarEmpleados() {
-  const tbody = document.getElementById('lista-empleados'); tbody.innerHTML = '<tr><td colspan="6" class="center">Cargando...</td></tr>';
+  const tbody = document.getElementById('lista-empleados'); 
+  tbody.innerHTML = '<tr><td colspan="6" class="center">Cargando...</td></tr>';
+  
   try {
     const empleados = await apiCall('obtenerEmpleados');
     tbody.innerHTML = '';
+    
     let empleadosVisibles = empleados;
     if (sesionActual.rol === 'Gerente') {
       empleadosVisibles = empleados.filter(e => e['Rol Asignado'] !== 'Superadmin');
@@ -374,13 +554,13 @@ async function cargarEmpleados() {
       if (sesionActual.rol === 'Superadmin') {
         opcionesRol += `<option value="Gerente" ${emp['Rol Asignado'] === 'Gerente' ? 'selected' : ''}>Gerente</option>`;
         opcionesRol += `<option value="Superadmin" ${emp['Rol Asignado'] === 'Superadmin' ? 'selected' : ''}>Superadmin</option>`;
-      } else if (sesionActual.rol === 'Gerente' && emp['Rol Asignado'] === 'Gerente') {
-        opcionesRol += `<option value="Gerente" selected>Gerente</option>`;
       }
 
       const row = document.createElement('tr');
       row.innerHTML = `
-        <td>${emp['Documento (Usuario)']}</td><td>${emp['Nombre Completo']}</td><td>${emp['Área Aspirada']}</td>
+        <td>${emp['Documento (Usuario)']}</td>
+        <td>${emp['Nombre Completo']}</td>
+        <td>${emp['Área Aspirada']}</td>
         <td><span class="badge ${emp['Estado'].toLowerCase()}">${emp['Estado']}</span></td>
         <td><select id="rol-${emp['Documento (Usuario)']}">${opcionesRol}</select></td>
         <td><button class="primary small" onclick="cambiarRol('${emp['Documento (Usuario)']}')">Guardar</button></td>
@@ -393,28 +573,37 @@ async function cargarEmpleados() {
 async function cambiarRol(documento) {
   const nuevoRol = document.getElementById(`rol-${documento}`).value;
   const nuevoEstado = nuevoRol === 'Pendiente' ? 'PENDIENTE' : 'ACTIVO';
-  try { await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); cargarEmpleados(); } catch(e) {}
+  
+  try { 
+    await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); 
+    cargarEmpleados(); 
+  } catch(e) {}
 }
 
 async function cargarFacturas() {
-  const tbody = document.getElementById('lista-facturas');
+  const tbody = document.getElementById('lista-facturas'); 
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando facturas en la nube...</td></tr>';
-  try {
-    FACTURAS_GLOBAL = await apiCall('obtenerFacturas');
-    filtrarFacturas();
-  } catch(e) { tbody.innerHTML = '<tr><td colspan="5">Error al cargar.</td></tr>'; }
+  
+  try { 
+    FACTURAS_GLOBAL = await apiCall('obtenerFacturas'); 
+    filtrarFacturas(); 
+  } catch(e) { 
+    tbody.innerHTML = '<tr><td colspan="5">Error al cargar.</td></tr>'; 
+  }
 }
 
 function filtrarFacturas() {
-  const query = document.getElementById('buscador-facturas').value.toLowerCase();
-  const tbody = document.getElementById('lista-facturas');
-  const filtradas = FACTURAS_GLOBAL.filter(f => f['Documento'].toString().includes(query) || f['ID Pedido'].toLowerCase().includes(query));
+  const query = document.getElementById('buscador-facturas').value.toLowerCase(); 
+  const tbody = document.getElementById('lista-facturas'); 
+  
+  const filtradas = FACTURAS_GLOBAL.filter(f => 
+    f['Documento'].toString().includes(query) || f['ID Pedido'].toLowerCase().includes(query)
+  );
   
   if(filtradas.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="5" class="center">No se encontraron facturas.</td></tr>';
-    return;
+    return tbody.innerHTML = '<tr><td colspan="5" class="center">No se encontraron facturas.</td></tr>';
   }
-
+  
   tbody.innerHTML = filtradas.map(f => `
     <tr>
       <td>${f['ID Factura']}</td>
@@ -427,17 +616,44 @@ function filtrarFacturas() {
 }
 
 async function cargarPedidos(estado, contenedorID) {
-  const container = document.getElementById(contenedorID); container.innerHTML = '<p class="note">Cargando...</p>';
+  const container = document.getElementById(contenedorID); 
+  container.innerHTML = '<p class="note">Cargando...</p>';
+  
   try {
-    const pedidos = await apiCall('obtenerPedidos'); const filtrados = pedidos.filter(p => p['Estado'] === estado);
+    const pedidos = await apiCall('obtenerPedidos'); 
+    const filtrados = pedidos.filter(p => p['Estado'] === estado);
+    
     if (filtrados.length === 0) return container.innerHTML = '<p class="note">No hay pedidos.</p>';
+    
     if (contenedorID === 'lista-despachados') {
-      container.innerHTML = filtrados.map(p => `<tr><td><b>${p['ID Pedido']}</b></td><td>${p['Nombre']}</td><td>${money(p['Total'])}</td><td><span class="badge despachado">${p['Estado']}</span></td></tr>`).join('');
+      container.innerHTML = filtrados.map(p => `
+        <tr>
+          <td><b>${p['ID Pedido']}</b></td>
+          <td>${p['Nombre']}</td>
+          <td>${money(p['Total'])}</td>
+          <td><span class="badge despachado">${p['Estado']}</span></td>
+        </tr>
+      `).join('');
     } else {
       container.innerHTML = filtrados.map(p => {
         const itemsCart = JSON.parse(p['Carrito (JSON)']);
-        let botonAccion = estado === 'ESPERA DE PAGO' ? `<button class="primary full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'EN PRODUCCIÓN')">Aprobar Pago -> Cocina</button>` : `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Despachado</button>`;
-        return `<div class="card product-card" style="text-align:left;"><h3 style="margin-bottom:0; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3><p class="note" style="text-align:left; margin-bottom: 10px;">Cliente: ${p['Nombre']}</p><ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">${itemsCart.map(i => `<li>${i.cant}x ${i.nombre}</li>`).join('')}</ul><div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;"><span>Total:</span><span class="text-gold">${money(p['Total'])}</span></div>${botonAccion}</div>`;
+        let botonAccion = estado === 'ESPERA DE PAGO' 
+          ? `<button class="primary full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'EN PRODUCCIÓN')">Aprobar Pago -> Cocina</button>` 
+          : `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Despachado</button>`;
+          
+        return `
+          <div class="card product-card" style="text-align:left;">
+            <h3 style="margin-bottom:0; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>
+            <p class="note" style="text-align:left; margin-bottom: 10px;">Cliente: ${p['Nombre']}</p>
+            <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
+              ${itemsCart.map(i => `<li>${i.cant}x ${i.nombre}</li>`).join('')}
+            </ul>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
+              <span>Total:</span>
+              <span class="text-gold">${money(p['Total'])}</span>
+            </div>
+            ${botonAccion}
+          </div>`;
       }).join('');
     }
   } catch(e) {}
@@ -446,12 +662,19 @@ async function cargarPedidos(estado, contenedorID) {
 async function cambiarEstadoPedido(idPedido, nuevoEstado) {
   try {
     await apiCall('cambiarEstadoPedido', { idPedido, nuevoEstado });
-    if (sesionActual.rol === 'Cartera' || sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') cargarPedidos('ESPERA DE PAGO', 'lista-cartera');
-    if (sesionActual.rol === 'Producción' || sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
+    
+    if (sesionActual.rol === 'Cartera' || sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') {
+      cargarPedidos('ESPERA DE PAGO', 'lista-cartera');
+    }
+    if (sesionActual.rol === 'Producción' || sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') {
+      cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
+    }
   } catch(e) {}
 }
 
-// Registro del Service Worker para la PWA
+// ============================================================================
+// REGISTRO DEL SERVICE WORKER PARA LA PWA
+// ============================================================================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').catch(err => console.log('Error SW:', err));
