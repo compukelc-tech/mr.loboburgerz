@@ -1,5 +1,5 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V3.1 (Blindado)
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V3.2 (Fusión de Datos)
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwB41m6Dgxqg0ZGHdpNmtIfnO8vnu3xDk_TRMP6dJcVr_tbwz8JdjmVBaE_laWv3Nva7g/exec";
@@ -9,6 +9,7 @@ let carrito = [];
 let CATALOGO = []; 
 let FACTURAS_GLOBAL = []; 
 
+// CATÁLOGO BASE (Actúa como semilla inmutable)
 const CATALOGO_BASE = [
   { id: 'p1', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Sangrienta', desc: 'Pan brioche, Carne de res, Tocineta, Jamón, Queso, Vegetales.', precio: 18000, agotado: false, urlImagen: '' },
   { id: 'p2', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Luna Llena', desc: 'Pan brioche negro, Pollo desmechado en salsa, Tocineta, Jamon, Queso, Vegetales.', precio: 17000, agotado: false, urlImagen: '' },
@@ -28,7 +29,7 @@ const CATALOGO_BASE = [
 
 const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
 
-// --- 1. INICIALIZACIÓN BLINDADA ---
+// --- 1. INICIALIZACIÓN ---
 window.onload = async () => {
   try {
     const savedSession = localStorage.getItem('lobo_session');
@@ -54,9 +55,7 @@ async function apiCall(accion, datos = {}) {
     const result = await response.json();
     if (!result.exito) throw new Error(result.error);
     return result.data;
-  } catch (error) { 
-    throw error; 
-  }
+  } catch (error) { throw error; }
 }
 
 function navegar(vistaID) {
@@ -82,7 +81,6 @@ function entrarComoCliente() { cerrarSesion(); }
 
 function configurarInterfazPorRol() {
   const isCliente = sesionActual.rol === 'Cliente';
-  
   const nav = document.getElementById('main-nav');
   const loginIcon = document.getElementById('btn-login-icon');
   const greeting = document.getElementById('user-greeting');
@@ -154,9 +152,7 @@ function mostrarAlerta(msg, tipo = 'error') {
   if(alertBox) {
     alertBox.textContent = msg; alertBox.className = `alert ${tipo}`;
     setTimeout(() => alertBox.classList.add('hidden'), 3500);
-  } else {
-    alert(msg);
-  }
+  } else { alert(msg); }
 }
 
 function togglePassword(inputId, btn) {
@@ -164,12 +160,17 @@ function togglePassword(inputId, btn) {
   if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; } else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
-// --- 6. GESTIÓN CATÁLOGO SEGURO ---
+// --- 6. GESTIÓN CATÁLOGO: ARQUITECTURA DE FUSIÓN (MERGE) ---
 async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
+    
+    // 1. Cargamos el catálogo base como punto de partida
+    let catalogoFusionado = [...CATALOGO_BASE];
+
+    // 2. Si Google Sheets responde con datos, aplicamos la fusión
     if (data && data.length > 0) {
-      CATALOGO = data.map(p => ({ 
+      const productosNube = data.map(p => ({ 
         id: p['ID Producto'], 
         categoria: p['Categoría'] || '~PRODUCTOS PRINCIPALES~', 
         nombre: p['Nombre'], 
@@ -178,11 +179,23 @@ async function cargarCatalogoGlobal() {
         agotado: p['Agotado (SI/NO)'] === 'SI', 
         urlImagen: p['URL Imagen'] 
       }));
-    } else { 
-      CATALOGO = [...CATALOGO_BASE]; 
+
+      // 3. Fusionamos los datos de la Nube con los del Código Base
+      productosNube.forEach(prodNube => {
+        const index = catalogoFusionado.findIndex(base => base.id === prodNube.id);
+        if (index !== -1) {
+          // Si el producto de Sheets coincide con uno base, lo sobreescribe (Actualización)
+          catalogoFusionado[index] = prodNube;
+        } else {
+          // Si es un producto completamente nuevo creado en Sheets, lo agrega
+          catalogoFusionado.push(prodNube);
+        }
+      });
     }
+    
+    CATALOGO = catalogoFusionado;
   } catch (error) { 
-    console.warn("Fallo al conectar con Sheets, cargando menú base.", error);
+    console.warn("Fallo al conectar con Sheets, cargando menú base puro.", error);
     CATALOGO = [...CATALOGO_BASE]; 
   }
   
@@ -257,10 +270,26 @@ async function guardarProductoBackend() {
 }
 
 async function eliminarProducto(id) {
-  if (!confirm('¿Eliminar producto permanentemente?')) return;
-  try { await apiCall('eliminarProducto', { idProducto: id }); await cargarCatalogoGlobal(); cargarGestorMenu(); } catch(e) { }
+  if (!confirm('¿Seguro que deseas eliminar este producto permanentemente?')) return;
+  
+  // REGLA DE SEGURIDAD: Previene que eliminen los productos base que están incrustados en el código.
+  const esProductoBase = CATALOGO_BASE.some(base => base.id === id);
+  if (esProductoBase) {
+    mostrarAlerta('No se puede eliminar un producto base. Si no quieres venderlo, presiona "Editar" y ponlo en AGOTADO.', 'warning');
+    return;
+  }
+
+  try { 
+    await apiCall('eliminarProducto', { idProducto: id }); 
+    mostrarAlerta('Producto eliminado', 'success');
+    await cargarCatalogoGlobal(); 
+    cargarGestorMenu(); 
+  } catch(e) { 
+    mostrarAlerta('Hubo un error al eliminar de la nube.');
+  }
 }
 
+// --- 7. CARRITO DE COMPRAS ---
 function agregarAlCarrito(id) { const prod = CATALOGO.find(p => p.id === id); const item = carrito.find(i => i.id === id); if (item) item.cant++; else carrito.push({ ...prod, cant: 1 }); renderCarrito(); }
 function quitarDelCarrito(id) { carrito = carrito.filter(i => { if (i.id === id) i.cant--; return i.cant > 0; }); renderCarrito(); }
 function renderCarrito() {
@@ -313,7 +342,7 @@ async function enviarPedido() {
   } catch (error) { mostrarAlerta('Error al procesar.'); } finally { btn.disabled = false; btn.textContent = 'Confirmar y Enviar Pedido'; }
 }
 
-// --- LOGICA DE ROLES: GERENTE Y SUPERADMIN ---
+// --- 8. LOGICA DE ROLES: GERENTE Y SUPERADMIN ---
 async function cargarEmpleados() {
   const tbody = document.getElementById('lista-empleados'); tbody.innerHTML = '<tr><td colspan="6" class="center">Cargando...</td></tr>';
   try {
@@ -360,7 +389,7 @@ async function cambiarRol(documento) {
   try { await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); cargarEmpleados(); } catch(e) {}
 }
 
-// --- BUSCADOR DE FACTURAS ---
+// --- 9. BUSCADOR DE FACTURAS ---
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas');
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando facturas en la nube...</td></tr>';
