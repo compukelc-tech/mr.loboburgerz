@@ -1,5 +1,5 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V3.0
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V3.1 (Blindado)
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbwB41m6Dgxqg0ZGHdpNmtIfnO8vnu3xDk_TRMP6dJcVr_tbwz8JdjmVBaE_laWv3Nva7g/exec";
@@ -13,18 +13,34 @@ const CATALOGO_BASE = [
   { id: 'p1', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Sangrienta', desc: 'Pan brioche, Carne de res, Tocineta, Jamón, Queso, Vegetales.', precio: 18000, agotado: false, urlImagen: '' },
   { id: 'p2', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Luna Llena', desc: 'Pan brioche negro, Pollo desmechado en salsa, Tocineta, Jamon, Queso, Vegetales.', precio: 17000, agotado: false, urlImagen: '' },
   { id: 'p3', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'Manada', desc: 'Pan brioche, Pollo, Carne, Tocineta, Chorizo, Jamón, Queso, Cebolla caramelizada, Vegetales.', precio: 20000, agotado: false, urlImagen: '' },
-  { id: 'p4', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'DoriLobo', desc: 'Doritos, Carne molida, Maicitos, Queso mozzarella, Guacamole, Pico de gallo, Limón.', precio: 15000, agotado: false, urlImagen: '' }
+  { id: 'p4', categoria: '~PRODUCTOS PRINCIPALES~', nombre: 'DoriLobo', desc: 'Doritos, Carne molida, Maicitos, Queso mozzarella, Guacamole, Pico de gallo, Limón.', precio: 15000, agotado: false, urlImagen: '' },
+  { id: 'b1', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Sangre De Alfa', desc: 'Sprite, Cereza, Zumo de limón, Borde de azúcar con limón, Gomita de Ojos.', precio: 8000, agotado: false, urlImagen: '' },
+  { id: 'b2', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Legado De Plata', desc: 'Sprite, Zumo de Limón, Polvo Plateado, Borde de Azúcar negro con Limón, Menta Fresca.', precio: 8000, agotado: false, urlImagen: '' },
+  { id: 'b3', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Noche Azul', desc: 'Sprite, Arándanos, Zumo de Limón, Borde de Azúcar con Limón, Menta Fresca.', precio: 8000, agotado: false, urlImagen: '' },
+  { id: 'po1', categoria: '~BEBIDAS Y POSTRES~', nombre: 'Exilir De Maracuya', desc: 'Postre Cremoso de Maracuyá, Base de Galleta dulce y Salsa de Maracuyá.', precio: 7000, agotado: false, urlImagen: '' },
+  { id: 'c1', categoria: '~COMBOS~', nombre: 'Mr. Lobo El Alfa', desc: '1 Manada, 1 Luna Llena, 1 Dorilobo, 1 Michelada a elección, 2 postres a elección, 2 gaseosas a elección.', precio: 60000, agotado: false, urlImagen: '' },
+  { id: 'c2', categoria: '~COMBOS~', nombre: 'La Caceria', desc: '1 Manada, 1 Sangrienta, 1 Dorilobo, 1 Michelada a elección, 2 gaseosas a elección.', precio: 50000, agotado: false, urlImagen: '' },
+  { id: 'c3', categoria: '~COMBOS~', nombre: 'Manada Feroz', desc: '1 Luna Llena, 1 Sangrienta, 2 micheladas a elección, 1 postre a elección.', precio: 40000, agotado: false, urlImagen: '' },
+  { id: 'c4', categoria: '~COMBOS~', nombre: 'Eclipse Lunar', desc: '1 Luna Llena, 1 Sangrienta, 1 michelada a elección, 1 gaseosa a elección.', precio: 32000, agotado: false, urlImagen: '' },
+  { id: 'c5', categoria: '~COMBOS~', nombre: 'MegaLobito Hambriento', desc: '1 Sangrienta, 1 postre a elección, 1 michelada a elección.', precio: 28000, agotado: false, urlImagen: '' },
+  { id: 'c6', categoria: '~COMBOS~', nombre: 'Lobo Solitario', desc: '1 Manada, 1 postre a elección, 1 gaseosa a elección.', precio: 24000, agotado: false, urlImagen: '' }
 ];
 
 const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(n);
 
+// --- 1. INICIALIZACIÓN BLINDADA ---
 window.onload = async () => {
-  const savedSession = localStorage.getItem('lobo_session');
-  if (savedSession) sesionActual = JSON.parse(savedSession);
-  else sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
-  
-  configurarInterfazPorRol();
-  await cargarCatalogoGlobal();
+  try {
+    const savedSession = localStorage.getItem('lobo_session');
+    if (savedSession) sesionActual = JSON.parse(savedSession);
+    else sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
+    
+    configurarInterfazPorRol();
+    await cargarCatalogoGlobal();
+  } catch (error) {
+    console.error("Error crítico en inicialización:", error);
+    document.getElementById('catalogo-productos').innerHTML = `<div style="text-align:center; color: var(--red); padding: 20px;"><h3>Error de sistema</h3><p>${error.message}</p><button class="primary" onclick="window.location.reload()">Recargar Página</button></div>`;
+  }
 };
 
 async function apiCall(accion, datos = {}) {
@@ -38,7 +54,9 @@ async function apiCall(accion, datos = {}) {
     const result = await response.json();
     if (!result.exito) throw new Error(result.error);
     return result.data;
-  } catch (error) { throw error; }
+  } catch (error) { 
+    throw error; 
+  }
 }
 
 function navegar(vistaID) {
@@ -64,27 +82,32 @@ function entrarComoCliente() { cerrarSesion(); }
 
 function configurarInterfazPorRol() {
   const isCliente = sesionActual.rol === 'Cliente';
-  document.getElementById('main-nav').style.display = isCliente ? 'none' : 'flex';
-  document.getElementById('btn-login-icon').style.display = isCliente ? 'block' : 'none';
-  document.getElementById('user-greeting').textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
+  
+  const nav = document.getElementById('main-nav');
+  const loginIcon = document.getElementById('btn-login-icon');
+  const greeting = document.getElementById('user-greeting');
+  
+  if (nav) nav.style.display = isCliente ? 'none' : 'flex';
+  if (loginIcon) loginIcon.style.display = isCliente ? 'block' : 'none';
+  if (greeting) greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
 
   if (isCliente) return navegar('vitrina');
 
   document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
-  document.querySelector('.btn-outline').style.display = 'block'; 
+  const btnOutline = document.querySelector('.btn-outline');
+  if (btnOutline) btnOutline.style.display = 'block'; 
 
-  // LOGICA GERENTE Y SUPERADMIN
   if (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'block');
     navegar('admin');
   } else if (sesionActual.rol === 'Vitrina') {
-    document.getElementById('nav-vitrina').style.display = 'block'; navegar('vitrina');
+    const navVit = document.getElementById('nav-vitrina'); if (navVit) navVit.style.display = 'block'; navegar('vitrina');
   } else if (sesionActual.rol === 'Cartera') {
-    document.getElementById('nav-cartera').style.display = 'block'; navegar('cartera');
+    const navCart = document.getElementById('nav-cartera'); if (navCart) navCart.style.display = 'block'; navegar('cartera');
   } else if (sesionActual.rol === 'Producción') {
-    document.getElementById('nav-produccion').style.display = 'block'; navegar('produccion');
+    const navProd = document.getElementById('nav-produccion'); if (navProd) navProd.style.display = 'block'; navegar('produccion');
   } else if (sesionActual.rol === 'Marketing') {
-    document.getElementById('nav-marketing').style.display = 'block'; navegar('marketing');
+    const navMark = document.getElementById('nav-marketing'); if (navMark) navMark.style.display = 'block'; navegar('marketing');
   }
 }
 
@@ -128,28 +151,59 @@ async function registrarEmpleado() {
 
 function mostrarAlerta(msg, tipo = 'error') {
   const alertBox = document.getElementById('alert-box');
-  alertBox.textContent = msg; alertBox.className = `alert ${tipo}`;
-  setTimeout(() => alertBox.classList.add('hidden'), 3500);
+  if(alertBox) {
+    alertBox.textContent = msg; alertBox.className = `alert ${tipo}`;
+    setTimeout(() => alertBox.classList.add('hidden'), 3500);
+  } else {
+    alert(msg);
+  }
 }
+
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId);
   if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; } else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
+// --- 6. GESTIÓN CATÁLOGO SEGURO ---
 async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
     if (data && data.length > 0) {
-      CATALOGO = data.map(p => ({ id: p['ID Producto'], categoria: p['Categoría'], nombre: p['Nombre'], desc: p['Descripción'], precio: Number(p['Precio']), agotado: p['Agotado (SI/NO)'] === 'SI', urlImagen: p['URL Imagen'] }));
-    } else { CATALOGO = [...CATALOGO_BASE]; }
-  } catch (error) { CATALOGO = [...CATALOGO_BASE]; }
-  if(document.getElementById('view-vitrina').classList.contains('active') || sesionActual?.rol === 'Cliente') renderCatalogo();
+      CATALOGO = data.map(p => ({ 
+        id: p['ID Producto'], 
+        categoria: p['Categoría'] || '~PRODUCTOS PRINCIPALES~', 
+        nombre: p['Nombre'], 
+        desc: p['Descripción'], 
+        precio: Number(p['Precio']), 
+        agotado: p['Agotado (SI/NO)'] === 'SI', 
+        urlImagen: p['URL Imagen'] 
+      }));
+    } else { 
+      CATALOGO = [...CATALOGO_BASE]; 
+    }
+  } catch (error) { 
+    console.warn("Fallo al conectar con Sheets, cargando menú base.", error);
+    CATALOGO = [...CATALOGO_BASE]; 
+  }
+  
+  const vitrinaActiva = document.getElementById('view-vitrina');
+  if((vitrinaActiva && vitrinaActiva.classList.contains('active')) || sesionActual?.rol === 'Cliente') {
+    renderCatalogo();
+  }
 }
 
 function renderCatalogo() {
   const container = document.getElementById('catalogo-productos');
+  if(!container) return;
+
+  if (CATALOGO.length === 0) {
+    container.innerHTML = '<p class="note">Catálogo vacío.</p>';
+    return;
+  }
+
   const categorias = [...new Set(CATALOGO.map(p => p.categoria))];
   let html = '';
+  
   categorias.forEach(cat => {
     html += `<h3 style="grid-column: 1 / -1; margin-top: 40px; margin-bottom: 10px; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 10px; font-family: 'Metal Mania', cursive; font-size: 38px; text-align: center;">${cat}</h3>`;
     const productos = CATALOGO.filter(p => p.categoria === cat);
@@ -160,6 +214,7 @@ function renderCatalogo() {
       html += `<div class="product-card" style="${estiloAgotado}">${imgHTML}<h3>${prod.nombre}</h3><p>${prod.desc}</p><span class="price">${money(prod.precio)}</span>${botonHTML}</div>`;
     });
   });
+  
   container.innerHTML = html;
 }
 
@@ -265,14 +320,12 @@ async function cargarEmpleados() {
     const empleados = await apiCall('obtenerEmpleados');
     tbody.innerHTML = '';
     
-    // RESTRICCIÓN: El gerente no puede ver a los superadministradores
     let empleadosVisibles = empleados;
     if (sesionActual.rol === 'Gerente') {
       empleadosVisibles = empleados.filter(e => e['Rol Asignado'] !== 'Superadmin');
     }
 
     empleadosVisibles.forEach(emp => {
-      // RESTRICCIÓN: El gerente no puede asignar roles de Gerente o Superadmin
       let opcionesRol = `
         <option value="Pendiente" ${emp['Rol Asignado'] === 'Ninguno' ? 'selected' : ''}>Sin Rol</option>
         <option value="Vitrina" ${emp['Rol Asignado'] === 'Vitrina' ? 'selected' : ''}>Vitrina</option>
