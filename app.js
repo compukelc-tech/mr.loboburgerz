@@ -264,6 +264,7 @@ async function guardarProductoBackend() {
   const btn = document.getElementById('btn-guardar-prod');
   const fileInput = document.getElementById('prod-img').files[0];
   const datos = { idProducto: document.getElementById('prod-id').value, categoria: document.getElementById('prod-categoria').value, nombre: document.getElementById('prod-nombre').value, descripcion: document.getElementById('prod-desc').value, precio: document.getElementById('prod-precio').value, agotado: document.getElementById('prod-agotado').value === 'SI', urlImagenExistente: document.getElementById('prod-img-existente').value };
+  
   if (!datos.nombre || !datos.descripcion || !datos.precio) return mostrarAlerta('Faltan campos obligatorios');
 
   btn.disabled = true; btn.textContent = 'Guardando...';
@@ -271,8 +272,12 @@ async function guardarProductoBackend() {
     if (fileInput) { datos.imagenBase64 = await comprimirImagen(fileInput, 'canvas-compresion-prod'); }
     await apiCall('guardarProducto', datos);
     cerrarModal('modal-producto'); await cargarCatalogoGlobal(); cargarGestorMenu();
-  } catch (error) { mostrarAlerta('Error al guardar el producto'); } 
-  finally { btn.disabled = false; btn.textContent = 'Guardar'; }
+  } catch (error) {
+    console.error("Error detallado:", error);
+    mostrarAlerta('Error: ' + error.message);
+  } finally { 
+    btn.disabled = false; btn.textContent = 'Guardar'; 
+  }
 }
 
 async function eliminarProducto(id) {
