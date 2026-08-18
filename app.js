@@ -242,6 +242,24 @@ function abrirModalProducto(id = null) {
   document.getElementById('prod-img').value = ''; 
 }
 
+function comprimirImagen(file, canvasId = 'canvas-compresion') {
+  return new Promise((resolve) => {
+    if (!file) return resolve(null);
+    const reader = new FileReader(); reader.readAsDataURL(file);
+    reader.onload = event => {
+      const img = new Image(); img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.getElementById(canvasId); const ctx = canvas.getContext('2d');
+        const MAX_WIDTH = 600;
+        let width = img.width; let height = img.height; 
+        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+        canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.5).split(',')[1]); 
+      };
+    };
+  });
+}
+
 async function guardarProductoBackend() {
   const btn = document.getElementById('btn-guardar-prod');
   const fileInput = document.getElementById('prod-img').files[0];
@@ -250,11 +268,11 @@ async function guardarProductoBackend() {
 
   btn.disabled = true; btn.textContent = 'Guardando...';
   try {
-    if (fileInput) { datos.imagenBase64 = await comprimirImagen(fileInput); }
+    if (fileInput) { datos.imagenBase64 = await comprimirImagen(fileInput, 'canvas-compresion-prod'); }
     await apiCall('guardarProducto', datos);
     cerrarModal('modal-producto'); await cargarCatalogoGlobal(); cargarGestorMenu();
   } catch (error) { mostrarAlerta('Error al guardar el producto'); } 
-  finally { btn.disabled = false; btn.textContent = 'Guardar Producto'; }
+  finally { btn.disabled = false; btn.textContent = 'Guardar'; }
 }
 
 async function eliminarProducto(id) {
@@ -285,24 +303,6 @@ function abrirModalCheckout() { document.getElementById('modal-checkout').classL
 function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
 function toggleCamposCliente() { document.getElementById('co-correo-field').classList.toggle('hidden', document.getElementById('co-tipo').value === 'Ocasional'); }
 function toggleVoucherInput() { document.getElementById('co-monto-abono-field').classList.toggle('hidden', document.getElementById('co-tipo-pago').value === 'Completo'); }
-
-function comprimirImagen(file) {
-  return new Promise((resolve) => {
-    if (!file) return resolve(null);
-    const reader = new FileReader(); reader.readAsDataURL(file);
-    reader.onload = event => {
-      const img = new Image(); img.src = event.target.result;
-      img.onload = () => {
-        const canvas = document.getElementById('canvas-compresion'); const ctx = canvas.getContext('2d');
-        const MAX_WIDTH = 600;
-        let width = img.width; let height = img.height; 
-        if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
-        canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
-        resolve(canvas.toDataURL('image/jpeg', 0.5).split(',')[1]); 
-      };
-    };
-  });
-}
 
 async function enviarPedido() {
   const btn = document.getElementById('btn-enviar-pedido');
@@ -424,4 +424,13 @@ async function cambiarEstadoPedido(idPedido, nuevoEstado) {
     if (sesionActual.rol === 'Cartera' || sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') cargarPedidos('ESPERA DE PAGO', 'lista-cartera');
     if (sesionActual.rol === 'Producción' || sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
   } catch(e) {}
+}
+
+// Registro del Service Worker para la PWA
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('Service Worker registrado:', reg))
+      .catch(err => console.log('Error al registrar SW:', err));
+  });
 }
