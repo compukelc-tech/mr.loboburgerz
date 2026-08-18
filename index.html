@@ -8,17 +8,16 @@
 </head>
 <body>
 
-  <!-- ==========================================
-       CABECERA Y NAVEGACIÓN DINÁMICA
-       ========================================== -->
-  <header style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px;">
+  <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
     <div style="flex: 1;"></div>
     <div style="flex: 2; text-align: center;">
-      <h1>🐺 <span class="text-red">MR. LOBO</span> BURGERZ</h1>
+      <div style="font-size: 35px; margin-bottom: 5px;">🐺</div>
+      <h1 style="color: white;">
+        <span class="text-red">MR.<br>LOBO</span><br>BURGERZ
+      </h1>
       <p class="subtitle" id="user-greeting">Menú Principal</p>
     </div>
     <div style="flex: 1; text-align: right;">
-      <!-- ICONO PARA EMPLEADOS -->
       <button onclick="navegar('login')" id="btn-login-icon" style="background: var(--card-hover); border: 1px solid var(--border); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; color: white;" title="Acceso Empleados">👤</button>
     </div>
   </header>
@@ -36,9 +35,6 @@
   <main>
     <div id="alert-box" class="alert hidden"></div>
 
-    <!-- ==========================================
-         VISTA 1: VITRINA / MENÚ (PANTALLA POR DEFECTO)
-         ========================================== -->
     <section id="view-vitrina" class="view active">
       <div class="vitrina-container">
         <div class="menu-list">
@@ -61,9 +57,6 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         VISTA 2: LOGIN DE EMPLEADOS (Oculto en el icono)
-         ========================================== -->
     <section id="view-login" class="view">
       <div class="card card-center">
         <h2>Acceso Empleados</h2>
@@ -86,9 +79,6 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         VISTA 3: REGISTRO DE EMPLEADOS
-         ========================================== -->
     <section id="view-registro" class="view">
       <div class="card card-center">
         <h2>Registro de Personal</h2>
@@ -127,9 +117,6 @@
       </div>
     </section>
 
-    <!-- ==========================================
-         VISTAS ADMINISTRATIVAS
-         ========================================== -->
     <section id="view-admin" class="view">
       <div class="card">
         <h2>👑 Panel de Control - Empleados</h2>
@@ -163,9 +150,6 @@
 
   </main>
 
-  <!-- ==========================================
-       MODAL: FINALIZAR PEDIDO (El login del cliente está aquí)
-       ========================================== -->
   <div class="modal" id="modal-checkout">
     <div class="invoice">
       <div class="modal-header">
@@ -204,7 +188,6 @@
     </div>
   </div>
 
-  <!-- MODAL: MARKETING -->
   <div class="modal" id="modal-producto">
     <div class="invoice">
       <div class="modal-header">
@@ -230,10 +213,9 @@
   </div>
 
   <footer class="creditos-estudiantes">
-    <div class="marquee-container">
-      <div class="marquee-text">
-        <span>🐺 PROYECTO DESARROLLADO POR:</span> Maria Fernanda Aragón | Naily Bustos | Shaira Nicoll Caballero | Hecna Thaliana | Gabriel Caceres | Mabel Celis | Gabriela Colmenares | Laura Contreras | Tatiana Florez | Jeimy Sabrina | Angie Elizabeth | Gabriela Gonzalez | Andrea Guerrero | Valeria Hernandez | Andres Felipe Latorre | Samuel Jimenez | Kelmer Andrey | Dorian Merino | Andres Felipe Meza | Roxana Miranda | Kevin Molina | Genesis Moncada | Maria Mora | Paula Gabriela | Juan Manuel Muñoz | Santiago Niño | Aaron Obeji | Gisell Palmero | Hasly Valeria | Lina Peña | Chelsea Ramirez | Sayhoa Rivera | Andry Rondon | Isabella Sarmiento | Sami Valeria | Mariangel Uribe | Natalia Velandia | Danna Salome Vera | Katherin Zambrano
-      </div>
+    <div class="creditos-text">
+      <span>🐺 PROYECTO DESARROLLADO POR:</span> 
+      Maria Fernanda Aragón | Naily Bustos | Shaira Nicoll Caballero | Hecna Thaliana | Gabriel Caceres | Mabel Celis | Gabriela Colmenares | Laura Contreras | Tatiana Florez | Jeimy Sabrina | Angie Elizabeth | Gabriela Gonzalez | Andrea Guerrero | Valeria Hernandez | Andres Felipe Latorre | Samuel Jimenez | Kelmer Andrey | Dorian Merino | Andres Felipe Meza | Roxana Miranda | Kevin Molina | Genesis Moncada | Maria Mora | Paula Gabriela | Juan Manuel Muñoz | Santiago Niño | Aaron Obeji | Gisell Palmero | Hasly Valeria | Lina Peña | Chelsea Ramirez | Sayhoa Rivera | Andry Rondon | Isabella Sarmiento | Sami Valeria | Mariangel Uribe | Natalia Velandia | Danna Salome Vera | Katherin Zambrano
     </div>
   </footer>
 
