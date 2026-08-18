@@ -29,13 +29,15 @@ function actualizarPantalla(data) {
 
 // ============================================================================
 // [FUNCIÓN: ESCRITURA DE DATOS VÍA FETCH API (POST)]
+// Solución CORS: Enviamos los datos empaquetados como formulario URL encoded
 // ============================================================================
 function enviarDatosASheets(payload) {
-  // Se usa text/plain para evitar el bloqueo de CORS en Google Apps Script
   return fetch(API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify(payload)
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: new URLSearchParams({ data: JSON.stringify(payload) })
   }).then(res => res.json());
 }
 
@@ -63,7 +65,10 @@ function crearPedido() {
       abrirFactura(p);
       limpiarFormulario();
     })
-    .catch(err => alert('Error de red al guardar el pedido.'));
+    .catch(err => {
+      document.getElementById('cloudStatus').textContent = '⚠️ Error al guardar';
+      alert('Error de red al guardar el pedido. Intenta nuevamente.');
+    });
 }
 
 function limpiarFormulario() {
@@ -92,16 +97,19 @@ function guardarAbono() {
   enviarDatosASheets(payload)
     .then(data => {
       actualizarPantalla(data);
-      alert('Abono guardado.');
+      alert('Abono guardado exitosamente.');
       cerrarAbono();
       cerrarModal();
       document.getElementById('nuevoAbono').value = '';
     })
-    .catch(err => alert('Error de red al guardar el abono.'));
+    .catch(err => {
+      document.getElementById('cloudStatus').textContent = '⚠️ Error al abonar';
+      alert('Error de red al guardar el abono. Intenta nuevamente.');
+    });
 }
 
 // ============================================================================
-// [FUNCIONES DE UI Y CALCULADORES] (Se mantienen igual)
+// [FUNCIONES DE UI Y CALCULADORES]
 // ============================================================================
 function showTab(id) {
   document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
