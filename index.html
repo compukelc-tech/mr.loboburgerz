@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mr. Lobo Burgerz - ERP</title>
+  <title>compukelc - ERP</title>
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
@@ -22,32 +22,35 @@
 </head>
 <body>
 
-  <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
-    <div style="flex: 1;"></div>
-    <div style="flex: 2; text-align: center;">
-      <div style="font-size: 35px; margin-bottom: 5px;">🐺</div>
-      <h1 style="color: white;">
-        <span class="text-red">MR.<br>LOBO</span><br>BURGERZ
-      </h1>
+  <!-- BANNER LATERAL IZQUIERDO -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div style="font-size: 35px; margin-bottom: 5px; text-align: center;">💻</div>
+      <h1>compukelc</h1>
       <p class="subtitle" id="user-greeting">Menú Principal</p>
     </div>
-    <div style="flex: 1; text-align: right;">
-      <button onclick="navegar('login')" id="btn-login-icon" style="background: var(--card-hover); border: 1px solid var(--border); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; color: white;" title="Acceso Empleados">👤</button>
-    </div>
-  </header>
-  
-  <nav id="main-nav" style="display: none; justify-content: center; margin-top: 10px;">
-    <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
-    <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
-    <button onclick="navegar('produccion')" class="nav-btn" id="nav-produccion">🍳 Producción</button>
-    <button onclick="navegar('despachados')" class="nav-btn" id="nav-despachados">✅ Despachos</button>
-    <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing</button>
-    <button onclick="navegar('facturas')" class="nav-btn" id="nav-facturas">🧾 Facturas</button>
-    <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 Panel Maestro</button>
-    <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
-  </nav>
 
-  <main>
+    <!-- Navegación: Mantiene los mismos IDs para que app.js funcione -->
+    <nav id="main-nav" class="sidebar-nav" style="display: none;">
+      <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
+      <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
+      <button onclick="navegar('produccion')" class="nav-btn" id="nav-produccion">🍳 Producción</button>
+      <button onclick="navegar('despachados')" class="nav-btn" id="nav-despachados">✅ Despachos</button>
+      <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing</button>
+      <button onclick="navegar('facturas')" class="nav-btn" id="nav-facturas">🧾 Facturas</button>
+      <button onclick="navegar('admin')" class="nav-btn active" id="nav-admin" style="background: var(--dark-red); color: white;">👑 Panel Maestro</button>
+      <button onclick="cerrarSesion()" class="nav-btn btn-outline" style="margin-top: auto; border-color: var(--red);">Cerrar Sesión</button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button onclick="navegar('login')" id="btn-login-icon" class="btn-login">👤 Acceso Empleados</button>
+      <p>compukelc@hotmail.com</p>
+      <p>cel. 3507973351</p>
+    </div>
+  </aside>
+
+  <!-- CONTENEDOR PRINCIPAL -->
+  <main class="main-content">
     <div id="alert-box" class="alert hidden"></div>
 
     <section id="view-vitrina" class="view active">
@@ -181,11 +184,12 @@
 
   </main>
 
+  <!-- MODALES -->
   <div class="modal" id="modal-checkout">
     <div class="invoice">
       <div class="modal-header">
         <span style="font-family: 'Montserrat', sans-serif;">Completar Pedido</span>
-        <button onclick="cerrarModal('modal-checkout')">✕</button>
+        <button onclick="cerrarModal('modal-checkout')" style="background:transparent; color:white; font-size:20px;">✕</button>
       </div>
       <p class="note" style="text-align: left;">Ingresa tus datos para registrar la orden.</p>
       <div class="field">
@@ -223,7 +227,7 @@
     <div class="invoice">
       <div class="modal-header">
         <span style="font-family: 'Montserrat', sans-serif;" id="modal-prod-titulo">Añadir Producto</span>
-        <button onclick="cerrarModal('modal-producto')">✕</button>
+        <button onclick="cerrarModal('modal-producto')" style="background:transparent; color:white; font-size:20px;">✕</button>
       </div>
       <input type="hidden" id="prod-id"><input type="hidden" id="prod-img-existente">
       <div class="field">
@@ -247,13 +251,6 @@
       <div class="actions" style="margin-top: 20px;"><button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button></div>
     </div>
   </div>
-
-  <footer class="creditos-estudiantes">
-    <div class="creditos-text">
-      <span>🐺 PROYECTO DESARROLLADO POR:</span> 
-      Maria Fernanda Aragón | Naily Bustos | Shaira Nicoll Caballero | Hecna Thaliana | Gabriel Caceres | Mabel Celis | Gabriela Colmenares | Laura Contreras | Tatiana Florez | Jeimy Sabrina | Angie Elizabeth | Gabriela Gonzalez | Andrea Guerrero | Valeria Hernandez | Andres Felipe Latorre | Samuel Jimenez | Kelmer Andrey | Dorian Merino | Andres Felipe Meza | Roxana Miranda | Kevin Molina | Genesis Moncada | Maria Mora | Paula Gabriela | Juan Manuel Muñoz | Santiago Niño | Aaron Obeji | Gisell Palmero | Hasly Valeria | Lina Peña | Chelsea Ramirez | Sayhoa Rivera | Andry Rondon | Isabella Sarmiento | Sami Valeria | Mariangel Uribe | Natalia Velandia | Danna Salome Vera | Katherin Zambrano
-    </div>
-  </footer>
 
   <script>
     document.write('<script src="app.js?v=' + new Date().getTime() + '"><\/script>');
