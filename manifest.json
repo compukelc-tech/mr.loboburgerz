@@ -8,32 +8,12 @@
   "theme_color": "#e3262e",
   "icons": [
     {
-      "src": "{
-  "name": "Mr. Lobo Burgerz ERP",
-  "short_name": "LoboERP",
-  "description": "Sistema de gestión para Mr. Lobo Burgerz",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#050505",
-  "theme_color": "#e3262e",
-  "icons": [
-    {
-      "src": "https://drive.google.com/file/d/1NIjXcEEb4KrqN6bDSFuRzNk9hRTWZh44/view?usp=drive_link",
+      "src": "https://drive.google.com/uc?id=1NIjXcEEb4KrqN6bDSFuRzNk9hRTWZh44",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://drive.google.com/file/d/1NIjXcEEb4KrqN6bDSFuRzNk9hRTWZh44/view?usp=drive_link",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
-}",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "AQUI_PON_EL_ENLACE_DE_TU_NUEVO_ICONO.png",
+      "src": "https://drive.google.com/uc?id=1NIjXcEEb4KrqN6bDSFuRzNk9hRTWZh44",
       "sizes": "512x512",
       "type": "image/png"
     }
