@@ -1,8 +1,9 @@
-const CACHE_NAME = 'lobo-erp-v1';
+const CACHE_NAME = 'lobo-erp-v2';
 const ASSETS = [
   './index.html',
   './styles.css',
-  './app.js'
+  './app.js',
+  './icono.png'
 ];
 
 self.addEventListener('install', (e) => {
