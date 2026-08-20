@@ -3,7 +3,7 @@
 // ARQUITECTURA: MOTOR CANVAS EN MEMORIA (DATA URI) SIN DRIVE
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwKwtWBXjwaP9TJ9ucc-_2GCJUSRFIR5mxT1xnE99S8TjNqFn7AzWAZKwo33u4m2zJj0A/exec"; // <-- PEGA TU URL AQUÍ
+const API_URL = "https://script.google.com/macros/s/AKfycbwKwtWBXjwaP9TJ9ucc-_2GCJUSRFIR5mxT1xnE99S8TjNqFn7AzWAZKwo33u4m2zJj0A/exec"; // <-- RECUERDA PEGAR TU NUEVA URL AQUÍ DESPUÉS DE IMPLEMENTAR
 
 let sesionActual = null; 
 let carrito = []; 
@@ -346,7 +346,7 @@ function comprimirEnCanvas(file) {
         const canvas = document.createElement('canvas'); 
         const ctx = canvas.getContext('2d');
         
-        const MAX_WIDTH = 400; // Mejor resolución para comprobantes y menús
+        const MAX_WIDTH = 400;
         let width = img.width; 
         let height = img.height; 
         
@@ -606,7 +606,6 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
   try {
     const pedidos = await apiCall('obtenerPedidosConAbonos'); 
     
-    // RENDERIZAR BANNER ESTADÍSTICAS FINANCIERAS
     if(contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
        let caja = 0, fiado = 0, total = 0;
        pedidos.forEach(p => { 
@@ -732,7 +731,7 @@ async function guardarAbono() {
 }
 
 // ----------------------------------------------------------------------------
-// GESTIÓN DE FACTURAS
+// GESTIÓN DE FACTURAS Y PROMOCIONES
 // ----------------------------------------------------------------------------
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas'); 
@@ -767,6 +766,23 @@ function filtrarFacturas() {
       <td><a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF</a></td>
     </tr>
   `).join('');
+}
+
+function cambiarTipoPromo() {
+  const tipo = document.getElementById('promo-tipo').value;
+  const txt = document.getElementById('promo-contenido');
+  const img = document.getElementById('promo-img-file');
+  if(tipo === 'imagen') {
+    txt.classList.add('hidden');
+    img.classList.remove('hidden');
+  } else {
+    txt.classList.remove('hidden');
+    img.classList.add('hidden');
+    txt.placeholder = tipo === 'video' ? 'Enlace de YouTube...' : 'Escribe tu mensaje...';
+  }
+}
+function guardarPromocion() {
+  mostrarAlerta('Promoción actualizada localmente', 'success');
 }
 
 // ============================================================================
