@@ -1,10 +1,11 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V4.5
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V6.0
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
 
 let sesionActual = null; 
+let clienteFidelizado = null; 
 let carrito = []; 
 let CATALOGO = []; 
 let FACTURAS_GLOBAL = []; 
@@ -33,6 +34,10 @@ window.onload = async () => {
     const savedSession = localStorage.getItem('lobo_session');
     if (savedSession) sesionActual = JSON.parse(savedSession);
     else sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
+    
+    const savedFidelidad = localStorage.getItem('lobo_cliente');
+    if (savedFidelidad) clienteFidelizado = JSON.parse(savedFidelidad);
+
     configurarInterfazPorRol();
     await cargarCatalogoGlobal();
     await cargarPromocionGlobal();
@@ -47,6 +52,20 @@ async function apiCall(accion, datos = {}) {
     if (!result.exito) throw new Error(result.error);
     return result.data;
   } catch (error) { throw error; }
+}
+
+function forzarUpdatePWA() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(registrations) {
+      for(let r of registrations) { r.unregister(); }
+      caches.keys().then(keys => {
+        Promise.all(keys.map(key => caches.delete(key))).then(() => {
+          mostrarAlerta('Sistema actualizado y purgado exitosamente. Recargando...', 'success');
+          setTimeout(() => window.location.reload(true), 1500);
+        });
+      });
+    });
+  } else { window.location.reload(true); }
 }
 
 function navegar(vistaID) {
@@ -85,7 +104,10 @@ function configurarInterfazPorRol() {
 
   document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
   const btnOutline = document.querySelector('.btn-outline');
+  const btnUpdate = document.getElementById('btn-update-pwa');
   if (btnOutline) btnOutline.style.display = 'block'; 
+  
+  if (btnUpdate) btnUpdate.style.display = (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') ? 'block' : 'none';
 
   if (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'block');
@@ -109,7 +131,7 @@ async function iniciarSesion() {
   if (!doc || !pass) return mostrarAlerta('Ingresa documento y contraseña');
   mostrarAlerta('Verificando...', 'info');
   try {
-    const empleados = await apiCall('obtenerEmpleados');
+    const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: 'Admin' });
     const usuario = empleados.find(e => String(e['Documento (Usuario)']) === String(doc) && String(e['Contraseña']) === String(pass));
     if (!usuario) return mostrarAlerta('Credenciales incorrectas');
     if (usuario['Estado'] === 'BLOQUEADO') return mostrarAlerta('Cuenta bloqueada.');
@@ -151,6 +173,54 @@ function togglePassword(inputId, btn) {
   else { input.type = 'password'; btn.textContent = '👁️'; }
 }
 
+/* MODAL DE FIDELIDAD */
+function abrirModalFidelidad() {
+  if (clienteFidelizado) {
+    if(confirm(`Ya tienes sesión como ${clienteFidelizado.nombre}. ¿Deseas cerrar sesión?`)) {
+      clienteFidelizado = null;
+      localStorage.removeItem('lobo_cliente');
+      mostrarAlerta('Sesión de cliente cerrada', 'info');
+    }
+  } else {
+    document.getElementById('modal-fidelidad').classList.add('active');
+  }
+}
+function toggleFidForms() {
+  document.getElementById('fid-login-section').classList.toggle('hidden');
+  document.getElementById('fid-reg-section').classList.toggle('hidden');
+}
+async function registrarFidelidad() {
+  const datos = {
+    documento: document.getElementById('fid-reg-doc').value,
+    nombre: document.getElementById('fid-reg-nombre').value,
+    celular: document.getElementById('fid-reg-celular').value,
+    correo: document.getElementById('fid-reg-correo').value,
+    clave: document.getElementById('fid-reg-pass').value
+  };
+  if (!datos.documento || !datos.nombre || !datos.celular || !datos.clave) return mostrarAlerta('Faltan campos requeridos.');
+  
+  try {
+    mostrarAlerta('Registrando...', 'info');
+    clienteFidelizado = await apiCall('registrarClienteFidelizado', datos);
+    localStorage.setItem('lobo_cliente', JSON.stringify(clienteFidelizado));
+    cerrarModal('modal-fidelidad');
+    mostrarAlerta('Membresía creada exitosamente.', 'success');
+  } catch (e) { mostrarAlerta(e.message); }
+}
+async function loginFidelidad() {
+  const doc = document.getElementById('fid-log-doc').value;
+  const clave = document.getElementById('fid-log-pass').value;
+  if(!doc || !clave) return mostrarAlerta('Ingresa tus credenciales');
+  try {
+    mostrarAlerta('Validando...', 'info');
+    clienteFidelizado = await apiCall('loginClienteFidelizado', { documento: doc, clave: clave });
+    localStorage.setItem('lobo_cliente', JSON.stringify(clienteFidelizado));
+    cerrarModal('modal-fidelidad');
+    mostrarAlerta(`Bienvenido de nuevo, ${clienteFidelizado.nombre}`, 'success');
+  } catch (e) { mostrarAlerta(e.message); }
+}
+
+/* CARGA DEL CATÁLOGO */
 async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
@@ -289,7 +359,17 @@ function renderCarrito() {
   displayTotal.textContent = money(total);
 }
 
-function abrirModalCheckout() { document.getElementById('modal-checkout').classList.add('active'); }
+function abrirModalCheckout() { 
+  document.getElementById('modal-checkout').classList.add('active'); 
+  if(clienteFidelizado) {
+    document.getElementById('co-tipo').value = 'Continuo';
+    document.getElementById('co-doc').value = clienteFidelizado.documento;
+    document.getElementById('co-nombre').value = clienteFidelizado.nombre;
+    document.getElementById('co-celular').value = clienteFidelizado.celular;
+    if(clienteFidelizado.correo) document.getElementById('co-correo').value = clienteFidelizado.correo;
+    toggleCamposCliente();
+  }
+}
 function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
 function toggleCamposCliente() { document.getElementById('co-correo-field').classList.toggle('hidden', document.getElementById('co-tipo').value === 'Ocasional'); }
 function toggleVoucherInput() { document.getElementById('co-monto-abono-field').classList.toggle('hidden', document.getElementById('co-tipo-pago').value === 'Completo'); }
@@ -329,10 +409,33 @@ async function cargarEmpleados() {
   if(!tbody) return;
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando...</td></tr>';
   try {
-    const empleados = await apiCall('obtenerEmpleados');
+    const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: sesionActual.rol });
     tbody.innerHTML = '';
+    
+    const rolesPosibles = sesionActual.rol === 'Superadmin' 
+        ? ['Superadmin', 'Gerente', 'Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'] 
+        : ['Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'];
+
     empleados.forEach(emp => {
-      tbody.innerHTML += `<tr><td>${emp['Documento (Usuario)']}</td><td>${emp['Nombre Completo']}</td><td><select id="rol-${emp['Documento (Usuario)']}"><option value="Vitrina" ${emp['Rol Asignado'] === 'Vitrina' ? 'selected' : ''}>Vitrina</option><option value="Cartera" ${emp['Rol Asignado'] === 'Cartera' ? 'selected' : ''}>Cartera</option><option value="Producción" ${emp['Rol Asignado'] === 'Producción' ? 'selected' : ''}>Producción</option></select></td><td><select id="estado-${emp['Documento (Usuario)']}"><option value="ACTIVO" ${emp['Estado'] === 'ACTIVO' ? 'selected' : ''}>ACTIVO</option><option value="PENDIENTE" ${emp['Estado'] === 'PENDIENTE' ? 'selected' : ''}>PENDIENTE</option></select></td><td><button class="primary small" onclick="cambiarRolYEstado('${emp['Documento (Usuario)']}')">Guardar</button></td></tr>`;
+      const doc = emp['Documento (Usuario)'];
+      const rolSelect = rolesPosibles.map(r => `<option value="${r}" ${emp['Rol Asignado'] === r ? 'selected' : ''}>${r}</option>`).join('');
+      
+      tbody.innerHTML += `<tr>
+        <td>${doc}</td>
+        <td>${emp['Nombre Completo']}</td>
+        <td><select id="rol-${doc}">${rolSelect}</select></td>
+        <td>
+          <select id="estado-${doc}">
+            <option value="ACTIVO" ${emp['Estado'] === 'ACTIVO' ? 'selected' : ''}>ACTIVO</option>
+            <option value="PENDIENTE" ${emp['Estado'] === 'PENDIENTE' ? 'selected' : ''}>PENDIENTE</option>
+            <option value="BLOQUEADO" ${emp['Estado'] === 'BLOQUEADO' ? 'selected' : ''}>BLOQUEADO</option>
+          </select>
+        </td>
+        <td>
+          <button class="primary small" onclick="cambiarRolYEstado('${doc}')">Guardar</button>
+          <button class="small" style="background:var(--dark-red); color: white;" onclick="eliminarEmpleado('${doc}')">Eliminar</button>
+        </td>
+      </tr>`;
     });
   } catch(e) {}
 }
@@ -343,15 +446,21 @@ async function cambiarRolYEstado(documento) {
   try { await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); mostrarAlerta('Actualizado', 'success'); } catch(e) { mostrarAlerta('Error'); }
 }
 
-// RENDERIZADO DE PEDIDOS BLINDADO CONTRA CELDAS VACÍAS
+async function eliminarEmpleado(documento) {
+  if(!confirm('¿Seguro que deseas eliminar definitivamente a este empleado?')) return;
+  try {
+    await apiCall('eliminarEmpleado', { documento });
+    mostrarAlerta('Empleado eliminado exitosamente', 'success');
+    cargarEmpleados();
+  } catch(e) { mostrarAlerta('Error eliminando empleado'); }
+}
+
 async function cargarPedidos(estadoFiltro, contenedorID) {
   const container = document.getElementById(contenedorID); 
   if(!container) return;
   container.innerHTML = '<p class="note">Cargando pedidos...</p>';
   try {
     const pedidos = await apiCall('obtenerPedidosConAbonos'); 
-    
-    // FILTRAR ESTRICTAMENTE SOLO PEDIDOS VÁLIDOS (Evita cuadros indefinidos)
     const pedidosValidos = (pedidos || []).filter(p => p && p['ID Pedido'] && String(p['ID Pedido']).trim() !== '');
 
     let caja = 0, fiado = 0, total = 0;
@@ -410,7 +519,18 @@ async function aprobarPagoTotal(id) {
     mostrarAlerta('Generando Factura PDF...', 'info');
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
     mostrarAlerta('Aprobado con éxito. Factura creada.', 'success');
-    if (res.urlFactura && res.urlFactura.includes('http')) window.open(res.urlFactura, '_blank');
+    
+    // Descarga directa del PDF que arregla la pantalla en blanco
+    if (res.urlFactura) {
+      const a = document.createElement('a');
+      a.href = res.urlFactura;
+      a.target = '_blank';
+      a.download = `Factura_${id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 100);
+    }
+    
     cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
   } catch(e) { mostrarAlerta(e.message); }
 }
