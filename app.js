@@ -2,7 +2,7 @@
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V6.1
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzPvQ74w31_Kn-E9DLwBc_xWFnhQMuliB2Vo-vLEf-UPlBvnO0UjOl5xpfxqO79JFE5cw/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
