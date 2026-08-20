@@ -514,9 +514,9 @@ async function enviarPedido() {
     await apiCall('subirVoucher', { idPedido, montoAbono, imagenBase64: base64Voucher });
     
     // LIMPIEZA DE CARRITO: Excluir las imágenes para no saturar el JSON y corromper la BD
-    const carritoLimpio = carrito.map(item => {
-      return { id: item.id, categoria: item.categoria, nombre: item.nombre, desc: item.desc, precio: item.precio, cant: item.cant };
-    });
+    const carritoLimpio = carrito.map(item => ({
+      id: item.id, categoria: item.categoria, nombre: item.nombre, desc: item.desc, precio: item.precio, cant: item.cant
+    }));
 
     await apiCall('crearPedido', { idPedido, documento, nombre, celular, tipoCliente, correo, carrito: carritoLimpio, total: totalVenta });
 
@@ -741,35 +741,47 @@ async function guardarAbono() {
 // ----------------------------------------------------------------------------
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas'); 
+  if (!tbody) return;
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando facturas en la nube...</td></tr>';
   
   try { 
     FACTURAS_GLOBAL = await apiCall('obtenerFacturas'); 
     filtrarFacturas(); 
   } catch(e) { 
-    tbody.innerHTML = '<tr><td colspan="5">Error al cargar.</td></tr>'; 
+    tbody.innerHTML = `<tr><td colspan="5" class="center" style="color:var(--red);">Error de conexión: ${e.message}</td></tr>`; 
   }
 }
 
 function filtrarFacturas() {
-  const query = document.getElementById('buscador-facturas').value.toLowerCase(); 
+  const buscador = document.getElementById('buscador-facturas');
+  const query = buscador ? buscador.value.toLowerCase().trim() : ''; 
   const tbody = document.getElementById('lista-facturas'); 
   
-  const filtradas = FACTURAS_GLOBAL.filter(f => 
-    f['Documento'].toString().includes(query) || f['ID Pedido'].toLowerCase().includes(query)
-  );
+  if (!FACTURAS_GLOBAL || FACTURAS_GLOBAL.length === 0) {
+    return tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas registradas en la base de datos.</td></tr>';
+  }
+  
+  const filtradas = FACTURAS_GLOBAL.filter(f => {
+    const doc = String(f['Documento'] || '').toLowerCase();
+    const idPed = String(f['ID Pedido'] || '').toLowerCase();
+    return doc.includes(query) || idPed.includes(query);
+  });
   
   if(filtradas.length === 0) {
-    return tbody.innerHTML = '<tr><td colspan="5" class="center">No se encontraron facturas.</td></tr>';
+    return tbody.innerHTML = '<tr><td colspan="5" class="center">No se encontraron facturas con esa búsqueda.</td></tr>';
   }
   
   tbody.innerHTML = filtradas.map(f => `
     <tr>
-      <td>${f['ID Factura']}</td>
-      <td>${f['ID Pedido']}</td>
-      <td>${f['Documento']}</td>
-      <td>${f['Fecha']}</td>
-      <td><a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF</a></td>
+      <td>${f['ID Factura'] || 'N/A'}</td>
+      <td>${f['ID Pedido'] || 'N/A'}</td>
+      <td>${f['Documento'] || 'N/A'}</td>
+      <td>${f['Fecha'] || 'N/A'}</td>
+      <td>
+        ${f['URL PDF'] && String(f['URL PDF']).includes('http') 
+          ? `<a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline; font-weight:bold;">Descargar PDF</a>` 
+          : `<span class="note" style="color:var(--red);">Enlace Roto</span>`}
+      </td>
     </tr>
   `).join('');
 }
