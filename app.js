@@ -1,5 +1,5 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V7.1 (ESTABLE)
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V8.0
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
@@ -514,34 +514,8 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
 }
 
 // ----------------------------------------------------------------------------
-// FUNCIÓN BLINDADA PARA DESCARGAR PDF EN MOVILES Y PWA
+// FUNCIÓN BLINDADA PARA DESCARGAR PDF (PC y MÓVIL PWA)
 // ----------------------------------------------------------------------------
-function descargarPDFLocal(base64Data, fileName) {
-  try {
-    const byteCharacters = atob(base64Data);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], {type: 'application/pdf'});
-    const blobUrl = URL.createObjectURL(blob);
-    
-    const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    
-    setTimeout(() => {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
-    }, 250);
-  } catch (err) {
-    mostrarAlerta('Error interno al generar el archivo en tu dispositivo.', 'error');
-  }
-}
-
 async function aprobarPagoTotal(id) {
   if(!confirm('¿Confirmas la validación de este pago? La orden pasará a cocina y se generará la factura.')) return;
   try { 
@@ -549,8 +523,15 @@ async function aprobarPagoTotal(id) {
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
     mostrarAlerta('Aprobado con éxito. Descargando factura...', 'success');
     
-    if (res.pdfBase64) {
-      descargarPDFLocal(res.pdfBase64, `Factura_${id}.pdf`);
+    // Descarga y vista universal sin cerrar la PWA
+    if (res.urlFactura) {
+      const a = document.createElement('a');
+      a.href = res.urlFactura;
+      a.target = '_blank';
+      a.download = `Factura_${id}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => document.body.removeChild(a), 100);
     }
     
     cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
@@ -572,7 +553,7 @@ async function cargarFacturas() {
 }
 
 // ----------------------------------------------------------------------------
-// CORRECCIÓN DE ENLACES ROTOS EN LA TABLA DE FACTURAS (PC ERROR 404)
+// RESTAURACIÓN DE LA TABLA DE FACTURAS (DESCARGAS PERMANENTES)
 // ----------------------------------------------------------------------------
 function filtrarFacturas() {
   const buscador = document.getElementById('buscador-facturas');
@@ -584,15 +565,8 @@ function filtrarFacturas() {
   if(filtradas.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas.</td></tr>'; return; }
   
   tbody.innerHTML = filtradas.map(f => {
-    let url = f['URL PDF'] || '';
-    let badge = '';
-    // Solo crea un enlace si es una URL real que empiece con http
-    if(url.includes('http')) {
-      badge = `<a href="${url}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF</a>`;
-    } else if (url !== '') {
-      badge = `<span style="color:var(--muted); font-size: 12px;">Descargado en Caja Físicamente</span>`;
-    }
-    return `<tr><td>${f['ID Factura'] || ''}</td><td>${f['ID Pedido'] || ''}</td><td>${f['Documento'] || ''}</td><td>${f['Fecha'] || ''}</td><td>${badge}</td></tr>`;
+    let enlace = f['URL PDF'] ? `<a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF</a>` : '';
+    return `<tr><td>${f['ID Factura'] || ''}</td><td>${f['ID Pedido'] || ''}</td><td>${f['Documento'] || ''}</td><td>${f['Fecha'] || ''}</td><td>${enlace}</td></tr>`;
   }).join('');
 }
 
