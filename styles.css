@@ -1,5 +1,5 @@
 /* ==========================================================================
-   SISTEMA ERP: MR. LOBO BURGERZ - ESTILOS (CSS) V4.0 + LAYOUT DOS COLUMNAS
+   SISTEMA ERP: MR. LOBO BURGERZ - ESTILOS (CSS) V6.0
    ========================================================================== */
 @import url('https://fonts.googleapis.com/css2?family=Metal+Mania&family=Montserrat:wght@400;600;800&display=swap');
 
@@ -61,8 +61,16 @@ header {
 
 nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 20px; }
 
+/* ANIMACIONES GLOBALES */
+@keyframes pulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 38, 46, 0.7); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(227, 38, 46, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(227, 38, 46, 0); }
+}
+@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+
 /* ==========================================================================
-   NUEVO LAYOUT A DOS COLUMNAS (BANNER IZQUIERDO + CONTENIDO DERECHO)
+   LAYOUT A DOS COLUMNAS
    ========================================================================== */
 .app-layout {
   display: flex;
@@ -85,7 +93,6 @@ nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin
   width: calc(100% - 350px);
 }
 
-/* ESTILOS DEL BANNER IZQUIERDO Y PROMOCIONES */
 .sidebar-promo {
   margin: 0 0 20px 0;
   padding: 15px;
@@ -111,7 +118,6 @@ nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin
   box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* Mapa y Enlace de Dirección Clickable */
 .map-container {
   width: 100%;
   height: 150px;
@@ -137,29 +143,11 @@ nav { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin
   transition: 0.3s;
 }
 .address-link:hover { color: var(--text); }
-.address-link b {
-  color: var(--gold);
-  display: block;
-  margin-top: 5px;
-  font-size: 11px;
-}
+.address-link b { color: var(--gold); display: block; margin-top: 5px; font-size: 11px; }
 .address-link:hover b { text-decoration: underline; }
 
-.social-links {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin-top: 20px;
-  border-top: 1px solid var(--border);
-  padding-top: 20px;
-}
-
-.social-item { 
-  display: flex; 
-  align-items: center; 
-  gap: 15px; 
-  transition: transform 0.2s; 
-}
+.social-links { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; border-top: 1px solid var(--border); padding-top: 20px; }
+.social-item { display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
 .social-item:hover { transform: translateX(5px); }
 .social-icon { display: flex; align-items: center; justify-content: center; width: 38px; height: 38px; background: #0a0a0a; border-radius: 10px; border: 1px solid var(--border); }
 .social-text { display: flex; flex-direction: column; }
@@ -176,12 +164,12 @@ button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 button.primary { background: var(--red); color: #fff; }
 button.purple { background: var(--dark-red); color: #fff; }
 button.btn-outline { background: transparent; border: 1px solid var(--border); }
-button.text-btn { background: transparent; padding: 5px; text-decoration: underline; color: var(--muted); }
+button.text-btn { background: transparent; padding: 5px; text-decoration: underline; color: var(--muted); cursor: pointer; }
+button.text-btn:hover { color: var(--gold); }
 .full-width { width: 100%; }
 
 .view { display: none; animation: fadeIn 0.4s ease-out; }
 .view.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
 
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
 .card-center { max-width: 450px; margin: 0 auto; }
@@ -192,7 +180,7 @@ input, select, textarea { width: 100%; padding: 14px; border-radius: 12px; borde
 input:focus, select:focus, textarea:focus { border-color: var(--gold); }
 .password-wrapper { position: relative; display: flex; }
 .password-wrapper input { padding-right: 50px; width: 100%; }
-.toggle-pass { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; font-size: 18px; padding: 5px 10px; }
+.toggle-pass { position: absolute; right: 5px; top: 50%; transform: translateY(-50%); background: transparent; font-size: 18px; padding: 5px 10px; border:none; }
 
 .vitrina-container { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; align-items: start; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 15px; margin-top: 20px; }
@@ -237,61 +225,34 @@ th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spa
 .hidden { display: none !important; }
 .text-red { color: var(--red); }
 .text-gold { color: var(--gold); }
-.center { text-align: center; }
+.center { text-align: center; display: block; margin: 0 auto; }
 .note { font-size: 13px; color: var(--muted); margin-bottom: 15px; text-align: center; }
 
 /* ==========================================================================
-   PIE DE PÁGINA (CRÉDITOS) A ANCHO COMPLETO PARA WEB Y MÓVIL
+   PIE DE PÁGINA
    ========================================================================== */
 .creditos-estudiantes {
   background: #0a0a0a;
   border: 1px solid var(--border);
   padding: 30px 20px;
-  margin: 40px auto 30px auto; /* Margen automático a los lados para centrar */
+  margin: 40px auto 30px auto;
   text-align: center;
   border-radius: 20px;
-  max-width: 1370px; /* Alineado con el contenedor principal de 1400px */
-  width: 95%; /* Para que nunca toque los bordes de la pantalla */
+  max-width: 1370px;
+  width: 95%; 
 }
 .creditos-text { color: var(--muted); font-size: 14px; font-weight: 600; line-height: 1.8; max-width: 900px; margin: 0 auto; }
 .creditos-text span { color: var(--gold); display: block; margin-bottom: 10px; font-size: 16px; font-family: 'Metal Mania', cursive; letter-spacing: 1px; }
 
 /* ==========================================================================
-   DISEÑO RESPONSIVO Y REORDENAMIENTO EN MÓVILES
+   DISEÑO RESPONSIVO
    ========================================================================== */
 @media (max-width: 900px) {
-  /* Al cambiar flex-direction a column, usamos display: contents para liberar los hijos
-     de left-banner y que actúen como columnas individuales, pudiendo reordenarlas */
-  .app-layout { 
-    display: flex; 
-    flex-direction: column; 
-    padding: 15px; 
-  }
-  
-  .left-banner { 
-    display: contents; 
-  }
-  
-  /* 1. La promoción queda de primera */
-  #sidebar-promo { 
-    order: 1; 
-    width: 100%; 
-  }
-  
-  /* 2. El contenido principal (catálogo, carrito) queda en el medio */
-  .main-content { 
-    order: 2; 
-    width: 100%; 
-    padding: 0; 
-  }
-  
-  /* 3. La caja de contacto (ubicación y redes) queda al final */
-  .contact-info { 
-    order: 3; 
-    width: 100%; 
-    margin-top: 25px; 
-    margin-bottom: 25px; 
-  }
+  .app-layout { display: flex; flex-direction: column; padding: 15px; }
+  .left-banner { display: contents; }
+  #sidebar-promo { order: 1; width: 100%; }
+  .main-content { order: 2; width: 100%; padding: 0; }
+  .contact-info { order: 3; width: 100%; margin-top: 25px; margin-bottom: 25px; }
   
   .vitrina-container { grid-template-columns: 1fr; }
   .carrito-panel { position: relative; top: 0; margin-top: 20px; border-top: 2px solid var(--border); }
