@@ -1,8 +1,8 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V6.1
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V7.0
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzPvQ74w31_Kn-E9DLwBc_xWFnhQMuliB2Vo-vLEf-UPlBvnO0UjOl5xpfxqO79JFE5cw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
@@ -131,7 +131,6 @@ async function iniciarSesion() {
   if (!doc || !pass) return mostrarAlerta('Ingresa documento y contraseña');
   mostrarAlerta('Verificando...', 'info');
   try {
-    // CORRECCIÓN APLICADA AQUÍ: Enviamos rolSolicitante: 'Login' para que backend permita ver al Superadmin
     const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: 'Login' });
     const usuario = empleados.find(e => String(e['Documento (Usuario)']) === String(doc) && String(e['Contraseña']) === String(pass));
     if (!usuario) return mostrarAlerta('Credenciales incorrectas');
@@ -514,21 +513,25 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
   }
 }
 
+// ----------------------------------------------------------------------------
+// APROBACIÓN DE PAGOS Y DESCARGA DIRECTA (NUEVA VERSIÓN SIN DRIVEAPP)
+// ----------------------------------------------------------------------------
 async function aprobarPagoTotal(id) {
   if(!confirm('¿Confirmas la validación de este pago? La orden pasará a cocina y se generará la factura.')) return;
   try { 
-    mostrarAlerta('Generando Factura PDF...', 'info');
+    mostrarAlerta('Validando pago y generando PDF...', 'info');
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
-    mostrarAlerta('Aprobado con éxito. Factura creada.', 'success');
+    mostrarAlerta('Aprobado con éxito. Descargando factura...', 'success');
     
-    if (res.urlFactura) {
-      const a = document.createElement('a');
-      a.href = res.urlFactura;
-      a.target = '_blank';
-      a.download = `Factura_${id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => document.body.removeChild(a), 100);
+    // Descarga directa utilizando Base64 
+    if (res.pdfBase64) {
+      const linkSource = `data:application/pdf;base64,${res.pdfBase64}`;
+      const downloadLink = document.createElement("a");
+      downloadLink.href = linkSource;
+      downloadLink.download = `Factura_${id}.pdf`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      setTimeout(() => document.body.removeChild(downloadLink), 100);
     }
     
     cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
@@ -556,7 +559,7 @@ function filtrarFacturas() {
   if(!tbody) return;
   const filtradas = (FACTURAS_GLOBAL || []).filter(f => f && (String(f['Documento'] || '').toLowerCase().includes(query) || String(f['ID Pedido'] || '').toLowerCase().includes(query)));
   if(filtradas.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas.</td></tr>'; return; }
-  tbody.innerHTML = filtradas.map(f => `<tr><td>${f['ID Factura'] || ''}</td><td>${f['ID Pedido'] || ''}</td><td>${f['Documento'] || ''}</td><td>${f['Fecha'] || ''}</td><td>${f['URL PDF'] ? `<a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF</a>` : ''}</td></tr>`).join('');
+  tbody.innerHTML = filtradas.map(f => `<tr><td>${f['ID Factura'] || ''}</td><td>${f['ID Pedido'] || ''}</td><td>${f['Documento'] || ''}</td><td>${f['Fecha'] || ''}</td><td>${f['URL PDF'] ? (f['URL PDF'] === 'Descarga Directa Local' ? '<span style="color:var(--muted);">PDF Descargado Localmente</span>' : `<a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline;">Ver Enlace</a>`) : ''}</td></tr>`).join('');
 }
 
 async function guardarPromocion() {
