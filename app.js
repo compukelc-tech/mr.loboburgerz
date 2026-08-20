@@ -3,7 +3,7 @@
 // ARQUITECTURA: MOTOR CANVAS EN MEMORIA (DATA URI) SIN DRIVE
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwKwtWBXjwaP9TJ9ucc-_2GCJUSRFIR5mxT1xnE99S8TjNqFn7AzWAZKwo33u4m2zJj0A/exec"; // <-- RECUERDA PEGAR TU NUEVA URL AQUÍ DESPUÉS DE IMPLEMENTAR
+const API_URL = "https://script.google.com/macros/s/AKfycbx7kUXiJTpBMecEfAOB22Vagf0k2OZt1I5U1AzTQIcV8BXg6S1G68ZuTXu0I-qGDtm-OQ/exec"; // <-- RECUERDA PEGAR TU NUEVA URL AQUÍ DESPUÉS DE IMPLEMENTAR
 
 let sesionActual = null; 
 let carrito = []; 
