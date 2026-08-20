@@ -40,6 +40,7 @@ window.onload = async () => {
     
     configurarInterfazPorRol();
     await cargarCatalogoGlobal();
+    await cargarPromocionGlobal();
   } catch (error) {
     console.error("Error crítico en inicialización:", error);
   }
@@ -512,7 +513,12 @@ async function enviarPedido() {
     const base64Voucher = await comprimirEnCanvas(voucherInput);
     await apiCall('subirVoucher', { idPedido, montoAbono, imagenBase64: base64Voucher });
     
-    await apiCall('crearPedido', { idPedido, documento, nombre, celular, tipoCliente, correo, carrito, total: totalVenta });
+    // LIMPIEZA DE CARRITO: Excluir las imágenes para no saturar el JSON y corromper la BD
+    const carritoLimpio = carrito.map(item => {
+      return { id: item.id, categoria: item.categoria, nombre: item.nombre, desc: item.desc, precio: item.precio, cant: item.cant };
+    });
+
+    await apiCall('crearPedido', { idPedido, documento, nombre, celular, tipoCliente, correo, carrito: carritoLimpio, total: totalVenta });
 
     mostrarAlerta('Pedido en Espera de Verificación por Cartera', 'success');
     
@@ -731,7 +737,7 @@ async function guardarAbono() {
 }
 
 // ----------------------------------------------------------------------------
-// GESTIÓN DE FACTURAS Y PROMOCIONES
+// GESTIÓN DE FACTURAS Y PROMOCIONES (MARKETING Y PROMOCION GLOBAL)
 // ----------------------------------------------------------------------------
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas'); 
@@ -781,8 +787,52 @@ function cambiarTipoPromo() {
     txt.placeholder = tipo === 'video' ? 'Enlace de YouTube...' : 'Escribe tu mensaje...';
   }
 }
-function guardarPromocion() {
-  mostrarAlerta('Promoción actualizada localmente', 'success');
+
+async function guardarPromocion() {
+  const btn = document.getElementById('btn-guardar-promo');
+  const activa = document.getElementById('promo-activa').value;
+  const tipo = document.getElementById('promo-tipo').value;
+  const contenidoTxt = document.getElementById('promo-contenido').value;
+  const fileInput = document.getElementById('promo-img-file').files[0];
+
+  btn.disabled = true;
+  btn.textContent = 'Guardando en la Nube...';
+
+  try {
+    let base64Img = '';
+    if (tipo === 'imagen' && fileInput) {
+       base64Img = await comprimirEnCanvas(fileInput);
+    }
+    await apiCall('guardarPromocion', { activa, tipo, contenidoTxt, base64Img });
+    mostrarAlerta('Promoción guardada. Visible para todos.', 'success');
+    await cargarPromocionGlobal();
+  } catch(e) {
+    mostrarAlerta(e.message || 'Error guardando promoción');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Guardar Promoción';
+  }
+}
+
+async function cargarPromocionGlobal() {
+   try {
+     const promo = await apiCall('obtenerPromocion');
+     const banner = document.getElementById('sidebar-promo');
+     if(!banner) return;
+     
+     if(promo && promo.activa === 'SI') {
+        banner.classList.remove('hidden');
+        if(promo.tipo === 'texto') banner.innerHTML = `<p>${promo.contenidoTxt}</p>`;
+        if(promo.tipo === 'imagen') banner.innerHTML = `<img src="${promo.base64Img}" alt="Promo">`;
+        if(promo.tipo === 'video') {
+           banner.innerHTML = `<a href="${promo.contenidoTxt}" target="_blank" style="color:var(--gold); font-weight:bold;">🎬 Ver Video Promocional</a>`;
+        }
+     } else {
+        banner.classList.add('hidden');
+     }
+   } catch(e) {
+     console.warn("No se pudo cargar la promoción global.");
+   }
 }
 
 // ============================================================================
