@@ -761,6 +761,7 @@ function filtrarFacturas() {
     return tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas registradas en la base de datos.</td></tr>';
   }
   
+  // PARCHE ANTI-RUTURA: Convertir valores nulos o números a texto de forma segura antes de filtrar
   const filtradas = FACTURAS_GLOBAL.filter(f => {
     const doc = String(f['Documento'] || '').toLowerCase();
     const idPed = String(f['ID Pedido'] || '').toLowerCase();
