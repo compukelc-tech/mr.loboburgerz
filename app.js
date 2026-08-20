@@ -1,5 +1,6 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V8.0
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V9.1 DEFINITIVO
+// CÓDIGO COMPLETO Y SIN COMPRIMIR (FORMATO ORIGINAL RESTAURADO)
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
@@ -32,53 +33,87 @@ const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency:
 window.onload = async () => {
   try {
     const savedSession = localStorage.getItem('lobo_session');
-    if (savedSession) sesionActual = JSON.parse(savedSession);
-    else sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
+    if (savedSession) {
+      sesionActual = JSON.parse(savedSession);
+    } else {
+      sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
+    }
     
+    // Cargar sesión del cliente fidelizado si existe
     const savedFidelidad = localStorage.getItem('lobo_cliente');
-    if (savedFidelidad) clienteFidelizado = JSON.parse(savedFidelidad);
+    if (savedFidelidad) {
+      clienteFidelizado = JSON.parse(savedFidelidad);
+    }
 
     configurarInterfazPorRol();
     await cargarCatalogoGlobal();
     await cargarPromocionGlobal();
-  } catch (error) { console.error(error); }
+  } catch (error) { 
+    console.error(error); 
+  }
 };
 
 async function apiCall(accion, datos = {}) {
   try {
-    const response = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ accion, datos }) });
+    const response = await fetch(API_URL, { 
+      method: 'POST', 
+      body: JSON.stringify({ accion, datos }) 
+    });
     const textResponse = await response.text();
     let result = JSON.parse(textResponse);
-    if (!result.exito) throw new Error(result.error);
+    if (!result.exito) {
+      throw new Error(result.error);
+    }
     return result.data;
-  } catch (error) { throw error; }
+  } catch (error) { 
+    throw error; 
+  }
 }
 
 function forzarUpdatePWA() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.getRegistrations().then(function(registrations) {
-      for(let r of registrations) { r.unregister(); }
+      for(let r of registrations) { 
+        r.unregister(); 
+      }
       caches.keys().then(keys => {
         Promise.all(keys.map(key => caches.delete(key))).then(() => {
-          mostrarAlerta('Sistema actualizado exitosamente. Recargando...', 'success');
+          mostrarAlerta('Sistema actualizado y purgado exitosamente. Recargando...', 'success');
           setTimeout(() => window.location.reload(true), 1500);
         });
       });
     });
-  } else { window.location.reload(true); }
+  } else { 
+    window.location.reload(true); 
+  }
 }
 
 function navegar(vistaID) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   const target = document.getElementById(`view-${vistaID}`);
-  if (target) target.classList.add('active');
+  if (target) {
+    target.classList.add('active');
+  }
   
-  if (vistaID === 'admin') { cargarEmpleados(); cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-admin'); }
-  if (vistaID === 'marketing') cargarGestorMenu();
-  if (vistaID === 'facturas') cargarFacturas();
-  if (vistaID === 'cartera') cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
-  if (vistaID === 'produccion') cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
-  if (vistaID === 'despachados') cargarPedidos('DESPACHADO', 'lista-despachados');
+  if (vistaID === 'admin') { 
+    cargarEmpleados(); 
+    cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-admin'); 
+  }
+  if (vistaID === 'marketing') {
+    cargarGestorMenu();
+  }
+  if (vistaID === 'facturas') {
+    cargarFacturas();
+  }
+  if (vistaID === 'cartera') {
+    cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
+  }
+  if (vistaID === 'produccion') {
+    cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
+  }
+  if (vistaID === 'despachados') {
+    cargarPedidos('DESPACHADO', 'lista-despachados');
+  }
 }
 
 function cerrarSesion() {
@@ -88,7 +123,9 @@ function cerrarSesion() {
   mostrarAlerta('Sesión cerrada correctamente', 'info');
 }
 
-function entrarComoCliente() { cerrarSesion(); }
+function entrarComoCliente() { 
+  cerrarSesion(); 
+}
 
 function configurarInterfazPorRol() {
   const isCliente = sesionActual.rol === 'Cliente';
@@ -96,51 +133,88 @@ function configurarInterfazPorRol() {
   const loginIcon = document.getElementById('btn-login-icon');
   const greeting = document.getElementById('user-greeting');
   
-  if (nav) nav.style.display = isCliente ? 'none' : 'flex';
-  if (loginIcon) loginIcon.style.display = isCliente ? 'block' : 'none';
-  if (greeting) greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
+  if (nav) {
+    nav.style.display = isCliente ? 'none' : 'flex';
+  }
+  if (loginIcon) {
+    loginIcon.style.display = isCliente ? 'block' : 'none';
+  }
+  if (greeting) {
+    greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
+  }
 
-  if (isCliente) return navegar('vitrina');
+  if (isCliente) {
+    return navegar('vitrina');
+  }
 
   document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
   const btnOutline = document.querySelector('.btn-outline');
   const btnUpdate = document.getElementById('btn-update-pwa');
-  if (btnOutline) btnOutline.style.display = 'block'; 
   
-  if (btnUpdate) btnUpdate.style.display = (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') ? 'block' : 'none';
+  if (btnOutline) {
+    btnOutline.style.display = 'block'; 
+  }
+  if (btnUpdate) {
+    btnUpdate.style.display = (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') ? 'block' : 'none';
+  }
 
   if (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'block');
     navegar('admin');
   } else if (sesionActual.rol === 'Vitrina') {
-    const navVit = document.getElementById('nav-vitrina'); if (navVit) navVit.style.display = 'block'; navegar('vitrina');
+    const navVit = document.getElementById('nav-vitrina'); 
+    if (navVit) navVit.style.display = 'block'; 
+    navegar('vitrina');
   } else if (sesionActual.rol === 'Cartera') {
-    const navCart = document.getElementById('nav-cartera'); if (navCart) navCart.style.display = 'block'; navegar('cartera');
+    const navCart = document.getElementById('nav-cartera'); 
+    if (navCart) navCart.style.display = 'block'; 
+    navegar('cartera');
   } else if (sesionActual.rol === 'Producción') {
-    const navProd = document.getElementById('nav-produccion'); if (navProd) navProd.style.display = 'block'; navegar('produccion');
+    const navProd = document.getElementById('nav-produccion'); 
+    if (navProd) navProd.style.display = 'block'; 
+    navegar('produccion');
   } else if (sesionActual.rol === 'Pedidos') {
-    const navDespachados = document.getElementById('nav-despachados'); if (navDespachados) navDespachados.style.display = 'block'; navegar('despachados');
+    const navDespachados = document.getElementById('nav-despachados'); 
+    if (navDespachados) navDespachados.style.display = 'block'; 
+    navegar('despachados');
   } else if (sesionActual.rol === 'Marketing') {
-    const navMark = document.getElementById('nav-marketing'); if (navMark) navMark.style.display = 'block'; navegar('marketing');
+    const navMark = document.getElementById('nav-marketing'); 
+    if (navMark) navMark.style.display = 'block'; 
+    navegar('marketing');
   }
 }
 
 async function iniciarSesion() {
   const doc = document.getElementById('login-doc').value;
   const pass = document.getElementById('login-pass').value;
-  if (!doc || !pass) return mostrarAlerta('Ingresa documento y contraseña');
+  if (!doc || !pass) {
+    return mostrarAlerta('Ingresa documento y contraseña');
+  }
+  
   mostrarAlerta('Verificando...', 'info');
+  
   try {
     const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: 'Login' });
     const usuario = empleados.find(e => String(e['Documento (Usuario)']) === String(doc) && String(e['Contraseña']) === String(pass));
-    if (!usuario) return mostrarAlerta('Credenciales incorrectas');
-    if (usuario['Estado'] === 'BLOQUEADO') return mostrarAlerta('Cuenta bloqueada.');
     
-    sesionActual = { documento: doc, nombre: usuario['Nombre Completo'], rol: usuario['Rol Asignado'] };
+    if (!usuario) {
+      return mostrarAlerta('Credenciales incorrectas');
+    }
+    if (usuario['Estado'] === 'BLOQUEADO') {
+      return mostrarAlerta('Cuenta bloqueada.');
+    }
+    
+    sesionActual = { 
+      documento: doc, 
+      nombre: usuario['Nombre Completo'], 
+      rol: usuario['Rol Asignado'] 
+    };
     localStorage.setItem('lobo_session', JSON.stringify(sesionActual));
     mostrarAlerta('Acceso concedido', 'success');
     configurarInterfazPorRol();
-  } catch (e) { mostrarAlerta(e.message || 'Error de red.'); }
+  } catch (e) { 
+    mostrarAlerta(e.message || 'Error de red.'); 
+  }
 }
 
 async function registrarEmpleado() {
@@ -151,29 +225,46 @@ async function registrarEmpleado() {
     area: document.getElementById('reg-area').value,
     contrasena: document.getElementById('reg-pass').value
   };
-  if (Object.values(datos).some(x => !x)) return mostrarAlerta('Faltan campos obligatorios');
+  
+  if (Object.values(datos).some(x => !x)) {
+    return mostrarAlerta('Faltan campos obligatorios');
+  }
+  
   try {
     await apiCall('registrarEmpleado', datos);
     mostrarAlerta('Registro exitoso.', 'success');
     navegar('login');
-  } catch (e) { mostrarAlerta('Error al registrar.'); }
+  } catch (e) { 
+    mostrarAlerta('Error al registrar.'); 
+  }
 }
 
 function mostrarAlerta(msg, tipo = 'error') {
   const alertBox = document.getElementById('alert-box');
   if(alertBox) {
-    alertBox.textContent = msg; alertBox.className = `alert ${tipo}`;
+    alertBox.textContent = msg; 
+    alertBox.className = `alert ${tipo}`;
     setTimeout(() => alertBox.classList.add('hidden'), 5000);
-  } else { alert(msg); }
+  } else { 
+    alert(msg); 
+  }
 }
 
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId);
-  if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; } 
-  else { input.type = 'password'; btn.textContent = '👁️'; }
+  if (input.type === 'password') { 
+    input.type = 'text'; 
+    btn.textContent = '🙈'; 
+  } else { 
+    input.type = 'password'; 
+    btn.textContent = '👁️'; 
+  }
 }
 
-/* MODAL DE FIDELIDAD */
+// ----------------------------------------------------------------------------
+// SISTEMA DE FIDELIZACIÓN (NUEVO MODAL)
+// ----------------------------------------------------------------------------
+
 function abrirModalFidelidad() {
   if (clienteFidelizado) {
     if(confirm(`Ya tienes sesión como ${clienteFidelizado.nombre}. ¿Deseas cerrar sesión?`)) {
@@ -185,10 +276,12 @@ function abrirModalFidelidad() {
     document.getElementById('modal-fidelidad').classList.add('active');
   }
 }
+
 function toggleFidForms() {
   document.getElementById('fid-login-section').classList.toggle('hidden');
   document.getElementById('fid-reg-section').classList.toggle('hidden');
 }
+
 async function registrarFidelidad() {
   const datos = {
     documento: document.getElementById('fid-reg-doc').value,
@@ -197,7 +290,10 @@ async function registrarFidelidad() {
     correo: document.getElementById('fid-reg-correo').value,
     clave: document.getElementById('fid-reg-pass').value
   };
-  if (!datos.documento || !datos.nombre || !datos.celular || !datos.clave) return mostrarAlerta('Faltan campos requeridos.');
+  
+  if (!datos.documento || !datos.nombre || !datos.celular || !datos.clave) {
+    return mostrarAlerta('Faltan campos requeridos.');
+  }
   
   try {
     mostrarAlerta('Registrando...', 'info');
@@ -205,56 +301,96 @@ async function registrarFidelidad() {
     localStorage.setItem('lobo_cliente', JSON.stringify(clienteFidelizado));
     cerrarModal('modal-fidelidad');
     mostrarAlerta('Membresía creada exitosamente.', 'success');
-  } catch (e) { mostrarAlerta(e.message); }
+  } catch (e) { 
+    mostrarAlerta(e.message); 
+  }
 }
+
 async function loginFidelidad() {
   const doc = document.getElementById('fid-log-doc').value;
   const clave = document.getElementById('fid-log-pass').value;
-  if(!doc || !clave) return mostrarAlerta('Ingresa tus credenciales');
+  
+  if(!doc || !clave) {
+    return mostrarAlerta('Ingresa tus credenciales');
+  }
+  
   try {
     mostrarAlerta('Validando...', 'info');
     clienteFidelizado = await apiCall('loginClienteFidelizado', { documento: doc, clave: clave });
     localStorage.setItem('lobo_cliente', JSON.stringify(clienteFidelizado));
     cerrarModal('modal-fidelidad');
     mostrarAlerta(`Bienvenido de nuevo, ${clienteFidelizado.nombre}`, 'success');
-  } catch (e) { mostrarAlerta(e.message); }
+  } catch (e) { 
+    mostrarAlerta(e.message); 
+  }
 }
 
-/* CARGA DEL CATÁLOGO */
+// ----------------------------------------------------------------------------
+// CARGA Y GESTIÓN DE CATÁLOGO
+// ----------------------------------------------------------------------------
+
 async function cargarCatalogoGlobal() {
   try {
     const data = await apiCall('obtenerCatalogo');
     let catalogoFusionado = [...CATALOGO_BASE];
+    
     if (data && data.length > 0) {
       const productosNube = data.map(p => ({ 
-        id: p['ID Producto'], categoria: p['Categoría'] || '~PRODUCTOS PRINCIPALES~', 
-        nombre: p['Nombre'], desc: p['Descripción'], precio: Number(p['Precio']), 
-        agotado: String(p['Agotado (SI/NO)']) === 'SI', urlImagen: p['URL Imagen'] 
+        id: p['ID Producto'], 
+        categoria: p['Categoría'] || '~PRODUCTOS PRINCIPALES~', 
+        nombre: p['Nombre'], 
+        desc: p['Descripción'], 
+        precio: Number(p['Precio']), 
+        agotado: String(p['Agotado (SI/NO)']) === 'SI', 
+        urlImagen: p['URL Imagen'] 
       }));
+      
       productosNube.forEach(prodNube => {
         const index = catalogoFusionado.findIndex(base => base.id === prodNube.id);
-        if (index !== -1) catalogoFusionado[index] = prodNube;
-        else catalogoFusionado.push(prodNube);
+        if (index !== -1) {
+          catalogoFusionado[index] = prodNube;
+        } else {
+          catalogoFusionado.push(prodNube);
+        }
       });
     }
     CATALOGO = catalogoFusionado;
-  } catch (error) { CATALOGO = [...CATALOGO_BASE]; }
-  if(document.getElementById('view-vitrina')?.classList.contains('active') || sesionActual?.rol === 'Cliente') renderCatalogo();
+  } catch (error) { 
+    CATALOGO = [...CATALOGO_BASE]; 
+  }
+  
+  if(document.getElementById('view-vitrina')?.classList.contains('active') || sesionActual?.rol === 'Cliente') {
+    renderCatalogo();
+  }
 }
 
 function renderCatalogo() {
   const container = document.getElementById('catalogo-productos');
   if(!container) return;
-  if (CATALOGO.length === 0) { container.innerHTML = '<p class="note">Catálogo vacío.</p>'; return; }
+  
+  if (CATALOGO.length === 0) { 
+    container.innerHTML = '<p class="note">Catálogo vacío.</p>'; 
+    return; 
+  }
+  
   const categorias = [...new Set(CATALOGO.map(p => p.categoria))];
   let html = '';
+  
   categorias.forEach(cat => {
     html += `<h3 style="grid-column: 1 / -1; margin-top: 40px; margin-bottom: 10px; color: var(--gold); border-bottom: 1px solid var(--border); padding-bottom: 10px; font-family: 'Metal Mania', cursive; font-size: 38px; text-align: center;">${cat}</h3>`;
+    
     CATALOGO.filter(p => p.categoria === cat).forEach(prod => {
       const botonHTML = prod.agotado ? `<button class="btn-outline full-width" disabled>Agotado</button>` : `<button class="primary full-width" onclick="agregarAlCarrito('${prod.id}')">+ Añadir a pedido</button>`;
-      html += `<div class="product-card" style="${prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : ''}">${prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : ''}<h3>${prod.nombre}</h3><p>${prod.desc}</p><span class="price">${money(prod.precio)}</span>${botonHTML}</div>`;
+      html += `<div class="product-card" style="${prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
+                ${prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : ''}
+                <h3>${prod.nombre}</h3>
+                <p>${prod.desc}</p>
+                <span class="price">${money(prod.precio)}</span>
+                ${botonHTML}
+               </div>`;
     });
   });
+  
   container.innerHTML = html;
 }
 
@@ -262,8 +398,19 @@ function cargarGestorMenu() {
   const tbody = document.getElementById('lista-marketing-productos'); 
   if(!tbody) return;
   tbody.innerHTML = '';
+  
   CATALOGO.forEach(p => {
-    tbody.innerHTML += `<tr><td>${p.urlImagen ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">` : 'Sin foto'}</td><td>${p.categoria}</td><td><b>${p.nombre}</b></td><td>${money(p.precio)}</td><td><span class="badge ${p.agotado ? 'denegado' : 'activo'}">${p.agotado ? 'AGOTADO' : 'DISPONIBLE'}</span></td><td><button class="primary small" onclick="abrirModalProducto('${p.id}')">Editar</button> <button class="small" style="background:var(--dark-red);" onclick="eliminarProducto('${p.id}')">Eliminar</button></td></tr>`;
+    tbody.innerHTML += `<tr>
+      <td>${p.urlImagen ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">` : 'Sin foto'}</td>
+      <td>${p.categoria}</td>
+      <td><b>${p.nombre}</b></td>
+      <td>${money(p.precio)}</td>
+      <td><span class="badge ${p.agotado ? 'denegado' : 'activo'}">${p.agotado ? 'AGOTADO' : 'DISPONIBLE'}</span></td>
+      <td>
+        <button class="primary small" onclick="abrirModalProducto('${p.id}')">Editar</button> 
+        <button class="small" style="background:var(--dark-red);" onclick="eliminarProducto('${p.id}')">Eliminar</button>
+      </td>
+    </tr>`;
   });
 }
 
@@ -272,14 +419,19 @@ function abrirModalProducto(id = null) {
   if (id) {
     const p = CATALOGO.find(x => x.id === id);
     document.getElementById('modal-prod-titulo').textContent = 'Editar Producto';
-    document.getElementById('prod-id').value = p.id; document.getElementById('prod-categoria').value = p.categoria; 
-    document.getElementById('prod-nombre').value = p.nombre; document.getElementById('prod-desc').value = p.desc; 
-    document.getElementById('prod-precio').value = p.precio; document.getElementById('prod-agotado').value = p.agotado ? 'SI' : 'NO'; 
+    document.getElementById('prod-id').value = p.id; 
+    document.getElementById('prod-categoria').value = p.categoria; 
+    document.getElementById('prod-nombre').value = p.nombre; 
+    document.getElementById('prod-desc').value = p.desc; 
+    document.getElementById('prod-precio').value = p.precio; 
+    document.getElementById('prod-agotado').value = p.agotado ? 'SI' : 'NO'; 
     document.getElementById('prod-img-existente').value = p.urlImagen || '';
   } else {
     document.getElementById('modal-prod-titulo').textContent = 'Añadir Producto';
-    document.getElementById('prod-id').value = ''; document.getElementById('prod-nombre').value = ''; 
-    document.getElementById('prod-desc').value = ''; document.getElementById('prod-precio').value = ''; 
+    document.getElementById('prod-id').value = ''; 
+    document.getElementById('prod-nombre').value = ''; 
+    document.getElementById('prod-desc').value = ''; 
+    document.getElementById('prod-precio').value = ''; 
     document.getElementById('prod-img-existente').value = '';
   }
   document.getElementById('prod-img').value = ''; 
@@ -290,15 +442,25 @@ function comprimirEnCanvas(file) {
     if (!file) return resolve(null);
     const reader = new FileReader();
     reader.readAsDataURL(file);
+    
     reader.onload = event => {
       const img = new Image();
       img.src = event.target.result;
       img.onload = () => {
-        const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
-        const MAX_WIDTH = 400; let width = img.width, height = img.height; 
-        if (width > MAX_WIDTH) { height = Math.round((height * MAX_WIDTH) / width); width = MAX_WIDTH; }
-        canvas.width = width; canvas.height = height; 
-        ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, width, height);
+        const canvas = document.createElement('canvas'); 
+        const ctx = canvas.getContext('2d');
+        const MAX_WIDTH = 400; 
+        let width = img.width, height = img.height; 
+        
+        if (width > MAX_WIDTH) { 
+          height = Math.round((height * MAX_WIDTH) / width); 
+          width = MAX_WIDTH; 
+        }
+        
+        canvas.width = width; 
+        canvas.height = height; 
+        ctx.fillStyle = "#ffffff"; 
+        ctx.fillRect(0, 0, width, height);
         ctx.drawImage(img, 0, 0, width, height);
         resolve(canvas.toDataURL('image/jpeg', 0.6)); 
       };
@@ -312,36 +474,74 @@ async function guardarProductoBackend() {
   const btn = document.getElementById('btn-guardar-prod');
   const fileInput = document.getElementById('prod-img').files[0];
   const datos = { 
-    idProducto: document.getElementById('prod-id').value, categoria: document.getElementById('prod-categoria').value, 
-    nombre: document.getElementById('prod-nombre').value, descripcion: document.getElementById('prod-desc').value, 
-    precio: document.getElementById('prod-precio').value, agotado: document.getElementById('prod-agotado').value === 'SI', 
+    idProducto: document.getElementById('prod-id').value, 
+    categoria: document.getElementById('prod-categoria').value, 
+    nombre: document.getElementById('prod-nombre').value, 
+    descripcion: document.getElementById('prod-desc').value, 
+    precio: document.getElementById('prod-precio').value, 
+    agotado: document.getElementById('prod-agotado').value === 'SI', 
     urlImagenExistente: document.getElementById('prod-img-existente').value 
   };
-  if (!datos.nombre || !datos.descripcion || !datos.precio) return mostrarAlerta('Faltan campos obligatorios');
-  btn.disabled = true; btn.textContent = 'Guardando...';
+  
+  if (!datos.nombre || !datos.descripcion || !datos.precio) {
+    return mostrarAlerta('Faltan campos obligatorios');
+  }
+  
+  btn.disabled = true; 
+  btn.textContent = 'Guardando...';
+  
   try {
-    if (fileInput) datos.imagenBase64 = await comprimirEnCanvas(fileInput); 
+    if (fileInput) {
+      datos.imagenBase64 = await comprimirEnCanvas(fileInput); 
+    }
     await apiCall('guardarProducto', datos);
-    cerrarModal('modal-producto'); await cargarCatalogoGlobal(); cargarGestorMenu();
+    cerrarModal('modal-producto'); 
+    await cargarCatalogoGlobal(); 
+    cargarGestorMenu();
     mostrarAlerta('Producto guardado correctamente', 'success');
-  } catch (error) { mostrarAlerta(error.message); } finally { btn.disabled = false; btn.textContent = 'Guardar'; }
+  } catch (error) { 
+    mostrarAlerta(error.message); 
+  } finally { 
+    btn.disabled = false; 
+    btn.textContent = 'Guardar'; 
+  }
 }
 
 async function eliminarProducto(id) {
   if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
-  if (CATALOGO_BASE.some(base => base.id === id)) return mostrarAlerta('No se puede eliminar un producto base.', 'warning');
-  try { await apiCall('eliminarProducto', { idProducto: id }); mostrarAlerta('Producto eliminado', 'success'); await cargarCatalogoGlobal(); cargarGestorMenu(); } catch(e) { mostrarAlerta(e.message); }
+  if (CATALOGO_BASE.some(base => base.id === id)) {
+    return mostrarAlerta('No se puede eliminar un producto base.', 'warning');
+  }
+  try { 
+    await apiCall('eliminarProducto', { idProducto: id }); 
+    mostrarAlerta('Producto eliminado', 'success'); 
+    await cargarCatalogoGlobal(); 
+    cargarGestorMenu(); 
+  } catch(e) { 
+    mostrarAlerta(e.message); 
+  }
 }
+
+// ----------------------------------------------------------------------------
+// CARRITO DE COMPRAS
+// ----------------------------------------------------------------------------
 
 function agregarAlCarrito(id) { 
   const prod = CATALOGO.find(p => p.id === id); 
   const item = carrito.find(i => i.id === id); 
-  if (item) item.cant++; else carrito.push({ ...prod, cant: 1 }); 
+  if (item) {
+    item.cant++; 
+  } else {
+    carrito.push({ ...prod, cant: 1 }); 
+  }
   renderCarrito(); 
 }
 
 function quitarDelCarrito(id) { 
-  carrito = carrito.filter(i => { if (i.id === id) i.cant--; return i.cant > 0; }); 
+  carrito = carrito.filter(i => { 
+    if (i.id === id) i.cant--; 
+    return i.cant > 0; 
+  }); 
   renderCarrito(); 
 }
 
@@ -350,29 +550,60 @@ function renderCarrito() {
   const btnProcesar = document.getElementById('btn-procesar'); 
   const displayTotal = document.getElementById('carrito-total-precio');
   if(!container) return;
-  if (carrito.length === 0) { container.innerHTML = '<p class="note">Carrito vacío</p>'; displayTotal.textContent = '$0'; btnProcesar.disabled = true; return; }
-  btnProcesar.disabled = false; let total = 0;
+  
+  if (carrito.length === 0) { 
+    container.innerHTML = '<p class="note">Carrito vacío</p>'; 
+    displayTotal.textContent = '$0'; 
+    btnProcesar.disabled = true; 
+    return; 
+  }
+  
+  btnProcesar.disabled = false; 
+  let total = 0;
+  
   container.innerHTML = carrito.map(item => { 
     total += item.precio * item.cant; 
-    return `<div class="cart-item"><div class="cart-item-info"><span class="qty" style="background:var(--red);">${item.cant}</span><span>${item.nombre}</span></div><div><span>${money(item.precio * item.cant)}</span><button class="del-btn" onclick="quitarDelCarrito('${item.id}')">✕</button></div></div>`; 
+    return `<div class="cart-item">
+              <div class="cart-item-info">
+                <span class="qty" style="background:var(--red);">${item.cant}</span>
+                <span>${item.nombre}</span>
+              </div>
+              <div>
+                <span>${money(item.precio * item.cant)}</span>
+                <button class="del-btn" onclick="quitarDelCarrito('${item.id}')">✕</button>
+              </div>
+            </div>`; 
   }).join('');
+  
   displayTotal.textContent = money(total);
 }
 
 function abrirModalCheckout() { 
   document.getElementById('modal-checkout').classList.add('active'); 
+  
   if(clienteFidelizado) {
     document.getElementById('co-tipo').value = 'Continuo';
     document.getElementById('co-doc').value = clienteFidelizado.documento;
     document.getElementById('co-nombre').value = clienteFidelizado.nombre;
     document.getElementById('co-celular').value = clienteFidelizado.celular;
-    if(clienteFidelizado.correo) document.getElementById('co-correo').value = clienteFidelizado.correo;
+    if(clienteFidelizado.correo) {
+      document.getElementById('co-correo').value = clienteFidelizado.correo;
+    }
     toggleCamposCliente();
   }
 }
-function cerrarModal(id) { document.getElementById(id).classList.remove('active'); }
-function toggleCamposCliente() { document.getElementById('co-correo-field').classList.toggle('hidden', document.getElementById('co-tipo').value === 'Ocasional'); }
-function toggleVoucherInput() { document.getElementById('co-monto-abono-field').classList.toggle('hidden', document.getElementById('co-tipo-pago').value === 'Completo'); }
+
+function cerrarModal(id) { 
+  document.getElementById(id).classList.remove('active'); 
+}
+
+function toggleCamposCliente() { 
+  document.getElementById('co-correo-field').classList.toggle('hidden', document.getElementById('co-tipo').value === 'Ocasional'); 
+}
+
+function toggleVoucherInput() { 
+  document.getElementById('co-monto-abono-field').classList.toggle('hidden', document.getElementById('co-tipo-pago').value === 'Completo'); 
+}
 
 async function enviarPedido() {
   const btn = document.getElementById('btn-enviar-pedido');
@@ -384,10 +615,16 @@ async function enviarPedido() {
   const tipoPago = document.getElementById('co-tipo-pago').value; 
   const voucherInput = document.getElementById('co-voucher').files[0];
   
-  if (!documento || !nombre || !celular) return mostrarAlerta('Faltan datos del cliente');
-  if (!voucherInput) return mostrarAlerta('Debe adjuntar el comprobante');
+  if (!documento || !nombre || !celular) {
+    return mostrarAlerta('Faltan datos del cliente');
+  }
+  if (!voucherInput) {
+    return mostrarAlerta('Debe adjuntar el comprobante');
+  }
 
-  btn.disabled = true; btn.textContent = 'Procesando...';
+  btn.disabled = true; 
+  btn.textContent = 'Procesando...';
+  
   try {
     const idPedido = 'ORD-' + new Date().getTime().toString().slice(-6);
     const totalVenta = carrito.reduce((acc, i) => acc + (i.precio * i.cant), 0);
@@ -396,18 +633,47 @@ async function enviarPedido() {
     const base64Voucher = await comprimirEnCanvas(voucherInput);
     await apiCall('subirVoucher', { idPedido, montoAbono, imagenBase64: base64Voucher });
     
-    const carritoLimpio = carrito.map(item => ({ id: item.id, categoria: item.categoria, nombre: item.nombre, desc: item.desc, precio: item.precio, cant: item.cant }));
-    await apiCall('crearPedido', { idPedido, documento, nombre, celular, tipoCliente, correo, carrito: carritoLimpio, total: totalVenta });
+    const carritoLimpio = carrito.map(item => ({ 
+      id: item.id, 
+      categoria: item.categoria, 
+      nombre: item.nombre, 
+      desc: item.desc, 
+      precio: item.precio, 
+      cant: item.cant 
+    }));
+    
+    await apiCall('crearPedido', { 
+      idPedido, 
+      documento, 
+      nombre, 
+      celular, 
+      tipoCliente, 
+      correo, 
+      carrito: carritoLimpio, 
+      total: totalVenta 
+    });
 
     mostrarAlerta('Pedido registrado con éxito.', 'success');
-    carrito = []; renderCarrito(); cerrarModal('modal-checkout');
-  } catch (error) { mostrarAlerta(error.message || 'Error al procesar.'); } finally { btn.disabled = false; btn.textContent = 'Confirmar y Enviar Pedido'; }
+    carrito = []; 
+    renderCarrito(); 
+    cerrarModal('modal-checkout');
+  } catch (error) { 
+    mostrarAlerta(error.message || 'Error al procesar.'); 
+  } finally { 
+    btn.disabled = false; 
+    btn.textContent = 'Confirmar y Enviar Pedido'; 
+  }
 }
+
+// ----------------------------------------------------------------------------
+// GESTIÓN DE PERSONAL (PANEL MAESTRO)
+// ----------------------------------------------------------------------------
 
 async function cargarEmpleados() {
   const tbody = document.getElementById('lista-empleados'); 
   if(!tbody) return;
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando...</td></tr>';
+  
   try {
     const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: sesionActual.rol });
     tbody.innerHTML = '';
@@ -437,13 +703,20 @@ async function cargarEmpleados() {
         </td>
       </tr>`;
     });
-  } catch(e) {}
+  } catch(e) {
+    console.error(e);
+  }
 }
 
 async function cambiarRolYEstado(documento) {
   const nuevoRol = document.getElementById(`rol-${documento}`).value;
   const nuevoEstado = document.getElementById(`estado-${documento}`).value;
-  try { await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); mostrarAlerta('Actualizado', 'success'); } catch(e) { mostrarAlerta('Error'); }
+  try { 
+    await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); 
+    mostrarAlerta('Actualizado', 'success'); 
+  } catch(e) { 
+    mostrarAlerta('Error al actualizar empleado'); 
+  }
 }
 
 async function eliminarEmpleado(documento) {
@@ -452,12 +725,19 @@ async function eliminarEmpleado(documento) {
     await apiCall('eliminarEmpleado', { documento });
     mostrarAlerta('Empleado eliminado exitosamente', 'success');
     cargarEmpleados();
-  } catch(e) { mostrarAlerta('Error eliminando empleado'); }
+  } catch(e) { 
+    mostrarAlerta('Error eliminando empleado'); 
+  }
 }
+
+// ----------------------------------------------------------------------------
+// FLUJO Y CONTROL DE PEDIDOS
+// ----------------------------------------------------------------------------
 
 async function cargarPedidos(estadoFiltro, contenedorID) {
   const container = document.getElementById(contenedorID); 
   if(!container) return;
+  
   container.innerHTML = '<p class="note">Cargando pedidos...</p>';
   try {
     const pedidos = await apiCall('obtenerPedidosConAbonos'); 
@@ -488,13 +768,23 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
     }
     
     if (contenedorID === 'lista-despachados') {
-      container.innerHTML = filtrados.map(p => `<tr><td><b>${p['ID Pedido']}</b></td><td>${p['Nombre'] || ''}</td><td>${money(p['Total'])}</td><td><span class="badge despachado">${p['Estado']}</span></td></tr>`).join('');
+      container.innerHTML = filtrados.map(p => `<tr>
+        <td><b>${p['ID Pedido']}</b></td>
+        <td>${p['Nombre'] || ''}</td>
+        <td>${money(p['Total'])}</td>
+        <td><span class="badge despachado">${p['Estado']}</span></td>
+      </tr>`).join('');
       return;
     } 
 
     container.innerHTML = filtrados.map(p => {
       let itemsCart = [];
-      try { itemsCart = JSON.parse(p['Carrito (JSON)'] || '[]'); } catch(e) { itemsCart = []; }
+      try { 
+        itemsCart = JSON.parse(p['Carrito (JSON)'] || '[]'); 
+      } catch(e) { 
+        itemsCart = []; 
+      }
+      
       let saldo = Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0));
       let badgeDinero = saldo === 0 ? `<span class="badge activo">TOTALMENTE PAGO</span>` : `<span class="badge pendiente">SALDO PENDIENTE: ${money(saldo)}</span>`;
       
@@ -505,7 +795,22 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
         botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`;
       }
           
-      return `<div class="card product-card" style="text-align:left; padding: 20px;"><h3 style="margin-bottom:5px; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>${badgeDinero}<p class="note" style="text-align:left; color:white; margin:10px 0;">Titular: <b>${p['Nombre'] || ''}</b><br>Doc: ${p['Documento'] || ''} | Tel: ${p['Celular'] || ''}</p><ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || ''}</li>`).join('')}</ul><div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;"><span>Total:</span><span class="text-gold">${money(p['Total'])}</span></div>${botones}</div>`;
+      return `<div class="card product-card" style="text-align:left; padding: 20px;">
+                <h3 style="margin-bottom:5px; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>
+                ${badgeDinero}
+                <p class="note" style="text-align:left; color:white; margin:10px 0;">
+                  Titular: <b>${p['Nombre'] || ''}</b><br>
+                  Doc: ${p['Documento'] || ''} | Tel: ${p['Celular'] || ''}
+                </p>
+                <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
+                  ${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || ''}</li>`).join('')}
+                </ul>
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
+                  <span>Total:</span>
+                  <span class="text-gold">${money(p['Total'])}</span>
+                </div>
+                ${botones}
+              </div>`;
     }).join('');
     
   } catch(e) {
@@ -514,8 +819,35 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
 }
 
 // ----------------------------------------------------------------------------
-// FUNCIÓN BLINDADA PARA DESCARGAR PDF (PC y MÓVIL PWA)
+// FUNCIÓN BLINDADA PARA DESCARGAR PDF (PC y MÓVIL PWA) SIN CERRAR APP
 // ----------------------------------------------------------------------------
+function descargarPDFLocal(base64Data, fileName) {
+  try {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], {type: 'application/pdf'});
+    const blobUrl = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    }, 250);
+  } catch (err) {
+    console.error(err);
+    mostrarAlerta('Error interno al generar el archivo en tu dispositivo.', 'error');
+  }
+}
+
 async function aprobarPagoTotal(id) {
   if(!confirm('¿Confirmas la validación de este pago? La orden pasará a cocina y se generará la factura.')) return;
   try { 
@@ -523,23 +855,22 @@ async function aprobarPagoTotal(id) {
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
     mostrarAlerta('Aprobado con éxito. Descargando factura...', 'success');
     
-    // Descarga y vista universal sin cerrar la PWA
-    if (res.urlFactura) {
-      const a = document.createElement('a');
-      a.href = res.urlFactura;
-      a.target = '_blank';
-      a.download = `Factura_${id}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      setTimeout(() => document.body.removeChild(a), 100);
+    // Ejecuta la descarga en formato Blob (Seguro para PC y Celulares sin Drive)
+    if (res.pdfBase64) {
+      descargarPDFLocal(res.pdfBase64, `Factura_${id}.pdf`);
     }
     
     cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
-  } catch(e) { mostrarAlerta(e.message); }
+  } catch(e) { 
+    mostrarAlerta(e.message); 
+  }
 }
 
 async function cambiarEstadoPedido(idPedido, nuevoEstado) {
-  try { await apiCall('cambiarEstadoPedido', { idPedido, nuevoEstado }); cargarPedidos('EN PRODUCCIÓN', 'lista-produccion'); } catch(e) {}
+  try { 
+    await apiCall('cambiarEstadoPedido', { idPedido, nuevoEstado }); 
+    cargarPedidos('EN PRODUCCIÓN', 'lista-produccion'); 
+  } catch(e) {}
 }
 
 async function cargarFacturas() {
@@ -549,39 +880,70 @@ async function cargarFacturas() {
   try { 
     FACTURAS_GLOBAL = await apiCall('obtenerFacturas'); 
     filtrarFacturas(); 
-  } catch(e) { tbody.innerHTML = `<tr><td colspan="5" class="center" style="color:var(--red);">Error</td></tr>`; }
+  } catch(e) { 
+    tbody.innerHTML = `<tr><td colspan="5" class="center" style="color:var(--red);">Error al cargar historial</td></tr>`; 
+  }
 }
 
 // ----------------------------------------------------------------------------
-// RESTAURACIÓN DE LA TABLA DE FACTURAS (DESCARGAS PERMANENTES)
+// CORRECCIÓN DE ENLACES ROTOS EN LA TABLA DE FACTURAS (PC ERROR 404)
 // ----------------------------------------------------------------------------
 function filtrarFacturas() {
   const buscador = document.getElementById('buscador-facturas');
   const query = buscador ? buscador.value.toLowerCase().trim() : ''; 
   const tbody = document.getElementById('lista-facturas'); 
   if(!tbody) return;
+  
   const filtradas = (FACTURAS_GLOBAL || []).filter(f => f && (String(f['Documento'] || '').toLowerCase().includes(query) || String(f['ID Pedido'] || '').toLowerCase().includes(query)));
   
-  if(filtradas.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas.</td></tr>'; return; }
+  if(filtradas.length === 0) { 
+    tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas.</td></tr>'; 
+    return; 
+  }
   
   tbody.innerHTML = filtradas.map(f => {
-    let enlace = f['URL PDF'] ? `<a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF</a>` : '';
-    return `<tr><td>${f['ID Factura'] || ''}</td><td>${f['ID Pedido'] || ''}</td><td>${f['Documento'] || ''}</td><td>${f['Fecha'] || ''}</td><td>${enlace}</td></tr>`;
+    let url = String(f['URL PDF'] || '').trim();
+    let badge = '';
+    
+    // Solo crea un enlace si es una URL real que empiece con http (historial antiguo)
+    if(url.startsWith('http')) {
+      badge = `<a href="${url}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF (Drive)</a>`;
+    } else if (url === 'ARCHIVO_LOCAL') {
+      badge = `<span style="color:var(--muted); font-size: 12px;">Descargada Localmente en Caja</span>`;
+    } else {
+      badge = `<span style="color:var(--muted); font-size: 12px;">No disponible</span>`;
+    }
+    
+    return `<tr>
+              <td>${f['ID Factura'] || ''}</td>
+              <td>${f['ID Pedido'] || ''}</td>
+              <td>${f['Documento'] || ''}</td>
+              <td>${f['Fecha'] || ''}</td>
+              <td>${badge}</td>
+            </tr>`;
   }).join('');
 }
 
+// ----------------------------------------------------------------------------
+// MARKETING Y PROMOCIONES GLOBALES
+// ----------------------------------------------------------------------------
 async function guardarPromocion() {
   const btn = document.getElementById('btn-guardar-promo');
   const activa = document.getElementById('promo-activa').value;
   const tipo = document.getElementById('promo-tipo').value;
   const contenidoTxt = document.getElementById('promo-contenido').value;
   const fileInput = document.getElementById('promo-img-file').files[0];
+  
   try {
     let base64Img = '';
-    if (tipo === 'imagen' && fileInput) base64Img = await comprimirEnCanvas(fileInput);
+    if (tipo === 'imagen' && fileInput) {
+      base64Img = await comprimirEnCanvas(fileInput);
+    }
     await apiCall('guardarPromocion', { activa, tipo, contenidoTxt, base64Img });
     mostrarAlerta('Promoción guardada.', 'success');
-  } catch(e) { mostrarAlerta('Error'); }
+  } catch(e) { 
+    mostrarAlerta('Error guardando la promoción.'); 
+  }
 }
 
 async function cargarPromocionGlobal() {
@@ -589,14 +951,30 @@ async function cargarPromocionGlobal() {
      const promo = await apiCall('obtenerPromocion');
      const banner = document.getElementById('sidebar-promo');
      if(!banner) return;
+     
      if(promo && promo.activa === 'SI') {
         banner.classList.remove('hidden');
-        if(promo.tipo === 'texto') banner.innerHTML = `<p>${promo.contenidoTxt}</p>`;
-        if(promo.tipo === 'imagen') banner.innerHTML = `<img src="${promo.base64Img}" alt="Promo">`;
-     } else { banner.classList.add('hidden'); }
-   } catch(e) {}
+        if(promo.tipo === 'texto') {
+          banner.innerHTML = `<p>${promo.contenidoTxt}</p>`;
+        }
+        if(promo.tipo === 'imagen') {
+          banner.innerHTML = `<img src="${promo.base64Img}" alt="Promo">`;
+        }
+     } else { 
+       banner.classList.add('hidden'); 
+     }
+   } catch(e) {
+     console.error('Error cargando promoción', e);
+   }
 }
 
+// ----------------------------------------------------------------------------
+// SERVICE WORKER PARA LA PWA
+// ----------------------------------------------------------------------------
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => {}));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(err => {
+      console.log('Error al registrar Service Worker', err);
+    });
+  });
 }
