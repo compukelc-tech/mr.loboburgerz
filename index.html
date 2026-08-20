@@ -8,11 +8,10 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <!-- Configuración PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#e3262e">
-  <link rel="icon" href="ico.jpg" type="image/jpeg">
-  <link rel="apple-touch-icon" href="ico.jpg">
+  <link rel="icon" href="icono.png" type="image/png">
+  <link rel="apple-touch-icon" href="icono.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="LoboERP">
@@ -22,6 +21,14 @@
   </script>
 </head>
 <body>
+
+  <!-- BOTÓN FLOTANTE FIDELIZACIÓN (CLUB DE LOBOS) -->
+  <div style="position: fixed; bottom: 25px; right: 25px; z-index: 999;">
+    <button onclick="abrirModalFidelidad()" style="background: var(--red); border-radius: 50%; width: 75px; height: 75px; padding: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.7); border: 2px solid var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: pulse 2s infinite;">
+      <img src="icono.png" alt="VIP" style="width: 35px; height: 35px; border-radius: 50%;">
+      <span style="font-size: 10px; line-height: 1.2; margin-top: 3px; font-weight: 800; color: white;">SOY<br>CLIENTE</span>
+    </button>
+  </div>
 
   <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
     <div style="flex: 1;"></div>
@@ -45,6 +52,8 @@
     <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing</button>
     <button onclick="navegar('facturas')" class="nav-btn" id="nav-facturas">🧾 Facturas</button>
     <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 Panel Maestro</button>
+    
+    <button onclick="forzarUpdatePWA()" class="nav-btn" id="btn-update-pwa" style="background: #113859; display: none;">🔄 Actualizar Sistema</button>
     <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
   </nav>
 
@@ -83,7 +92,7 @@
             </div>
           </a>
 
-          <a href="https://wa.me/message/N4N44WCQ4RD6N1" target="_blank" class="social-item" style="text-decoration: none;">
+          <a href="https://wa.me/573170949928" target="_blank" class="social-item" style="text-decoration: none;">
             <span class="social-icon" style="color: #25D366;">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
@@ -155,11 +164,12 @@
           <div class="field">
             <label>Área a la que aspiras *</label>
             <select id="reg-area">
+              <option value="Gerente">Gerente (Administrativo)</option>
               <option value="Vitrina">Vitrina (Atención)</option>
               <option value="Cartera">Cartera (Pagos)</option>
               <option value="Producción">Producción (Cocina)</option>
-              <option value="Pedidos">Pedidos (Logística)</option>
-              <option value="Marketing">Marketing (Menú)</option>
+              <option value="Pedidos">Pedidos (Despachos/Logística)</option>
+              <option value="Marketing">Marketing (Gestor Menú)</option>
             </select>
           </div>
           <div class="field">
@@ -179,6 +189,7 @@
       <section id="view-admin" class="view">
         <div class="card">
           <h2>👑 Panel Maestro - Personal</h2>
+          <p class="note" style="text-align: left;">Recuerda: Los roles superiores pueden asignar permisos inferiores.</p>
           <div class="table-container">
             <table id="tabla-empleados">
               <thead>
@@ -187,7 +198,7 @@
                   <th>Nombre</th>
                   <th>Rol</th>
                   <th>Estado</th>
-                  <th>Acción</th>
+                  <th>Acciones</th>
                 </tr>
               </thead>
               <tbody id="lista-empleados"></tbody>
@@ -199,7 +210,6 @@
       <section id="view-marketing" class="view">
         <div class="card" style="margin-bottom: 25px;">
           <h2>📣 Gestor de Promoción Lateral</h2>
-          <p class="note">Configura un anuncio que aparecerá en el menú izquierdo para todos los usuarios.</p>
           <div class="field">
             <label>Estado del Anuncio</label>
             <select id="promo-activa">
@@ -212,12 +222,11 @@
             <select id="promo-tipo" onchange="cambiarTipoPromo()">
               <option value="texto">Texto / Mensaje</option>
               <option value="imagen">Imagen Promocional</option>
-              <option value="video">Video (Enlace de YouTube o MP4)</option>
             </select>
           </div>
           <div class="field">
             <label>Contenido</label>
-            <textarea id="promo-contenido" rows="3" placeholder="Escribe tu mensaje o pega el enlace..."></textarea>
+            <textarea id="promo-contenido" rows="3" placeholder="Escribe tu mensaje..."></textarea>
             <input type="file" id="promo-img-file" accept="image/*" class="hidden">
           </div>
           <div class="actions">
@@ -273,14 +282,13 @@
       <section id="view-produccion" class="view">
         <div class="card">
           <h2>🍳 Comandas Pagadas (Cocina)</h2>
-          <p class="note" style="text-align:left;">Estas comandas ya pasaron el filtro de Cartera y están pagadas al 100%. Listas para preparar.</p>
           <div class="grid" id="lista-produccion"></div>
         </div>
       </section>
 
       <section id="view-despachados" class="view">
         <div class="card">
-          <h2>✅ Historial de Entregas</h2>
+          <h2>✅ Historial de Entregas (Despachos)</h2>
           <div class="table-container">
             <table>
               <thead>
@@ -300,7 +308,6 @@
       <section id="view-facturas" class="view">
         <div class="card">
           <h2>🧾 Buscador de Facturas PDF</h2>
-          <p class="note" style="text-align:left;">Busca copias de seguridad de las facturas generadas por el sistema.</p>
           <div class="field">
             <input type="text" id="buscador-facturas" placeholder="🔍 Escribe Documento o Ticket de Pedido..." oninput="filtrarFacturas()">
           </div>
@@ -331,6 +338,51 @@
     </div>
   </footer>
 
+  <!-- MODAL DE FIDELIDAD -->
+  <div class="modal" id="modal-fidelidad">
+    <div class="invoice">
+      <div class="modal-header">
+        <span style="font-family: 'Montserrat', sans-serif;">🐺 Club de Lobos</span>
+        <button onclick="cerrarModal('modal-fidelidad')">✕</button>
+      </div>
+
+      <div id="fid-login-section">
+        <p class="note" style="text-align: left;">Inicia sesión para autocompletar tus datos en los pedidos y acceder a beneficios exclusivos.</p>
+        <div class="field"><label>Documento de Identidad</label><input type="number" id="fid-log-doc" placeholder="Ej: 1005000123"></div>
+        <div class="field">
+          <label>Clave</label>
+          <div class="password-wrapper">
+            <input type="password" id="fid-log-pass" placeholder="Ingresa tu clave">
+            <button class="toggle-pass" onclick="togglePassword('fid-log-pass', this)">👁️</button>
+          </div>
+        </div>
+        <div class="actions" style="margin-top: 15px;">
+          <button class="primary full-width" onclick="loginFidelidad()">Entrar</button>
+          <button class="text-btn text-gold full-width center" style="margin-top:15px; display:block;" onclick="toggleFidForms()">¿Aún no eres miembro? Crea tu membresía</button>
+        </div>
+      </div>
+
+      <div id="fid-reg-section" class="hidden">
+        <p class="note" style="text-align: left;">Tu membresía estará ligada a tu número de documento de identidad.</p>
+        <div class="field"><label>Documento de Identidad *</label><input type="number" id="fid-reg-doc"></div>
+        <div class="field"><label>Nombre Completo *</label><input type="text" id="fid-reg-nombre"></div>
+        <div class="field"><label>Celular (WhatsApp) *</label><input type="number" id="fid-reg-celular"></div>
+        <div class="field"><label>Correo Electrónico</label><input type="email" id="fid-reg-correo" placeholder="Opcional"></div>
+        <div class="field">
+          <label>Crea una clave segura *</label>
+          <div class="password-wrapper">
+            <input type="password" id="fid-reg-pass">
+            <button class="toggle-pass" onclick="togglePassword('fid-reg-pass', this)">👁️</button>
+          </div>
+        </div>
+        <div class="actions" style="margin-top: 15px;">
+          <button class="primary full-width" onclick="registrarFidelidad()">Registrar Membresía</button>
+          <button class="text-btn text-gold full-width center" style="margin-top:15px; display:block;" onclick="toggleFidForms()">Ya tengo una membresía, volver al login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div class="modal" id="modal-checkout">
     <div class="invoice">
       <div class="modal-header">
@@ -343,13 +395,13 @@
         <label>Tipo de Cliente</label>
         <select id="co-tipo" onchange="toggleCamposCliente()">
           <option value="Ocasional">Cliente Vitrina (Ocasional)</option>
-          <option value="Continuo">Cliente Continuo (Fidelizado)</option>
+          <option value="Continuo">Miembro Club (Fidelizado)</option>
         </select>
       </div>
       <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
       <div class="field"><label>Nombre Completo *</label><input type="text" id="co-nombre"></div>
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
-      <div class="field hidden" id="co-correo-field"><label>Correo Electrónico *</label><input type="email" id="co-correo"></div>
+      <div class="field hidden" id="co-correo-field"><label>Correo Electrónico</label><input type="email" id="co-correo"></div>
       
       <hr style="border-color: #333; margin: 15px 0;">
       
@@ -409,28 +461,6 @@
       </div>
       <div class="actions" style="margin-top: 20px;">
         <button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal" id="modal-abono">
-    <div class="invoice">
-      <div class="modal-header">
-        <span style="font-family: 'Montserrat', sans-serif;">Registrar Nuevo Abono</span>
-        <button onclick="cerrarModal('modal-abono')">✕</button>
-      </div>
-      <p class="note" style="text-align:left;">Sube la nueva captura de pantalla y el monto para ir saldando la deuda de este pedido.</p>
-      <input type="hidden" id="abono-id">
-      <div class="field">
-        <label>Monto de este Abono</label>
-        <input type="number" id="abono-monto" placeholder="Ej: 5000">
-      </div>
-      <div class="field">
-        <label>Foto del comprobante</label>
-        <input type="file" id="abono-voucher" accept="image/*">
-      </div>
-      <div class="actions" style="margin-top: 20px;">
-        <button class="primary full-width" onclick="guardarAbono()" id="btn-guardar-abono">Guardar Abono en el Historial</button>
       </div>
     </div>
   </div>
