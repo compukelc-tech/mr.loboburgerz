@@ -8,15 +8,10 @@
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
   
-  <!-- Configuración PWA -->
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#e3262e">
-  
-  <!-- ====== INICIO INYECCIÓN DE ICONO PWA ====== -->
   <link rel="icon" href="ico.jpg" type="image/jpeg">
   <link rel="apple-touch-icon" href="ico.jpg">
-  <!-- ====== FIN INYECCIÓN DE ICONO PWA ====== -->
-  
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="LoboERP">
@@ -27,7 +22,6 @@
 </head>
 <body>
 
-  <!-- ENCABEZADO ORIGINAL INTACTO -->
   <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
     <div style="flex: 1;"></div>
     <div style="flex: 2; text-align: center;">
@@ -38,12 +32,10 @@
       <p class="subtitle" id="user-greeting">Menú Principal</p>
     </div>
     <div style="flex: 1; text-align: right;">
-      <!-- LOGIN SUTIL ORIGINAL -->
       <button onclick="navegar('login')" id="btn-login-icon" style="background: var(--card-hover); border: 1px solid var(--border); border-radius: 50%; width: 45px; height: 45px; font-size: 20px; cursor: pointer; color: white;" title="Acceso Empleados">👤</button>
     </div>
   </header>
   
-  <!-- NAVEGACIÓN ORIGINAL INTACTA -->
   <nav id="main-nav" style="display: none; justify-content: center; margin-top: 10px;">
     <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
     <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
@@ -55,26 +47,20 @@
     <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
   </nav>
 
-  <!-- LAYOUT A DOS COLUMNAS -->
   <div class="app-layout">
     
-    <!-- BANNER IZQUIERDO DE INFORMACIÓN -->
     <aside class="left-banner">
-      <!-- Gestor de Promociones (Si no hay, se oculta) -->
       <div id="sidebar-promo" class="sidebar-promo hidden"></div>
 
-      <!-- Datos de Contacto, Mapa e Iconos -->
       <div class="contact-info">
         <h4 style="color: var(--gold); margin-bottom: 12px; font-family: 'Metal Mania', cursive; font-size: 16px; letter-spacing: 1px;">📍 ¿DÓNDE ESTAMOS?</h4>
         
-        <!-- Mapa interactivo envuelto en un enlace -->
         <div class="map-container">
           <a href="https://maps.app.goo.gl/935e2Q99P8yymqtC8" target="_blank" title="Abrir en Google Maps">
             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3952.0722129037233!2d-72.4967385!3d7.8875225!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e66459c5d0a6c25%3A0x6b8830113f01c23!2sCaobos%2C%20C%C3%BAcuta%2C%20Norte%20de%20Santander!5e0!3m2!1ses!2sco!4v1716000000000!5m2!1ses!2sco" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="pointer-events: none;"></iframe>
           </a>
         </div>
         
-        <!-- Texto de dirección clickable -->
         <a href="https://maps.app.goo.gl/935e2Q99P8yymqtC8" target="_blank" class="address-link">
           Av 2E # 13 - 10 B. Caobos<br>
           Cúcuta, Norte de Santander<br>
@@ -82,14 +68,9 @@
         </a>
 
         <div class="social-links">
-          <!-- ENLACE DE INSTAGRAM: Reemplaza "AQUI_TU_LINK_DE_INSTAGRAM" por el link real -->
           <a href="https://www.instagram.com/mrloboburgerz?igsh=MTRkcnpldGNqMjV6Mw==" target="_blank" class="social-item" style="text-decoration: none;">
             <span class="social-icon" style="color: #E1306C;">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-              </svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
             </span>
             <div class="social-text">
               <b>INSTAGRAM</b>
@@ -97,12 +78,9 @@
             </div>
           </a>
 
-          <!-- ENLACE DE WHATSAPP: Reemplaza "AQUI_TU_LINK_DE_WHATSAPP" por el link real -->
           <a href="AQUI_TU_LINK_DE_WHATSAPP" target="_blank" class="social-item" style="text-decoration: none;">
             <span class="social-icon" style="color: #25D366;">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-              </svg>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
             </span>
             <div class="social-text">
               <b>WHATSAPP</b>
@@ -113,7 +91,6 @@
       </div>
     </aside>
 
-    <!-- ÁREA PRINCIPAL DERECHA -->
     <main class="main-content">
       <div id="alert-box" class="alert hidden"></div>
 
@@ -165,18 +142,9 @@
         <div class="card card-center">
           <h2>Registro de Personal</h2>
           <p class="note">Tu usuario de acceso será tu Documento de Identidad.</p>
-          <div class="field">
-            <label>Nombre Completo *</label>
-            <input type="text" id="reg-nombre">
-          </div>
-          <div class="field">
-            <label>Documento de Identidad *</label>
-            <input type="number" id="reg-doc">
-          </div>
-          <div class="field">
-            <label>Grado Escolar *</label>
-            <input type="text" id="reg-grado">
-          </div>
+          <div class="field"><label>Nombre Completo *</label><input type="text" id="reg-nombre"></div>
+          <div class="field"><label>Documento de Identidad *</label><input type="number" id="reg-doc"></div>
+          <div class="field"><label>Grado Escolar *</label><input type="text" id="reg-grado"></div>
           <div class="field">
             <label>Área a la que aspiras *</label>
             <select id="reg-area">
@@ -192,13 +160,6 @@
             <div class="password-wrapper">
               <input type="password" id="reg-pass">
               <button class="toggle-pass" onclick="togglePassword('reg-pass', this)">👁️</button>
-            </div>
-          </div>
-          <div class="field">
-            <label>Repite tu Contraseña *</label>
-            <div class="password-wrapper">
-              <input type="password" id="reg-pass2">
-              <button class="toggle-pass" onclick="togglePassword('reg-pass2', this)">👁️</button>
             </div>
           </div>
           <div class="actions center">
@@ -217,9 +178,8 @@
                 <tr>
                   <th>Documento</th>
                   <th>Nombre</th>
-                  <th>Aspiración</th>
-                  <th>Estado</th>
                   <th>Rol</th>
+                  <th>Estado</th>
                   <th>Acción</th>
                 </tr>
               </thead>
@@ -230,7 +190,6 @@
       </section>
 
       <section id="view-marketing" class="view">
-        <!-- GESTOR DE PROMOCIÓN -->
         <div class="card" style="margin-bottom: 25px;">
           <h2>📣 Gestor de Promoción Lateral</h2>
           <p class="note">Configura un anuncio que aparecerá en el menú izquierdo para todos los usuarios.</p>
@@ -282,12 +241,61 @@
         </div>
       </section>
 
+      <section id="view-cartera" class="view">
+        <div class="card">
+          <h2>💰 Control Financiero (Cartera)</h2>
+          <div class="stats" style="margin: 20px 0; display:flex; gap:15px; text-align:center; flex-wrap: wrap;">
+            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;">
+              <small>Dinero en Caja (Aprobado)</small><br>
+              <b class="text-gold" style="font-size:24px;" id="stat-caja">$0</b>
+            </div>
+            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;">
+              <small>Por Cobrar (Fiado)</small><br>
+              <b style="color:#f2c96b; font-size:24px;" id="stat-fiado">$0</b>
+            </div>
+            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;">
+              <small>Total Proyección Ventas</small><br>
+              <b style="font-size:24px;" id="stat-total">$0</b>
+            </div>
+          </div>
+          <p class="note" style="text-align:left;">Compara los comprobantes subidos por los clientes con los movimientos reales en las cuentas bancarias del proyecto.</p>
+          <div class="grid" id="lista-cartera"></div>
+        </div>
+      </section>
+
+      <section id="view-produccion" class="view">
+        <div class="card">
+          <h2>🍳 Comandas Pagadas (Cocina)</h2>
+          <p class="note" style="text-align:left;">Estas comandas ya pasaron el filtro de Cartera y están pagadas al 100%. Listas para preparar.</p>
+          <div class="grid" id="lista-produccion"></div>
+        </div>
+      </section>
+
+      <section id="view-despachados" class="view">
+        <div class="card">
+          <h2>✅ Historial de Entregas</h2>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>ID Pedido</th>
+                  <th>Cliente Titular</th>
+                  <th>Total</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="lista-despachados"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
       <section id="view-facturas" class="view">
         <div class="card">
-          <h2>🧾 Buscador de Facturas</h2>
-          <p class="note" style="text-align:left;">Busca copias de seguridad de las facturas por Documento o Ticket.</p>
+          <h2>🧾 Buscador de Facturas PDF</h2>
+          <p class="note" style="text-align:left;">Busca copias de seguridad de las facturas generadas por el sistema.</p>
           <div class="field">
-            <input type="text" id="buscador-facturas" placeholder="🔍 Escribe Documento o ID de Pedido..." oninput="filtrarFacturas()">
+            <input type="text" id="buscador-facturas" placeholder="🔍 Escribe Documento o Ticket de Pedido..." oninput="filtrarFacturas()">
           </div>
           <div class="table-container">
             <table>
@@ -306,42 +314,9 @@
         </div>
       </section>
 
-      <section id="view-cartera" class="view">
-        <div class="card">
-          <h2>💰 Pedidos (En Espera de Pago)</h2>
-          <div class="grid" id="lista-cartera"></div>
-        </div>
-      </section>
-
-      <section id="view-produccion" class="view">
-        <div class="card">
-          <h2>🍳 Comandas en Producción</h2>
-          <div class="grid" id="lista-produccion"></div>
-        </div>
-      </section>
-
-      <section id="view-despachados" class="view">
-        <div class="card">
-          <h2>✅ Historial de Entregas</h2>
-          <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Cliente</th>
-                  <th>Total</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody id="lista-despachados"></tbody>
-            </table>
-          </div>
-        </div>
-      </section>
     </main>
-  </div> <!-- FIN APP-LAYOUT -->
+  </div>
 
-  <!-- CRÉDITOS MOVIDOS FUERA DEL LAYOUT PARA ABARCAR TODO EL ANCHO (PC y Móvil) -->
   <footer class="creditos-estudiantes">
     <div class="creditos-text">
       <span>🐺 PROYECTO DESARROLLADO POR:</span> 
@@ -355,7 +330,8 @@
         <span style="font-family: 'Montserrat', sans-serif;">Completar Pedido</span>
         <button onclick="cerrarModal('modal-checkout')">✕</button>
       </div>
-      <p class="note" style="text-align: left;">Ingresa tus datos para registrar la orden.</p>
+      <p class="note" style="text-align: left;">Ingresa tus datos para registrar la orden de compra.</p>
+      
       <div class="field">
         <label>Tipo de Cliente</label>
         <select id="co-tipo" onchange="toggleCamposCliente()">
@@ -363,39 +339,30 @@
           <option value="Continuo">Cliente Continuo (Fidelizado)</option>
         </select>
       </div>
-      <div class="field">
-        <label>Documento de Identidad *</label>
-        <input type="number" id="co-doc">
-      </div>
-      <div class="field">
-        <label>Nombre Completo *</label>
-        <input type="text" id="co-nombre">
-      </div>
-      <div class="field">
-        <label>Celular *</label>
-        <input type="number" id="co-celular">
-      </div>
-      <div class="field hidden" id="co-correo-field">
-        <label>Correo Electrónico *</label>
-        <input type="email" id="co-correo">
-      </div>
+      <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
+      <div class="field"><label>Nombre Completo *</label><input type="text" id="co-nombre"></div>
+      <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
+      <div class="field hidden" id="co-correo-field"><label>Correo Electrónico *</label><input type="email" id="co-correo"></div>
+      
       <hr style="border-color: #333; margin: 15px 0;">
+      
       <div class="field">
         <label>Tipo de Pago</label>
         <select id="co-tipo-pago" onchange="toggleVoucherInput()">
           <option value="Completo">Pago Completo (De contado)</option>
-          <option value="Abono">Abono Parcial</option>
+          <option value="Abono">Abono Parcial (Fiado)</option>
         </select>
       </div>
       <div class="field hidden" id="co-monto-abono-field">
-        <label>Monto a Abonar</label>
+        <label>Monto a Abonar en este momento</label>
         <input type="number" id="co-monto-abono">
       </div>
       <div class="field">
-        <label>Subir Voucher / Comprobante (Imagen)</label>
+        <label>Sube el comprobante de pago *</label>
         <input type="file" id="co-voucher" accept="image/*">
         <canvas id="canvas-compresion" style="display:none;"></canvas>
       </div>
+      
       <div class="actions" style="margin-top: 20px;">
         <button class="primary full-width" onclick="enviarPedido()" id="btn-enviar-pedido">Confirmar y Enviar Pedido</button>
       </div>
@@ -418,18 +385,9 @@
           <option value="~COMBOS~">Combos</option>
         </select>
       </div>
-      <div class="field">
-        <label>Nombre del Producto *</label>
-        <input type="text" id="prod-nombre">
-      </div>
-      <div class="field">
-        <label>Ingredientes / Descripción *</label>
-        <input type="text" id="prod-desc">
-      </div>
-      <div class="field">
-        <label>Precio ($ COP) *</label>
-        <input type="number" id="prod-precio">
-      </div>
+      <div class="field"><label>Nombre del Producto *</label><input type="text" id="prod-nombre"></div>
+      <div class="field"><label>Ingredientes / Descripción *</label><input type="text" id="prod-desc"></div>
+      <div class="field"><label>Precio ($ COP) *</label><input type="number" id="prod-precio"></div>
       <div class="field">
         <label>Estado</label>
         <select id="prod-agotado">
@@ -444,6 +402,28 @@
       </div>
       <div class="actions" style="margin-top: 20px;">
         <button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal-abono">
+    <div class="invoice">
+      <div class="modal-header">
+        <span style="font-family: 'Montserrat', sans-serif;">Registrar Nuevo Abono</span>
+        <button onclick="cerrarModal('modal-abono')">✕</button>
+      </div>
+      <p class="note" style="text-align:left;">Sube la nueva captura de pantalla y el monto para ir saldando la deuda de este pedido.</p>
+      <input type="hidden" id="abono-id">
+      <div class="field">
+        <label>Monto de este Abono</label>
+        <input type="number" id="abono-monto" placeholder="Ej: 5000">
+      </div>
+      <div class="field">
+        <label>Foto del comprobante</label>
+        <input type="file" id="abono-voucher" accept="image/*">
+      </div>
+      <div class="actions" style="margin-top: 20px;">
+        <button class="primary full-width" onclick="guardarAbono()" id="btn-guardar-abono">Guardar Abono en el Historial</button>
       </div>
     </div>
   </div>
