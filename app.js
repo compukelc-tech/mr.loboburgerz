@@ -1,9 +1,9 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V9.1 DEFINITIVO
-// CÓDIGO COMPLETO Y SIN COMPRIMIR (FORMATO ORIGINAL RESTAURADO)
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
+// CÓDIGO COMPLETO Y SIN COMPRIMIR
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxoPHLPG_TYo9UbCcKPdqJg-S4xcj8gTTMgYKpJ5BwtObCJIc8hUDeGLkoFJOk_Vs6-Pw/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
@@ -39,7 +39,6 @@ window.onload = async () => {
       sesionActual = { documento: 'Invitado', nombre: 'Cliente Presencial', rol: 'Cliente' };
     }
     
-    // Cargar sesión del cliente fidelizado si existe
     const savedFidelidad = localStorage.getItem('lobo_cliente');
     if (savedFidelidad) {
       clienteFidelizado = JSON.parse(savedFidelidad);
@@ -262,7 +261,7 @@ function togglePassword(inputId, btn) {
 }
 
 // ----------------------------------------------------------------------------
-// SISTEMA DE FIDELIZACIÓN (NUEVO MODAL)
+// SISTEMA DE FIDELIZACIÓN
 // ----------------------------------------------------------------------------
 
 function abrirModalFidelidad() {
@@ -788,6 +787,18 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       let saldo = Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0));
       let badgeDinero = saldo === 0 ? `<span class="badge activo">TOTALMENTE PAGO</span>` : `<span class="badge pendiente">SALDO PENDIENTE: ${money(saldo)}</span>`;
       
+      // MOSTRAR VOUCHERS PARA CARTERA/GERENTE/SUPERADMIN
+      let abonosHtml = '';
+      if (p['Historial Abonos'] && p['Historial Abonos'].length > 0) {
+        abonosHtml = '<div style="margin-top:10px; padding-top:10px; border-top:1px solid #333;"><strong>Comprobantes de pago:</strong><br>';
+        p['Historial Abonos'].forEach((abono, index) => {
+          abonosHtml += `<a href="${abono['URL Voucher']}" target="_blank" style="color:var(--gold); text-decoration:underline; font-size: 12px; margin-right: 10px; display:inline-block; margin-top:5px;">📄 Ver Voucher ${index + 1} (${money(abono['Monto'])})</a>`;
+        });
+        abonosHtml += '</div>';
+      }
+      
+      let mostrarAbonos = (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') ? abonosHtml : '';
+      
       let botones = '';
       if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
         botones = `<button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">Validar y Enviar a Cocina</button>`;
@@ -809,7 +820,8 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
                   <span>Total:</span>
                   <span class="text-gold">${money(p['Total'])}</span>
                 </div>
-                ${botones}
+                ${mostrarAbonos}
+                <div style="margin-top: 15px;">${botones}</div>
               </div>`;
     }).join('');
     
@@ -905,7 +917,7 @@ function filtrarFacturas() {
     let url = String(f['URL PDF'] || '').trim();
     let badge = '';
     
-    // Solo crea un enlace si es una URL real que empiece con http (historial antiguo)
+    // Solo crea un enlace si es una URL real que empiece con http
     if(url.startsWith('http')) {
       badge = `<a href="${url}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF (Drive)</a>`;
     } else if (url === 'ARCHIVO_LOCAL') {
