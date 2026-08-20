@@ -1,5 +1,5 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V7.0
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V7.1 (ESTABLE)
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
@@ -60,7 +60,7 @@ function forzarUpdatePWA() {
       for(let r of registrations) { r.unregister(); }
       caches.keys().then(keys => {
         Promise.all(keys.map(key => caches.delete(key))).then(() => {
-          mostrarAlerta('Sistema actualizado y purgado exitosamente. Recargando...', 'success');
+          mostrarAlerta('Sistema actualizado exitosamente. Recargando...', 'success');
           setTimeout(() => window.location.reload(true), 1500);
         });
       });
@@ -514,8 +514,34 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
 }
 
 // ----------------------------------------------------------------------------
-// APROBACIÓN DE PAGOS Y DESCARGA DIRECTA (NUEVA VERSIÓN SIN DRIVEAPP)
+// FUNCIÓN BLINDADA PARA DESCARGAR PDF EN MOVILES Y PWA
 // ----------------------------------------------------------------------------
+function descargarPDFLocal(base64Data, fileName) {
+  try {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], {type: 'application/pdf'});
+    const blobUrl = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    }, 250);
+  } catch (err) {
+    mostrarAlerta('Error interno al generar el archivo en tu dispositivo.', 'error');
+  }
+}
+
 async function aprobarPagoTotal(id) {
   if(!confirm('¿Confirmas la validación de este pago? La orden pasará a cocina y se generará la factura.')) return;
   try { 
@@ -523,15 +549,8 @@ async function aprobarPagoTotal(id) {
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
     mostrarAlerta('Aprobado con éxito. Descargando factura...', 'success');
     
-    // Descarga directa utilizando Base64 
     if (res.pdfBase64) {
-      const linkSource = `data:application/pdf;base64,${res.pdfBase64}`;
-      const downloadLink = document.createElement("a");
-      downloadLink.href = linkSource;
-      downloadLink.download = `Factura_${id}.pdf`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      setTimeout(() => document.body.removeChild(downloadLink), 100);
+      descargarPDFLocal(res.pdfBase64, `Factura_${id}.pdf`);
     }
     
     cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
@@ -552,14 +571,29 @@ async function cargarFacturas() {
   } catch(e) { tbody.innerHTML = `<tr><td colspan="5" class="center" style="color:var(--red);">Error</td></tr>`; }
 }
 
+// ----------------------------------------------------------------------------
+// CORRECCIÓN DE ENLACES ROTOS EN LA TABLA DE FACTURAS (PC ERROR 404)
+// ----------------------------------------------------------------------------
 function filtrarFacturas() {
   const buscador = document.getElementById('buscador-facturas');
   const query = buscador ? buscador.value.toLowerCase().trim() : ''; 
   const tbody = document.getElementById('lista-facturas'); 
   if(!tbody) return;
   const filtradas = (FACTURAS_GLOBAL || []).filter(f => f && (String(f['Documento'] || '').toLowerCase().includes(query) || String(f['ID Pedido'] || '').toLowerCase().includes(query)));
+  
   if(filtradas.length === 0) { tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas.</td></tr>'; return; }
-  tbody.innerHTML = filtradas.map(f => `<tr><td>${f['ID Factura'] || ''}</td><td>${f['ID Pedido'] || ''}</td><td>${f['Documento'] || ''}</td><td>${f['Fecha'] || ''}</td><td>${f['URL PDF'] ? (f['URL PDF'] === 'Descarga Directa Local' ? '<span style="color:var(--muted);">PDF Descargado Localmente</span>' : `<a href="${f['URL PDF']}" target="_blank" style="color:var(--gold); text-decoration:underline;">Ver Enlace</a>`) : ''}</td></tr>`).join('');
+  
+  tbody.innerHTML = filtradas.map(f => {
+    let url = f['URL PDF'] || '';
+    let badge = '';
+    // Solo crea un enlace si es una URL real que empiece con http
+    if(url.includes('http')) {
+      badge = `<a href="${url}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF</a>`;
+    } else if (url !== '') {
+      badge = `<span style="color:var(--muted); font-size: 12px;">Descargado en Caja Físicamente</span>`;
+    }
+    return `<tr><td>${f['ID Factura'] || ''}</td><td>${f['ID Pedido'] || ''}</td><td>${f['Documento'] || ''}</td><td>${f['Fecha'] || ''}</td><td>${badge}</td></tr>`;
+  }).join('');
 }
 
 async function guardarPromocion() {
