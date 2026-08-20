@@ -1,5 +1,5 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V4.3
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V4.4
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
@@ -55,7 +55,7 @@ async function apiCall(accion, datos = {}) {
     try {
       result = JSON.parse(textResponse);
     } catch (err) {
-      throw new Error("Conexión rechazada. Verifique la URL y permisos de la API.");
+      throw new Error("Conexión rechazada. Verifique la URL de la API.");
     }
     if (!result.exito) throw new Error(result.error);
     return result.data;
@@ -436,34 +436,43 @@ async function borrarEmpleado(documento) {
   } catch(e) { mostrarAlerta('Error al eliminar'); }
 }
 
+// CARGA DE PEDIDOS BLINDADA (MUESTRA CUALQUIER ESTADO PARA EVITAR QUE QUEDEN OCULTOS)
 async function cargarPedidos(estadoFiltro, contenedorID) {
   const container = document.getElementById(contenedorID); 
   if(!container) return;
-  container.innerHTML = '<p class="note">Cargando datos...</p>';
+  container.innerHTML = '<p class="note">Cargando datos desde Sheets...</p>';
   try {
     const pedidos = await apiCall('obtenerPedidosConAbonos'); 
     
-    if(contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
-       let caja = 0, fiado = 0, total = 0;
-       pedidos.forEach(p => { 
-         total += Number(p['Total'] || 0); 
-         caja += Number(p['Total Abonado'] || 0); 
-         fiado += Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0)); 
-       });
-       if(document.getElementById('stat-caja')) document.getElementById('stat-caja').textContent = money(caja);
-       if(document.getElementById('stat-fiado')) document.getElementById('stat-fiado').textContent = money(fiado);
-       if(document.getElementById('stat-total')) document.getElementById('stat-total').textContent = money(total);
+    if (!pedidos || pedidos.length === 0) {
+      container.innerHTML = '<p class="note">La base de datos no devolvió ningún pedido.</p>';
+      return;
     }
 
-    const filtrados = pedidos.filter(p => {
-      let est = String(p['Estado'] || '').trim().toUpperCase();
-      if (estadoFiltro === 'ESPERA DE VERIFICACIÓN') {
-        return est === 'ESPERA DE VERIFICACIÓN' || est === 'ESPERA DE PAGO' || est === 'PENDIENTE';
-      }
-      return est === estadoFiltro.toUpperCase();
+    let caja = 0, fiado = 0, total = 0;
+    pedidos.forEach(p => { 
+      total += Number(p['Total'] || 0); 
+      caja += Number(p['Total Abonado'] || 0); 
+      fiado += Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0)); 
     });
     
-    if (filtrados.length === 0) return container.innerHTML = '<p class="note">No hay pedidos en esta etapa.</p>';
+    if(document.getElementById('stat-caja')) document.getElementById('stat-caja').textContent = money(caja);
+    if(document.getElementById('stat-fiado')) document.getElementById('stat-fiado').textContent = money(fiado);
+    if(document.getElementById('stat-total')) document.getElementById('stat-total').textContent = money(total);
+
+    // FILTRO AMPLIO: Muestra todos los pedidos que estén pendientes o en espera, asegurando visibilidad total
+    const filtrados = pedidos.filter(p => {
+      let est = String(p['Estado'] || '').trim().toUpperCase();
+      if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
+        return est.includes('ESPERA') || est.includes('PENDIENTE') || est === '' || est.includes('PAGO');
+      }
+      return est.includes(estadoFiltro.toUpperCase());
+    });
+    
+    if (filtrados.length === 0) {
+      container.innerHTML = `<p class="note">No hay pedidos con filtro "${estadoFiltro}". (Total de pedidos en BD: ${pedidos.length})</p>`;
+      return;
+    }
     
     if (contenedorID === 'lista-despachados') {
       container.innerHTML = filtrados.map(p => `<tr><td><b>${p['ID Pedido']}</b></td><td>${p['Nombre']}</td><td>${money(p['Total'])}</td><td><span class="badge despachado">${p['Estado']}</span></td></tr>`).join('');
@@ -474,30 +483,26 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       let itemsCart = [];
       try { itemsCart = JSON.parse(p['Carrito (JSON)']); } catch(e) { itemsCart = []; }
       let saldo = Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0));
-      let badgeDinero = saldo === 0 ? `<span class="badge activo">TOTALMENTE PAGO</span>` : `<span class="badge pendiente">FIADO - SALDO PENDIENTE: ${money(saldo)}</span>`;
-      let infoCliente = `<p class="note" style="text-align:left; color:white; margin:10px 0;">Titular de Orden: <b>${p['Nombre']}</b><br>Doc: ${p['Documento']} | Tel: ${p['Celular']}</p>`;
+      let badgeDinero = saldo === 0 ? `<span class="badge activo">TOTALMENTE PAGO</span>` : `<span class="badge pendiente">SALDO PENDIENTE: ${money(saldo)}</span>`;
+      let infoCliente = `<p class="note" style="text-align:left; color:white; margin:10px 0;">Titular: <b>${p['Nombre']}</b><br>Doc: ${p['Documento']} | Tel: ${p['Celular']}</p>`;
       
       let botones = '';
-      if (estadoFiltro === 'ESPERA DE VERIFICACIÓN') {
-        if (saldo === 0) {
-          botones = `<button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">Validar en Banco y Enviar a Cocina</button>`;
-        } else {
-          botones = `<button class="btn-outline full-width" onclick="abrirModalAbono('${p['ID Pedido']}')">Registrar Abono</button>`;
-        }
-      } else if (estadoFiltro === 'EN PRODUCCIÓN') {
+      if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
+        botones = `<button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">Validar y Enviar a Cocina</button>`;
+      } else if (p['Estado'] === 'EN PRODUCCIÓN') {
         botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`;
       }
           
-      return `<div class="card product-card" style="text-align:left; padding: 20px;"><h3 style="margin-bottom:5px; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>${badgeDinero}${infoCliente}<ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">${itemsCart.map(i => `<li>${i.cant}x ${i.nombre}</li>`).join('')}</ul><div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;"><span>Total:</span><span class="text-gold">${money(p['Total'])}</span></div>${botones}</div>`;
+      return `<div class="card product-card" style="text-align:left; padding: 20px;"><h3 style="margin-bottom:5px; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>${badgeDinero}${infoCliente}<ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || 'Producto'}</li>`).join('')}</ul><div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;"><span>Total:</span><span class="text-gold">${money(p['Total'])}</span></div>${botones}</div>`;
     }).join('');
     
   } catch(e) {
-    container.innerHTML = '<p class="note">Error de conexión al cargar pedidos.</p>';
+    container.innerHTML = `<p class="note" style="color:var(--red);">Error cargando pedidos: ${e.message}</p>`;
   }
 }
 
 async function aprobarPagoTotal(id) {
-  if(!confirm('¿Confirmas que el dinero está en cuentas bancarias? La orden pasará a cocina y se generará el PDF.')) return;
+  if(!confirm('¿Confirmas la validación de este pago? La orden pasará a cocina y se generará la factura.')) return;
   try { 
     mostrarAlerta('Generando Factura PDF...', 'info');
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
