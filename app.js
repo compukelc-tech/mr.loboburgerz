@@ -1,5 +1,5 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V6.0
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V6.1
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
@@ -131,7 +131,8 @@ async function iniciarSesion() {
   if (!doc || !pass) return mostrarAlerta('Ingresa documento y contraseña');
   mostrarAlerta('Verificando...', 'info');
   try {
-    const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: 'Admin' });
+    // CORRECCIÓN APLICADA AQUÍ: Enviamos rolSolicitante: 'Login' para que backend permita ver al Superadmin
+    const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: 'Login' });
     const usuario = empleados.find(e => String(e['Documento (Usuario)']) === String(doc) && String(e['Contraseña']) === String(pass));
     if (!usuario) return mostrarAlerta('Credenciales incorrectas');
     if (usuario['Estado'] === 'BLOQUEADO') return mostrarAlerta('Cuenta bloqueada.');
@@ -520,7 +521,6 @@ async function aprobarPagoTotal(id) {
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
     mostrarAlerta('Aprobado con éxito. Factura creada.', 'success');
     
-    // Descarga directa del PDF que arregla la pantalla en blanco
     if (res.urlFactura) {
       const a = document.createElement('a');
       a.href = res.urlFactura;
