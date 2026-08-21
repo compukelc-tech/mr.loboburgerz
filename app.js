@@ -1,6 +1,6 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V11.0 DEFINITIVO
-// CÓDIGO COMPLETO Y SIN COMPRIMIR - COMPUKELC
+// CÓDIGO COMPLETO Y SIN COMPRIMIR
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
@@ -813,7 +813,7 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
        return;
     }
 
-    // CARTERA: DISEÑO DE ACORDEÓN
+    // CARTERA: DISEÑO DE ACORDEÓN COMPLETO
     if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
         container.innerHTML = filtrados.map(p => {
           let itemsCart = [];
@@ -915,7 +915,7 @@ async function cambiarEstadoPedido(idPedido, nuevoEstado) {
 }
 
 // ----------------------------------------------------------------------------
-// HISTORIAL DE FACTURAS (Buscador y Compartir)
+// HISTORIAL DE FACTURAS (Buscador Global y Compartir en WhatsApp)
 // ----------------------------------------------------------------------------
 
 async function cargarFacturas() {
@@ -993,7 +993,6 @@ async function accionFactura(urlDrive, idFactura, accion) {
   try {
     mostrarAlerta(accion === 'descargar' ? 'Preparando PDF para descarga...' : 'Preparando archivo para compartir...', 'info');
     
-    // Solicitamos al backend que extraiga el base64 de Drive
     const base64 = await apiCall('obtenerBase64Factura', { urlDrive: urlDrive });
     
     const byteCharacters = atob(base64);
