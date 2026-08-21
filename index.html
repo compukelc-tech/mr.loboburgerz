@@ -10,8 +10,8 @@
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#e3262e">
-  <link rel="icon" href="icono.png" type="image/png">
-  <link rel="apple-touch-icon" href="icono.png">
+  <link rel="icon" href="icono_2.jpg" type="image/jpeg">
+  <link rel="apple-touch-icon" href="icono_2.jpg">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="LoboERP">
@@ -25,7 +25,7 @@
   <!-- BOTÓN FLOTANTE FIDELIZACIÓN (CLUB DE LOBOS) -->
   <div style="position: fixed; bottom: 25px; right: 25px; z-index: 999;">
     <button onclick="abrirModalFidelidad()" style="background: var(--red); border-radius: 50%; width: 75px; height: 75px; padding: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.7); border: 2px solid var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: pulse 2s infinite;">
-      <img src="icono.png" alt="VIP" style="width: 35px; height: 35px; border-radius: 50%;">
+      <img src="icono_2.jpg" alt="VIP" style="width: 35px; height: 35px; border-radius: 50%;">
       <span style="font-size: 10px; line-height: 1.2; margin-top: 3px; font-weight: 800; color: white;">SOY<br>CLIENTE</span>
     </button>
   </div>
@@ -33,9 +33,10 @@
   <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
     <div style="flex: 1;"></div>
     <div style="flex: 2; text-align: center;">
-      <img src="icono.jpg" alt="Mr. Lobo Burgerz" style="width: 75px; height: 75px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
-      <h1 style="color: white;">
-        <span class="text-red">MR.<br>LOBO</span><br>BURGERZ
+      <!-- CAMBIO: Nombre exacto del archivo icono_2.jpg -->
+      <img src="icono_2.jpg" alt="Mr. Lobo Burgerz" style="width: 85px; height: 85px; border-radius: 50%; border: 2px solid var(--gold); margin-bottom: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+      <h1 style="color: white; font-size: 28px; line-height: 1;">
+        <span class="text-red">MR. LOBO</span><br>BURGERZ
       </h1>
       <p class="subtitle" id="user-greeting">Menú Principal</p>
     </div>
@@ -53,7 +54,6 @@
     <button onclick="navegar('facturas')" class="nav-btn" id="nav-facturas">🧾 Facturas</button>
     <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 Panel Maestro</button>
     
-    <button onclick="forzarUpdatePWA()" class="nav-btn" id="btn-update-pwa" style="background: #113859; display: none;">🔄 Actualizar Sistema</button>
     <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
   </nav>
 
@@ -64,7 +64,6 @@
 
       <div class="contact-info">
         <h4 style="color: var(--gold); margin-bottom: 12px; font-family: 'Metal Mania', cursive; font-size: 16px; letter-spacing: 1px;">📍 ¿DÓNDE ESTAMOS?</h4>
-        
         <div class="map-container">
           <a href="https://maps.app.goo.gl/935e2Q99P8yymqtC8" target="_blank" title="Abrir en Google Maps">
             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3952.0722129037233!2d-72.4967385!3d7.8875225!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e66459c5d0a6c25%3A0x6b8830113f01c23!2sCaobos%2C%20C%C3%BAcuta%2C%20Norte%20de%20Santander!5e0!3m2!1ses!2sco!4v1716000000000!5m2!1ses!2sco" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="pointer-events: none;"></iframe>
@@ -112,21 +111,11 @@
 
       <section id="view-vitrina" class="view active">
         <div class="vitrina-container">
-          <div class="menu-list">
-            <div class="grid" id="catalogo-productos">
-              <p class="note">Cargando menú...</p>
-            </div>
-          </div>
-
+          <div class="menu-list"><div class="grid" id="catalogo-productos"><p class="note">Cargando menú...</p></div></div>
           <div class="carrito-panel card">
             <h2 style="font-family: 'Montserrat', sans-serif; font-size: 20px; color: var(--gold);">🛒 Tu Pedido</h2>
-            <div id="carrito-items" class="carrito-items">
-              <p class="note">Agrega productos con el botón +</p>
-            </div>
-            <div class="carrito-total">
-              <span>Total:</span>
-              <b id="carrito-total-precio" class="text-gold">$0</b>
-            </div>
+            <div id="carrito-items" class="carrito-items"><p class="note">Agrega productos con el botón +</p></div>
+            <div class="carrito-total"><span>Total:</span><b id="carrito-total-precio" class="text-gold">$0</b></div>
             <button class="primary full-width" onclick="abrirModalCheckout()" id="btn-procesar" disabled>Procesar Pedido</button>
           </div>
         </div>
@@ -135,14 +124,11 @@
       <section id="view-login" class="view">
         <div class="card card-center">
           <h2>Acceso Empleados</h2>
-          <div class="field">
-            <label>Documento de Identidad (Usuario)</label>
-            <input type="number" id="login-doc" placeholder="Ej: 1005000123">
-          </div>
+          <div class="field"><label>Documento (Usuario)</label><input type="number" id="login-doc"></div>
           <div class="field">
             <label>Contraseña</label>
             <div class="password-wrapper">
-              <input type="password" id="login-pass" placeholder="Ingresa tu contraseña">
+              <input type="password" id="login-pass">
               <button class="toggle-pass" onclick="togglePassword('login-pass', this)">👁️</button>
             </div>
           </div>
@@ -157,23 +143,18 @@
       <section id="view-registro" class="view">
         <div class="card card-center">
           <h2>Registro de Personal</h2>
-          <p class="note">Tu usuario de acceso será tu Documento de Identidad.</p>
           <div class="field"><label>Nombre Completo *</label><input type="text" id="reg-nombre"></div>
-          <div class="field"><label>Documento de Identidad *</label><input type="number" id="reg-doc"></div>
+          <div class="field"><label>Documento *</label><input type="number" id="reg-doc"></div>
           <div class="field"><label>Grado Escolar *</label><input type="text" id="reg-grado"></div>
           <div class="field">
             <label>Área a la que aspiras *</label>
             <select id="reg-area">
-              <option value="Gerente">Gerente (Administrativo)</option>
-              <option value="Vitrina">Vitrina (Atención)</option>
-              <option value="Cartera">Cartera (Pagos)</option>
-              <option value="Producción">Producción (Cocina)</option>
-              <option value="Pedidos">Pedidos (Despachos/Logística)</option>
-              <option value="Marketing">Marketing (Gestor Menú)</option>
+              <option value="Gerente">Gerente</option><option value="Vitrina">Vitrina</option><option value="Cartera">Cartera</option>
+              <option value="Producción">Producción</option><option value="Pedidos">Pedidos</option><option value="Marketing">Marketing</option>
             </select>
           </div>
           <div class="field">
-            <label>Crea una Contraseña *</label>
+            <label>Contraseña *</label>
             <div class="password-wrapper">
               <input type="password" id="reg-pass">
               <button class="toggle-pass" onclick="togglePassword('reg-pass', this)">👁️</button>
@@ -189,18 +170,9 @@
       <section id="view-admin" class="view">
         <div class="card">
           <h2>👑 Panel Maestro - Personal</h2>
-          <p class="note" style="text-align: left;">Recuerda: Los roles superiores pueden asignar permisos inferiores.</p>
           <div class="table-container">
             <table id="tabla-empleados">
-              <thead>
-                <tr>
-                  <th>Documento</th>
-                  <th>Nombre</th>
-                  <th>Rol</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Documento</th><th>Nombre</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
               <tbody id="lista-empleados"></tbody>
             </table>
           </div>
@@ -210,47 +182,18 @@
       <section id="view-marketing" class="view">
         <div class="card" style="margin-bottom: 25px;">
           <h2>📣 Gestor de Promoción Lateral</h2>
-          <div class="field">
-            <label>Estado del Anuncio</label>
-            <select id="promo-activa">
-              <option value="NO">Inactivo (Oculto)</option>
-              <option value="SI">Activo (Visible)</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Tipo de Contenido</label>
-            <select id="promo-tipo" onchange="cambiarTipoPromo()">
-              <option value="texto">Texto / Mensaje</option>
-              <option value="imagen">Imagen Promocional</option>
-            </select>
-          </div>
-          <div class="field">
-            <label>Contenido</label>
-            <textarea id="promo-contenido" rows="3" placeholder="Escribe tu mensaje..."></textarea>
-            <input type="file" id="promo-img-file" accept="image/*" class="hidden">
-          </div>
-          <div class="actions">
-            <button class="primary full-width" onclick="guardarPromocion()" id="btn-guardar-promo">Guardar Promoción</button>
-          </div>
+          <div class="field"><label>Estado del Anuncio</label><select id="promo-activa"><option value="NO">Inactivo</option><option value="SI">Activo</option></select></div>
+          <div class="field"><label>Tipo de Contenido</label><select id="promo-tipo"><option value="texto">Texto</option><option value="imagen">Imagen</option></select></div>
+          <div class="field"><label>Contenido</label><textarea id="promo-contenido" rows="3"></textarea><input type="file" id="promo-img-file" accept="image/*" class="hidden"></div>
+          <button class="primary full-width" onclick="guardarPromocion()" id="btn-guardar-promo">Guardar Promoción</button>
         </div>
-
         <div class="card">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-            <h2>📸 GESTOR DE MENÚ</h2>
-            <button class="primary" onclick="abrirModalProducto()">+ Añadir Producto</button>
+            <h2>📸 GESTOR DE MENÚ</h2><button class="primary" onclick="abrirModalProducto()">+ Añadir Producto</button>
           </div>
           <div class="table-container">
             <table>
-              <thead>
-                <tr>
-                  <th>Imagen</th>
-                  <th>Categoría</th>
-                  <th>Nombre</th>
-                  <th>Precio</th>
-                  <th>Estado</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Imagen</th><th>Categoría</th><th>Nombre</th><th>Precio</th><th>Estado</th><th>Acciones</th></tr></thead>
               <tbody id="lista-marketing-productos"></tbody>
             </table>
           </div>
@@ -261,65 +204,42 @@
         <div class="card">
           <h2>💰 Control Financiero (Cartera)</h2>
           <div class="stats" style="margin: 20px 0; display:flex; gap:15px; text-align:center; flex-wrap: wrap;">
-            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;">
-              <small>Dinero en Caja (Aprobado)</small><br>
-              <b class="text-gold" style="font-size:24px;" id="stat-caja">$0</b>
-            </div>
-            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;">
-              <small>Por Cobrar (Fiado)</small><br>
-              <b style="color:#f2c96b; font-size:24px;" id="stat-fiado">$0</b>
-            </div>
-            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;">
-              <small>Total Proyección Ventas</small><br>
-              <b style="font-size:24px;" id="stat-total">$0</b>
-            </div>
+            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;"><small>Dinero en Caja</small><br><b class="text-gold" style="font-size:24px;" id="stat-caja">$0</b></div>
+            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;"><small>Por Cobrar</small><br><b style="color:#f2c96b; font-size:24px;" id="stat-fiado">$0</b></div>
+            <div class="stat card" style="flex:1; min-width:150px; padding: 15px;"><small>Ventas Totales</small><br><b style="font-size:24px;" id="stat-total">$0</b></div>
           </div>
-          <p class="note" style="text-align:left;">Compara los comprobantes subidos por los clientes con los movimientos reales en las cuentas bancarias del proyecto.</p>
-          <div class="grid" id="lista-cartera"></div>
+          <p class="note" style="text-align:left;">Toca un pedido para desplegar los vouchers y validar la factura a producción.</p>
+          <div id="lista-cartera" style="display:flex; flex-direction:column; gap:10px;"></div>
         </div>
       </section>
 
       <section id="view-produccion" class="view">
-        <div class="card">
-          <h2>🍳 Comandas Pagadas (Cocina)</h2>
-          <div class="grid" id="lista-produccion"></div>
-        </div>
+        <div class="card"><h2>🍳 Comandas Pagadas (Cocina)</h2><div class="grid" id="lista-produccion"></div></div>
       </section>
-
+      
       <section id="view-despachados" class="view">
-        <div class="card">
-          <h2>✅ Historial de Entregas (Despachos)</h2>
+        <div class="card"><h2>✅ Historial de Entregas</h2>
           <div class="table-container">
-            <table>
-              <thead>
-                <tr>
-                  <th>ID Pedido</th>
-                  <th>Cliente Titular</th>
-                  <th>Total</th>
-                  <th>Estado</th>
-                </tr>
-              </thead>
-              <tbody id="lista-despachados"></tbody>
-            </table>
+            <table><thead><tr><th>ID Pedido</th><th>Cliente Titular</th><th>Total</th><th>Estado</th></tr></thead><tbody id="lista-despachados"></tbody></table>
           </div>
         </div>
       </section>
 
       <section id="view-facturas" class="view">
         <div class="card">
-          <h2>🧾 Buscador de Facturas PDF</h2>
+          <h2>🧾 Historial de Facturación</h2>
+          <p class="note">Mostrando las últimas facturas generadas. Usa el buscador para encontrar registros específicos.</p>
           <div class="field">
-            <input type="text" id="buscador-facturas" placeholder="🔍 Escribe Documento o Ticket de Pedido..." oninput="filtrarFacturas()">
+            <input type="text" id="buscador-facturas" placeholder="🔍 Buscar por Ticket, Factura, Doc o Nombre..." oninput="filtrarFacturas()">
           </div>
           <div class="table-container">
             <table>
               <thead>
                 <tr>
-                  <th>Factura ID</th>
-                  <th>Ticket Pedido</th>
-                  <th>Documento</th>
+                  <th>Factura / Ticket</th>
+                  <th>Cliente / Doc</th>
                   <th>Fecha</th>
-                  <th>Acción</th>
+                  <th style="text-align:right;">Acciones (PDF)</th>
                 </tr>
               </thead>
               <tbody id="lista-facturas"></tbody>
@@ -338,130 +258,54 @@
     </div>
   </footer>
 
-  <!-- MODAL DE FIDELIDAD -->
   <div class="modal" id="modal-fidelidad">
     <div class="invoice">
-      <div class="modal-header">
-        <span style="font-family: 'Montserrat', sans-serif;">🐺 Club de Lobos</span>
-        <button onclick="cerrarModal('modal-fidelidad')">✕</button>
-      </div>
-
+      <div class="modal-header"><span style="font-family: 'Montserrat', sans-serif;">🐺 Club de Lobos</span><button onclick="cerrarModal('modal-fidelidad')">✕</button></div>
       <div id="fid-login-section">
-        <p class="note" style="text-align: left;">Inicia sesión para autocompletar tus datos en los pedidos y acceder a beneficios exclusivos.</p>
-        <div class="field"><label>Documento de Identidad</label><input type="number" id="fid-log-doc" placeholder="Ej: 1005000123"></div>
-        <div class="field">
-          <label>Clave</label>
-          <div class="password-wrapper">
-            <input type="password" id="fid-log-pass" placeholder="Ingresa tu clave">
-            <button class="toggle-pass" onclick="togglePassword('fid-log-pass', this)">👁️</button>
-          </div>
-        </div>
-        <div class="actions" style="margin-top: 15px;">
-          <button class="primary full-width" onclick="loginFidelidad()">Entrar</button>
-          <button class="text-btn text-gold full-width center" style="margin-top:15px; display:block;" onclick="toggleFidForms()">¿Aún no eres miembro? Crea tu membresía</button>
-        </div>
+        <div class="field"><label>Documento</label><input type="number" id="fid-log-doc"></div>
+        <div class="field"><label>Clave</label><input type="password" id="fid-log-pass"></div>
+        <button class="primary full-width" onclick="loginFidelidad()">Entrar</button>
+        <button class="text-btn text-gold full-width center" onclick="toggleFidForms()">Crea tu membresía</button>
       </div>
-
       <div id="fid-reg-section" class="hidden">
-        <p class="note" style="text-align: left;">Tu membresía estará ligada a tu número de documento de identidad.</p>
-        <div class="field"><label>Documento de Identidad *</label><input type="number" id="fid-reg-doc"></div>
+        <div class="field"><label>Documento *</label><input type="number" id="fid-reg-doc"></div>
         <div class="field"><label>Nombre Completo *</label><input type="text" id="fid-reg-nombre"></div>
-        <div class="field"><label>Celular (WhatsApp) *</label><input type="number" id="fid-reg-celular"></div>
-        <div class="field"><label>Correo Electrónico</label><input type="email" id="fid-reg-correo" placeholder="Opcional"></div>
-        <div class="field">
-          <label>Crea una clave segura *</label>
-          <div class="password-wrapper">
-            <input type="password" id="fid-reg-pass">
-            <button class="toggle-pass" onclick="togglePassword('fid-reg-pass', this)">👁️</button>
-          </div>
-        </div>
-        <div class="actions" style="margin-top: 15px;">
-          <button class="primary full-width" onclick="registrarFidelidad()">Registrar Membresía</button>
-          <button class="text-btn text-gold full-width center" style="margin-top:15px; display:block;" onclick="toggleFidForms()">Ya tengo una membresía, volver al login</button>
-        </div>
+        <div class="field"><label>Celular *</label><input type="number" id="fid-reg-celular"></div>
+        <div class="field"><label>Correo</label><input type="email" id="fid-reg-correo"></div>
+        <div class="field"><label>Clave *</label><input type="password" id="fid-reg-pass"></div>
+        <button class="primary full-width" onclick="registrarFidelidad()">Registrar</button>
+        <button class="text-btn text-gold full-width center" onclick="toggleFidForms()">Volver al login</button>
       </div>
     </div>
   </div>
 
   <div class="modal" id="modal-checkout">
     <div class="invoice">
-      <div class="modal-header">
-        <span style="font-family: 'Montserrat', sans-serif;">Completar Pedido</span>
-        <button onclick="cerrarModal('modal-checkout')">✕</button>
-      </div>
-      <p class="note" style="text-align: left;">Ingresa tus datos para registrar la orden de compra.</p>
-      
-      <div class="field">
-        <label>Tipo de Cliente</label>
-        <select id="co-tipo" onchange="toggleCamposCliente()">
-          <option value="Ocasional">Cliente Vitrina (Ocasional)</option>
-          <option value="Continuo">Miembro Club (Fidelizado)</option>
-        </select>
-      </div>
-      <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
+      <div class="modal-header"><span style="font-family: 'Montserrat', sans-serif;">Completar Pedido</span><button onclick="cerrarModal('modal-checkout')">✕</button></div>
+      <div class="field"><label>Tipo de Cliente</label><select id="co-tipo" onchange="toggleCamposCliente()"><option value="Ocasional">Vitrina</option><option value="Continuo">Club</option></select></div>
+      <div class="field"><label>Documento *</label><input type="number" id="co-doc"></div>
       <div class="field"><label>Nombre Completo *</label><input type="text" id="co-nombre"></div>
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
-      <div class="field hidden" id="co-correo-field"><label>Correo Electrónico</label><input type="email" id="co-correo"></div>
-      
+      <div class="field hidden" id="co-correo-field"><label>Correo</label><input type="email" id="co-correo"></div>
       <hr style="border-color: #333; margin: 15px 0;">
-      
-      <div class="field">
-        <label>Tipo de Pago</label>
-        <select id="co-tipo-pago" onchange="toggleVoucherInput()">
-          <option value="Completo">Pago Completo (De contado)</option>
-          <option value="Abono">Abono Parcial (Fiado)</option>
-        </select>
-      </div>
-      <div class="field hidden" id="co-monto-abono-field">
-        <label>Monto a Abonar en este momento</label>
-        <input type="number" id="co-monto-abono">
-      </div>
-      <div class="field">
-        <label>Sube el comprobante de pago *</label>
-        <input type="file" id="co-voucher" accept="image/*">
-        <canvas id="canvas-compresion" style="display:none;"></canvas>
-      </div>
-      
-      <div class="actions" style="margin-top: 20px;">
-        <button class="primary full-width" onclick="enviarPedido()" id="btn-enviar-pedido">Confirmar y Enviar Pedido</button>
-      </div>
+      <div class="field"><label>Tipo de Pago</label><select id="co-tipo-pago" onchange="toggleVoucherInput()"><option value="Completo">Pago Completo</option><option value="Abono">Abono Parcial</option></select></div>
+      <div class="field hidden" id="co-monto-abono-field"><label>Monto a Abonar</label><input type="number" id="co-monto-abono"></div>
+      <div class="field"><label>Comprobante de pago *</label><input type="file" id="co-voucher" accept="image/*"><canvas id="canvas-compresion" style="display:none;"></canvas></div>
+      <button class="primary full-width" onclick="enviarPedido()" id="btn-enviar-pedido">Confirmar y Enviar Pedido</button>
     </div>
   </div>
 
   <div class="modal" id="modal-producto">
     <div class="invoice">
-      <div class="modal-header">
-        <span style="font-family: 'Montserrat', sans-serif;" id="modal-prod-titulo">Añadir Producto</span>
-        <button onclick="cerrarModal('modal-producto')">✕</button>
-      </div>
-      <input type="hidden" id="prod-id">
-      <input type="hidden" id="prod-img-existente">
-      <div class="field">
-        <label>Categoría *</label>
-        <select id="prod-categoria">
-          <option value="~PRODUCTOS PRINCIPALES~">Productos Principales</option>
-          <option value="~BEBIDAS Y POSTRES~">Bebidas y Postres</option>
-          <option value="~COMBOS~">Combos</option>
-        </select>
-      </div>
-      <div class="field"><label>Nombre del Producto *</label><input type="text" id="prod-nombre"></div>
-      <div class="field"><label>Ingredientes / Descripción *</label><input type="text" id="prod-desc"></div>
-      <div class="field"><label>Precio ($ COP) *</label><input type="number" id="prod-precio"></div>
-      <div class="field">
-        <label>Estado</label>
-        <select id="prod-agotado">
-          <option value="NO">Disponible</option>
-          <option value="SI">Agotado</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>Subir Foto</label>
-        <input type="file" id="prod-img" accept="image/*">
-        <canvas id="canvas-compresion-prod" style="display:none;"></canvas>
-      </div>
-      <div class="actions" style="margin-top: 20px;">
-        <button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button>
-      </div>
+      <div class="modal-header"><span id="modal-prod-titulo">Añadir Producto</span><button onclick="cerrarModal('modal-producto')">✕</button></div>
+      <input type="hidden" id="prod-id"><input type="hidden" id="prod-img-existente">
+      <div class="field"><label>Categoría *</label><select id="prod-categoria"><option value="~PRODUCTOS PRINCIPALES~">Principales</option><option value="~BEBIDAS Y POSTRES~">Bebidas/Postres</option><option value="~COMBOS~">Combos</option></select></div>
+      <div class="field"><label>Nombre *</label><input type="text" id="prod-nombre"></div>
+      <div class="field"><label>Descripción *</label><input type="text" id="prod-desc"></div>
+      <div class="field"><label>Precio *</label><input type="number" id="prod-precio"></div>
+      <div class="field"><label>Estado</label><select id="prod-agotado"><option value="NO">Disponible</option><option value="SI">Agotado</option></select></div>
+      <div class="field"><label>Subir Foto</label><input type="file" id="prod-img" accept="image/*"><canvas id="canvas-compresion-prod" style="display:none;"></canvas></div>
+      <button class="primary full-width" onclick="guardarProductoBackend()" id="btn-guardar-prod">Guardar</button>
     </div>
   </div>
 
