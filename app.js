@@ -3,7 +3,7 @@
 // CÓDIGO COMPLETO Y SIN COMPRIMIR
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbwoCsSWEzD0xCbdi_qlw3f84Q8ryYoeZ5Hm3VThi2tg4RthI9gFZZOy433S-RFki20YAQ/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxndKhWUItfbJR_6EmgA1qOe2F5_ebtbYhrYhRWmbf96GFAysIv-s-q-WIHRK67YFnRfw/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
