@@ -3,7 +3,7 @@
 // CÓDIGO COMPLETO Y SIN COMPRIMIR
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbz4xUyV6fmrEoNnlDajX2c9BFlNNao9EOsI3RgsZBX6Es3JPNnGpweI3glITKGXIJABjA/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxKGFrz9tyuXpeuI8c2MuNUKcNNsDpUpYYS3IkHR9y2WYjxr9y0U3j8dZ5jAoO5AGmxRg/exec";
 
 // ============================================================================
 // BUSTER DE ACTUALIZACIÓN AUTOMÁTICA PWA
