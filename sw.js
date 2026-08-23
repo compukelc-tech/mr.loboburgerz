@@ -1,22 +1,19 @@
-const CACHE_NAME = 'lobo-erp-v11';
+const CACHE_NAME = 'lobo-erp-v3';
 const ASSETS = [
   './index.html',
   './styles.css',
   './app.js',
-  './icono.png',
-  './icono.jpg'
+  './icono.png'
 ];
 
 self.addEventListener('install', (e) => {
-  // Fuerza al service worker a instalarse de inmediato
-  self.skipWaiting();
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (e) => {
-  // Limpia los cachés antiguos que no coincidan con la versión actual
   e.waitUntil(
     caches.keys().then((keyList) => {
       return Promise.all(keyList.map((key) => {
@@ -26,8 +23,7 @@ self.addEventListener('activate', (e) => {
       }));
     })
   );
-  // Reclama el control de los clientes de inmediato
-  return self.clients.claim();
+  self.clients.claim();
 });
 
 self.addEventListener('fetch', (e) => {
