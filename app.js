@@ -3,7 +3,7 @@
 // CÓDIGO COMPLETO Y SIN COMPRIMIR - ESTRUCTURA ORIGINAL RESTAURADA
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/TU_NUEVA_URL_AQUI/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbz6med-rYVxbAgfUgxGDstg4zEfXrJ6Sd5kRbjsuYd1LZn56XIAEeVMfUue3Ck9JbxWug/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
