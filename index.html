@@ -33,9 +33,7 @@
   <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
     <div style="flex: 1;"></div>
     <div style="flex: 2; text-align: center;">
-      <!-- Logo redimensionado -->
       <img src="icono.png" alt="Logo Mr Lobo Burgerz" style="width: 160px; height: 160px; object-fit: contain; margin-bottom: 15px; border-radius: 50%; box-shadow: 0 0 25px rgba(227, 38, 46, 0.6);">
-      <!-- Título corregido sin cortes -->
       <h1 style="color: white; line-height: 1.1;">
         <span class="text-red">MR. LOBO</span> BURGERZ
       </h1>
@@ -189,7 +187,6 @@
       </section>
 
       <section id="view-admin" class="view">
-        <!-- SECCIÓN DE REFERIDOS PARA EL GERENTE -->
         <div class="card" style="margin-bottom: 25px;">
           <h2>📊 Ranking de Referidos</h2>
           <p class="note" style="text-align: left;">Muestra qué estudiantes han traído clientes mediante membresías y pedidos de vitrina.</p>
@@ -389,8 +386,12 @@
         <div class="field"><label>Nombre Completo *</label><input type="text" id="fid-reg-nombre"></div>
         <div class="field"><label>Celular (WhatsApp) *</label><input type="number" id="fid-reg-celular"></div>
         <div class="field"><label>Correo Electrónico</label><input type="email" id="fid-reg-correo" placeholder="Opcional"></div>
-        <!-- NUEVO CAMPO: REFERIDO EN FIDELIZACIÓN -->
-        <div class="field"><label>Estudiante que te refirió (Opcional)</label><input type="text" id="fid-reg-referido" placeholder="Ingresa el nombre del estudiante"></div>
+        
+        <!-- CAMPO REFERIDO CON DATALIST EN FIDELIZACIÓN -->
+        <div class="field">
+          <label>Estudiante que te refirió *</label>
+          <input type="text" id="fid-reg-referido" list="lista-estudiantes" placeholder="Escribe para buscar estudiante...">
+        </div>
         
         <div class="field">
           <label>Crea una clave segura *</label>
@@ -407,6 +408,7 @@
     </div>
   </div>
 
+  <!-- MODAL DE CHECKOUT (COMPLETAR PEDIDO) -->
   <div class="modal" id="modal-checkout">
     <div class="invoice">
       <div class="modal-header">
@@ -425,17 +427,17 @@
       
       <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
       <div class="field"><label>Nombre(s) *</label><input type="text" id="co-nombre"></div>
-      
-      <!-- NUEVOS CAMPOS: APELLIDOS, JORNADA, GRADO -->
       <div class="field"><label>Apellidos *</label><input type="text" id="co-apellidos"></div>
       <div class="field"><label>Jornada *</label><input type="text" id="co-jornada" placeholder="Ej: Mañana / Tarde"></div>
       <div class="field"><label>Grado *</label><input type="text" id="co-grado" placeholder="Ej: 11A"></div>
-      
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
       <div class="field hidden" id="co-correo-field"><label>Correo Electrónico</label><input type="email" id="co-correo"></div>
       
-      <!-- NUEVO CAMPO: REFERIDO EN PEDIDO -->
-      <div class="field"><label>Estudiante que te refirió (Opcional)</label><input type="text" id="co-referido" placeholder="Ingresa el nombre del estudiante"></div>
+      <!-- CAMPO REFERIDO CON DATALIST EN PEDIDO -->
+      <div class="field">
+        <label>Estudiante que te refirió *</label>
+        <input type="text" id="co-referido" list="lista-estudiantes" placeholder="Escribe para buscar estudiante...">
+      </div>
       
       <hr style="border-color: #333; margin: 15px 0;">
       
@@ -498,6 +500,49 @@
       </div>
     </div>
   </div>
+
+  <!-- BASE DE DATOS DE ESTUDIANTES PARA EL BUSCADOR (DATALIST) -->
+  <datalist id="lista-estudiantes">
+    <option value="Maria Fernanda Aragón">
+    <option value="Naily Bustos">
+    <option value="Shaira Nicoll Caballero">
+    <option value="Hecna Thaliana">
+    <option value="Gabriel Caceres">
+    <option value="Mabel Celis">
+    <option value="Gabriela Colmenares">
+    <option value="Laura Contreras">
+    <option value="Tatiana Florez">
+    <option value="Jeimy Sabrina">
+    <option value="Angie Elizabeth">
+    <option value="Gabriela Gonzalez">
+    <option value="Andrea Guerrero">
+    <option value="Valeria Hernandez">
+    <option value="Andres Felipe Latorre">
+    <option value="Samuel Jimenez">
+    <option value="Kelmer Andrey">
+    <option value="Dorian Merino">
+    <option value="Andres Felipe Meza">
+    <option value="Roxana Miranda">
+    <option value="Kevin Molina">
+    <option value="Genesis Moncada">
+    <option value="Maria Mora">
+    <option value="Paula Gabriela">
+    <option value="Juan Manuel Muñoz">
+    <option value="Santiago Niño">
+    <option value="Aaron Obeji">
+    <option value="Gisell Palmero">
+    <option value="Hasly Valeria">
+    <option value="Lina Peña">
+    <option value="Chelsea Ramirez">
+    <option value="Sayhoa Rivera">
+    <option value="Andry Rondon">
+    <option value="Isabella Sarmiento">
+    <option value="Sami Valeria">
+    <option value="Mariangel Uribe">
+    <option value="Natalia Velandia">
+    <option value="Danna Salome Vera">
+    <option value="Katherin Zambrano">
+  </datalist>
 
   <script>
     document.write('<script src="app.js?v=' + new Date().getTime() + '"><\/script>');
