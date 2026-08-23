@@ -1,9 +1,9 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
-// CÓDIGO COMPLETO Y SIN COMPRIMIR
+// CÓDIGO COMPLETO Y SIN COMPRIMIR - ESTRUCTURA ORIGINAL RESTAURADA
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxndKhWUItfbJR_6EmgA1qOe2F5_ebtbYhrYhRWmbf96GFAysIv-s-q-WIHRK67YFnRfw/exec";
+const API_URL = "https://script.google.com/macros/s/TU_NUEVA_URL_AQUI/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
@@ -33,6 +33,7 @@ const money = n => new Intl.NumberFormat('es-CO', { style: 'currency', currency:
 window.onload = async () => {
   try {
     const savedSession = localStorage.getItem('lobo_session');
+    
     if (savedSession) {
       sesionActual = JSON.parse(savedSession);
     } else {
@@ -40,6 +41,7 @@ window.onload = async () => {
     }
     
     const savedFidelidad = localStorage.getItem('lobo_cliente');
+    
     if (savedFidelidad) {
       clienteFidelizado = JSON.parse(savedFidelidad);
     }
@@ -58,11 +60,14 @@ async function apiCall(accion, datos = {}) {
       method: 'POST', 
       body: JSON.stringify({ accion, datos }) 
     });
+    
     const textResponse = await response.text();
     let result = JSON.parse(textResponse);
+    
     if (!result.exito) {
       throw new Error(result.error);
     }
+    
     return result.data;
   } catch (error) { 
     throw error; 
@@ -89,29 +94,31 @@ function forzarUpdatePWA() {
 
 function navegar(vistaID) {
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  
   const target = document.getElementById(`view-${vistaID}`);
-  if (target) {
-    target.classList.add('active');
+  if (target) { 
+    target.classList.add('active'); 
   }
   
   if (vistaID === 'admin') { 
     cargarEmpleados(); 
+    cargarRankingReferidos(); 
     cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-admin'); 
   }
-  if (vistaID === 'marketing') {
-    cargarGestorMenu();
+  if (vistaID === 'marketing') { 
+    cargarGestorMenu(); 
   }
-  if (vistaID === 'facturas') {
-    cargarFacturas();
+  if (vistaID === 'facturas') { 
+    cargarFacturas(); 
   }
-  if (vistaID === 'cartera') {
-    cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
+  if (vistaID === 'cartera') { 
+    cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera'); 
   }
-  if (vistaID === 'produccion') {
-    cargarPedidos('EN PRODUCCIÓN', 'lista-produccion');
+  if (vistaID === 'produccion') { 
+    cargarPedidos('EN PRODUCCIÓN', 'lista-produccion'); 
   }
-  if (vistaID === 'despachados') {
-    cargarPedidos('DESPACHADO', 'lista-despachados');
+  if (vistaID === 'despachados') { 
+    cargarPedidos('DESPACHADO', 'lista-despachados'); 
   }
 }
 
@@ -137,9 +144,11 @@ function configurarInterfazPorRol() {
   if (nav) {
     nav.style.display = isCliente ? 'none' : 'flex';
   }
+  
   if (loginIcon) {
     loginIcon.style.display = isCliente ? 'block' : 'none';
   }
+  
   if (greeting) {
     greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
   }
@@ -149,12 +158,14 @@ function configurarInterfazPorRol() {
   }
 
   document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
+  
   const btnOutline = document.querySelector('.btn-outline');
   const btnUpdate = document.getElementById('btn-update-pwa');
   
   if (btnOutline) {
     btnOutline.style.display = 'block'; 
   }
+  
   if (btnUpdate) {
     btnUpdate.style.display = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') ? 'block' : 'none';
   }
@@ -164,23 +175,33 @@ function configurarInterfazPorRol() {
     navegar('admin');
   } else if (rolSeguro === 'vitrina') {
     const navVit = document.getElementById('nav-vitrina'); 
-    if (navVit) navVit.style.display = 'block'; 
+    if (navVit) {
+      navVit.style.display = 'block'; 
+    }
     navegar('vitrina');
   } else if (rolSeguro === 'cartera') {
     const navCart = document.getElementById('nav-cartera'); 
-    if (navCart) navCart.style.display = 'block'; 
+    if (navCart) {
+      navCart.style.display = 'block'; 
+    }
     navegar('cartera');
   } else if (rolSeguro === 'producción' || rolSeguro === 'produccion') {
     const navProd = document.getElementById('nav-produccion'); 
-    if (navProd) navProd.style.display = 'block'; 
+    if (navProd) {
+      navProd.style.display = 'block'; 
+    }
     navegar('produccion');
   } else if (rolSeguro === 'pedidos' || rolSeguro === 'despachos') {
     const navDespachados = document.getElementById('nav-despachados'); 
-    if (navDespachados) navDespachados.style.display = 'block'; 
+    if (navDespachados) {
+      navDespachados.style.display = 'block'; 
+    }
     navegar('despachados');
   } else if (rolSeguro === 'marketing') {
     const navMark = document.getElementById('nav-marketing'); 
-    if (navMark) navMark.style.display = 'block'; 
+    if (navMark) {
+      navMark.style.display = 'block'; 
+    }
     navegar('marketing');
   }
 }
@@ -188,6 +209,7 @@ function configurarInterfazPorRol() {
 async function iniciarSesion() {
   const doc = document.getElementById('login-doc').value;
   const pass = document.getElementById('login-pass').value;
+  
   if (!doc || !pass) {
     return mostrarAlerta('Ingresa documento y contraseña');
   }
@@ -201,6 +223,7 @@ async function iniciarSesion() {
     if (!usuario) {
       return mostrarAlerta('Credenciales incorrectas');
     }
+    
     if (String(usuario['Estado']).toUpperCase() === 'BLOQUEADO') {
       return mostrarAlerta('Cuenta bloqueada.');
     }
@@ -210,9 +233,11 @@ async function iniciarSesion() {
       nombre: usuario['Nombre Completo'], 
       rol: usuario['Rol Asignado'] 
     };
+    
     localStorage.setItem('lobo_session', JSON.stringify(sesionActual));
     mostrarAlerta('Acceso concedido', 'success');
     configurarInterfazPorRol();
+    
   } catch (e) { 
     mostrarAlerta(e.message || 'Error de red.'); 
   }
@@ -242,7 +267,8 @@ async function registrarEmpleado() {
 
 function mostrarAlerta(msg, tipo = 'error') {
   const alertBox = document.getElementById('alert-box');
-  if(alertBox) {
+  
+  if (alertBox) {
     alertBox.textContent = msg; 
     alertBox.className = `alert ${tipo}`;
     setTimeout(() => alertBox.classList.add('hidden'), 5000);
@@ -253,6 +279,7 @@ function mostrarAlerta(msg, tipo = 'error') {
 
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId);
+  
   if (input.type === 'password') { 
     input.type = 'text'; 
     btn.textContent = '🙈'; 
@@ -268,13 +295,13 @@ function togglePassword(inputId, btn) {
 
 function abrirModalFidelidad() {
   if (clienteFidelizado) {
-    if(confirm(`Ya tienes sesión como ${clienteFidelizado.nombre}. ¿Deseas cerrar sesión?`)) {
-      clienteFidelizado = null;
-      localStorage.removeItem('lobo_cliente');
+    if (confirm(`Ya tienes sesión como ${clienteFidelizado.nombre}. ¿Deseas cerrar sesión?`)) {
+      clienteFidelizado = null; 
+      localStorage.removeItem('lobo_cliente'); 
       mostrarAlerta('Sesión de cliente cerrada', 'info');
     }
-  } else {
-    document.getElementById('modal-fidelidad').classList.add('active');
+  } else { 
+    document.getElementById('modal-fidelidad').classList.add('active'); 
   }
 }
 
@@ -289,6 +316,7 @@ async function registrarFidelidad() {
     nombre: document.getElementById('fid-reg-nombre').value,
     celular: document.getElementById('fid-reg-celular').value,
     correo: document.getElementById('fid-reg-correo').value,
+    referido: document.getElementById('fid-reg-referido').value,
     clave: document.getElementById('fid-reg-pass').value
   };
   
@@ -311,7 +339,7 @@ async function loginFidelidad() {
   const doc = document.getElementById('fid-log-doc').value;
   const clave = document.getElementById('fid-log-pass').value;
   
-  if(!doc || !clave) {
+  if (!doc || !clave) {
     return mostrarAlerta('Ingresa tus credenciales');
   }
   
@@ -360,14 +388,15 @@ async function cargarCatalogoGlobal() {
     CATALOGO = [...CATALOGO_BASE]; 
   }
   
-  if(document.getElementById('view-vitrina')?.classList.contains('active') || String(sesionActual?.rol).toLowerCase() === 'cliente') {
+  if (document.getElementById('view-vitrina')?.classList.contains('active') || String(sesionActual?.rol).toLowerCase() === 'cliente') {
     renderCatalogo();
   }
 }
 
 function renderCatalogo() {
   const container = document.getElementById('catalogo-productos');
-  if(!container) return;
+  
+  if (!container) return;
   
   if (CATALOGO.length === 0) { 
     container.innerHTML = '<p class="note">Catálogo vacío.</p>'; 
@@ -382,13 +411,16 @@ function renderCatalogo() {
     
     CATALOGO.filter(p => p.categoria === cat).forEach(prod => {
       const botonHTML = prod.agotado ? `<button class="btn-outline full-width" disabled>Agotado</button>` : `<button class="primary full-width" onclick="agregarAlCarrito('${prod.id}')">+ Añadir a pedido</button>`;
-      html += `<div class="product-card" style="${prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
-                ${prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : ''}
-                <h3>${prod.nombre}</h3>
-                <p>${prod.desc}</p>
-                <span class="price">${money(prod.precio)}</span>
-                ${botonHTML}
-               </div>`;
+      
+      html += `
+        <div class="product-card" style="${prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
+          ${prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : ''}
+          <h3>${prod.nombre}</h3>
+          <p>${prod.desc}</p>
+          <span class="price">${money(prod.precio)}</span>
+          ${botonHTML}
+        </div>
+      `;
     });
   });
   
@@ -397,26 +429,31 @@ function renderCatalogo() {
 
 function cargarGestorMenu() {
   const tbody = document.getElementById('lista-marketing-productos'); 
-  if(!tbody) return;
+  
+  if (!tbody) return;
+  
   tbody.innerHTML = '';
   
   CATALOGO.forEach(p => {
-    tbody.innerHTML += `<tr>
-      <td>${p.urlImagen ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">` : 'Sin foto'}</td>
-      <td>${p.categoria}</td>
-      <td><b>${p.nombre}</b></td>
-      <td>${money(p.precio)}</td>
-      <td><span class="badge ${p.agotado ? 'denegado' : 'activo'}">${p.agotado ? 'AGOTADO' : 'DISPONIBLE'}</span></td>
-      <td>
-        <button class="primary small" onclick="abrirModalProducto('${p.id}')">Editar</button> 
-        <button class="small" style="background:var(--dark-red);" onclick="eliminarProducto('${p.id}')">Eliminar</button>
-      </td>
-    </tr>`;
+    tbody.innerHTML += `
+      <tr>
+        <td>${p.urlImagen ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">` : 'Sin foto'}</td>
+        <td>${p.categoria}</td>
+        <td><b>${p.nombre}</b></td>
+        <td>${money(p.precio)}</td>
+        <td><span class="badge ${p.agotado ? 'denegado' : 'activo'}">${p.agotado ? 'AGOTADO' : 'DISPONIBLE'}</span></td>
+        <td>
+          <button class="primary small" onclick="abrirModalProducto('${p.id}')">Editar</button> 
+          <button class="small" style="background:var(--dark-red);" onclick="eliminarProducto('${p.id}')">Eliminar</button>
+        </td>
+      </tr>
+    `;
   });
 }
 
 function abrirModalProducto(id = null) {
   document.getElementById('modal-producto').classList.add('active');
+  
   if (id) {
     const p = CATALOGO.find(x => x.id === id);
     document.getElementById('modal-prod-titulo').textContent = 'Editar Producto';
@@ -435,18 +472,21 @@ function abrirModalProducto(id = null) {
     document.getElementById('prod-precio').value = ''; 
     document.getElementById('prod-img-existente').value = '';
   }
+  
   document.getElementById('prod-img').value = ''; 
 }
 
 function comprimirEnCanvas(file) {
   return new Promise((resolve, reject) => {
     if (!file) return resolve(null);
+    
     const reader = new FileReader();
     reader.readAsDataURL(file);
     
     reader.onload = event => {
-      const img = new Image();
+      const img = new Image(); 
       img.src = event.target.result;
+      
       img.onload = () => {
         const canvas = document.createElement('canvas'); 
         const ctx = canvas.getContext('2d');
@@ -461,12 +501,15 @@ function comprimirEnCanvas(file) {
         canvas.width = width; 
         canvas.height = height; 
         ctx.fillStyle = "#ffffff"; 
-        ctx.fillRect(0, 0, width, height);
+        ctx.fillRect(0, 0, width, height); 
         ctx.drawImage(img, 0, 0, width, height);
+        
         resolve(canvas.toDataURL('image/jpeg', 0.6)); 
       };
+      
       img.onerror = () => reject("Error cargando la imagen.");
     };
+    
     reader.onerror = () => reject("Error leyendo el archivo.");
   });
 }
@@ -495,6 +538,7 @@ async function guardarProductoBackend() {
     if (fileInput) {
       datos.imagenBase64 = await comprimirEnCanvas(fileInput); 
     }
+    
     await apiCall('guardarProducto', datos);
     cerrarModal('modal-producto'); 
     await cargarCatalogoGlobal(); 
@@ -510,9 +554,11 @@ async function guardarProductoBackend() {
 
 async function eliminarProducto(id) {
   if (!confirm('¿Seguro que deseas eliminar este producto?')) return;
+  
   if (CATALOGO_BASE.some(base => base.id === id)) {
     return mostrarAlerta('No se puede eliminar un producto base.', 'warning');
   }
+  
   try { 
     await apiCall('eliminarProducto', { idProducto: id }); 
     mostrarAlerta('Producto eliminado', 'success'); 
@@ -542,7 +588,9 @@ function agregarAlCarrito(id) {
 
 function quitarDelCarrito(id) { 
   carrito = carrito.filter(i => { 
-    if (i.id === id) i.cant--; 
+    if (i.id === id) {
+      i.cant--; 
+    }
     return i.cant > 0; 
   }); 
   
@@ -568,16 +616,18 @@ function renderCarrito() {
   
   container.innerHTML = carrito.map(item => { 
     total += item.precio * item.cant; 
-    return `<div class="cart-item">
-              <div class="cart-item-info">
-                <span class="qty" style="background:var(--red);">${item.cant}</span>
-                <span>${item.nombre}</span>
-              </div>
-              <div>
-                <span>${money(item.precio * item.cant)}</span>
-                <button class="del-btn" onclick="quitarDelCarrito('${item.id}')">✕</button>
-              </div>
-            </div>`; 
+    return `
+      <div class="cart-item">
+        <div class="cart-item-info">
+          <span class="qty" style="background:var(--red);">${item.cant}</span>
+          <span>${item.nombre}</span>
+        </div>
+        <div>
+          <span>${money(item.precio * item.cant)}</span>
+          <button class="del-btn" onclick="quitarDelCarrito('${item.id}')">✕</button>
+        </div>
+      </div>
+    `; 
   }).join('');
   
   displayTotal.textContent = money(total);
@@ -587,13 +637,15 @@ function abrirModalCheckout() {
   document.getElementById('modal-checkout').classList.add('active'); 
   
   if(clienteFidelizado) {
-    document.getElementById('co-tipo').value = 'Continuo';
+    document.getElementById('co-tipo').value = 'Continuo'; 
     document.getElementById('co-doc').value = clienteFidelizado.documento;
-    document.getElementById('co-nombre').value = clienteFidelizado.nombre;
+    document.getElementById('co-nombre').value = clienteFidelizado.nombre; 
     document.getElementById('co-celular').value = clienteFidelizado.celular;
+    
     if(clienteFidelizado.correo) {
       document.getElementById('co-correo').value = clienteFidelizado.correo;
     }
+    
     toggleCamposCliente();
   }
 }
@@ -615,14 +667,19 @@ async function enviarPedido() {
   const tipoCliente = document.getElementById('co-tipo').value; 
   const documento = document.getElementById('co-doc').value; 
   const nombre = document.getElementById('co-nombre').value; 
+  const apellidos = document.getElementById('co-apellidos').value; 
+  const jornada = document.getElementById('co-jornada').value; 
+  const grado = document.getElementById('co-grado').value; 
   const celular = document.getElementById('co-celular').value; 
   const correo = document.getElementById('co-correo').value; 
+  const referido = document.getElementById('co-referido').value; 
   const tipoPago = document.getElementById('co-tipo-pago').value; 
   const voucherInput = document.getElementById('co-voucher').files[0];
   
-  if (!documento || !nombre || !celular) {
-    return mostrarAlerta('Faltan datos del cliente');
+  if (!documento || !nombre || !apellidos || !jornada || !grado || !celular) {
+    return mostrarAlerta('Faltan datos obligatorios del cliente');
   }
+  
   if (!voucherInput) {
     return mostrarAlerta('Debe adjuntar el comprobante');
   }
@@ -651,17 +708,27 @@ async function enviarPedido() {
       idPedido, 
       documento, 
       nombre, 
+      apellidos, 
+      jornada, 
+      grado, 
       celular, 
       tipoCliente, 
       correo, 
+      referido, 
       carrito: carritoLimpio, 
       total: totalVenta 
     });
-
+    
     mostrarAlerta('Pedido registrado con éxito.', 'success');
     carrito = []; 
     renderCarrito(); 
     cerrarModal('modal-checkout');
+    
+    document.getElementById('co-apellidos').value = '';
+    document.getElementById('co-jornada').value = '';
+    document.getElementById('co-grado').value = '';
+    document.getElementById('co-referido').value = '';
+    
   } catch (error) { 
     mostrarAlerta(error.message || 'Error al procesar.'); 
   } finally { 
@@ -671,11 +738,12 @@ async function enviarPedido() {
 }
 
 // ----------------------------------------------------------------------------
-// GESTIÓN DE PERSONAL (PANEL MAESTRO)
+// GESTIÓN DE PERSONAL Y REFERIDOS
 // ----------------------------------------------------------------------------
 
 async function cargarEmpleados() {
   const tbody = document.getElementById('lista-empleados'); 
+  
   if(!tbody) return;
   
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando...</td></tr>';
@@ -685,38 +753,65 @@ async function cargarEmpleados() {
     tbody.innerHTML = '';
     
     const rolSeguro = String(sesionActual.rol || '').toLowerCase();
-    const rolesPosibles = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador') 
-        ? ['Superadmin', 'Gerente', 'Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'] 
-        : ['Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'];
+    const rolesPosibles = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador') ? ['Superadmin', 'Gerente', 'Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'] : ['Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'];
 
     empleados.forEach(emp => {
       const doc = emp['Documento (Usuario)'];
       const rolSelect = rolesPosibles.map(r => `<option value="${r}" ${emp['Rol Asignado'] === r ? 'selected' : ''}>${r}</option>`).join('');
       
-      tbody.innerHTML += `<tr>
-        <td>${doc}</td>
-        <td>${emp['Nombre Completo']}</td>
-        <td><select id="rol-${doc}">${rolSelect}</select></td>
-        <td>
-          <select id="estado-${doc}">
-            <option value="ACTIVO" ${emp['Estado'] === 'ACTIVO' ? 'selected' : ''}>ACTIVO</option>
-            <option value="PENDIENTE" ${emp['Estado'] === 'PENDIENTE' ? 'selected' : ''}>PENDIENTE</option>
-            <option value="BLOQUEADO" ${emp['Estado'] === 'BLOQUEADO' ? 'selected' : ''}>BLOQUEADO</option>
-          </select>
-        </td>
-        <td>
-          <button class="primary small" onclick="cambiarRolYEstado('${doc}')">Guardar</button>
-          <button class="small" style="background:var(--dark-red); color: white;" onclick="eliminarEmpleado('${doc}')">Eliminar</button>
-        </td>
-      </tr>`;
+      tbody.innerHTML += `
+        <tr>
+          <td>${doc}</td>
+          <td>${emp['Nombre Completo']}</td>
+          <td><select id="rol-${doc}">${rolSelect}</select></td>
+          <td>
+            <select id="estado-${doc}">
+              <option value="ACTIVO" ${emp['Estado'] === 'ACTIVO' ? 'selected' : ''}>ACTIVO</option>
+              <option value="PENDIENTE" ${emp['Estado'] === 'PENDIENTE' ? 'selected' : ''}>PENDIENTE</option>
+              <option value="BLOQUEADO" ${emp['Estado'] === 'BLOQUEADO' ? 'selected' : ''}>BLOQUEADO</option>
+            </select>
+          </td>
+          <td>
+            <button class="primary small" onclick="cambiarRolYEstado('${doc}')">Guardar</button> 
+            <button class="small" style="background:var(--dark-red); color: white;" onclick="eliminarEmpleado('${doc}')">Eliminar</button>
+          </td>
+        </tr>
+      `;
     });
+  } catch(e) { 
+    console.error(e); 
+  }
+}
+
+async function cargarRankingReferidos() {
+  const tbody = document.getElementById('lista-referidos');
+  
+  if(!tbody) return;
+  
+  tbody.innerHTML = '<tr><td colspan="2" class="center note">Calculando ranking...</td></tr>';
+  
+  try {
+    const ranking = await apiCall('obtenerRankingReferidos');
+    
+    if (!ranking || ranking.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="2" class="center note">No hay referidos registrados aún.</td></tr>';
+      return;
+    }
+    
+    tbody.innerHTML = ranking.map(r => `
+      <tr>
+        <td><b>${r.nombre}</b></td>
+        <td style="text-align:center;"><span class="badge activo">${r.cantidad} referidos</span></td>
+      </tr>
+    `).join('');
+    
   } catch(e) {
-    console.error(e);
+    tbody.innerHTML = '<tr><td colspan="2" class="center note" style="color:var(--red);">Error al cargar ranking.</td></tr>';
   }
 }
 
 async function cambiarRolYEstado(documento) {
-  const nuevoRol = document.getElementById(`rol-${documento}`).value;
+  const nuevoRol = document.getElementById(`rol-${documento}`).value; 
   const nuevoEstado = document.getElementById(`estado-${documento}`).value;
   
   try { 
@@ -730,24 +825,21 @@ async function cambiarRolYEstado(documento) {
 async function eliminarEmpleado(documento) {
   if(!confirm('¿Seguro que deseas eliminar definitivamente a este empleado?')) return;
   
-  try {
-    await apiCall('eliminarEmpleado', { documento });
-    mostrarAlerta('Empleado eliminado exitosamente', 'success');
-    cargarEmpleados();
+  try { 
+    await apiCall('eliminarEmpleado', { documento }); 
+    mostrarAlerta('Empleado eliminado exitosamente', 'success'); 
+    cargarEmpleados(); 
   } catch(e) { 
     mostrarAlerta('Error eliminando empleado'); 
   }
 }
-
-// ----------------------------------------------------------------------------
-// FLUJO Y CONTROL DE PEDIDOS (TARJETAS TIPO ACORDEÓN)
-// ----------------------------------------------------------------------------
 
 function togglePedido(id) {
   document.querySelectorAll('[id^="detalles-"]').forEach(el => {
     if (el.id !== 'detalles-' + id && !el.classList.contains('hidden')) {
       el.classList.add('hidden');
       const iconId = el.id.replace('detalles-', 'icon-');
+      
       if (document.getElementById(iconId)) {
         document.getElementById(iconId).textContent = '▼';
       }
@@ -768,7 +860,6 @@ function togglePedido(id) {
   }
 }
 
-// FUNCIÓN PARA ABRIR VOUCHERS BASE64 ANTIGUOS
 function verVoucherLocal(base64Data) {
   const w = window.open("");
   w.document.write(`
@@ -781,6 +872,7 @@ function verVoucherLocal(base64Data) {
 
 async function cargarPedidos(estadoFiltro, contenedorID) {
   const container = document.getElementById(contenedorID); 
+  
   if(!container) return;
   
   container.innerHTML = '<p class="note">Cargando pedidos...</p>';
@@ -815,9 +907,9 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       return est.includes(estadoFiltro.toUpperCase());
     });
     
-    if (filtrados.length === 0) {
-      container.innerHTML = `<p class="note">No hay pedidos en esta etapa.</p>`;
-      return;
+    if (filtrados.length === 0) { 
+      container.innerHTML = `<p class="note">No hay pedidos en esta etapa.</p>`; 
+      return; 
     }
     
     if (contenedorID === 'lista-despachados') {
@@ -833,7 +925,7 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
     } 
 
     container.innerHTML = filtrados.map(p => {
-      let itemsCart = [];
+      let itemsCart = []; 
       try { 
         itemsCart = JSON.parse(p['Carrito (JSON)'] || '[]'); 
       } catch(e) { 
@@ -860,73 +952,72 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       }
       
       let mostrarAbonos = (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') ? abonosHtml : '';
-      
       let botones = '';
-      if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
-        botones = `<button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">Validar y Enviar a Cocina</button>`;
-      } else if (p['Estado'] === 'EN PRODUCCIÓN') {
-        botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`;
+      
+      if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') { 
+        botones = `<button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">Validar y Enviar a Cocina</button>`; 
+      } else if (p['Estado'] === 'EN PRODUCCIÓN') { 
+        botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`; 
       }
           
-      return `<div class="card product-card" style="text-align:left; padding: 15px;">
-                <div onclick="togglePedido('${p['ID Pedido']}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
-                  <div>
-                    <h3 style="margin:0; font-family:'Metal Mania', cursive; font-size:22px; color:var(--gold); text-align:left;">${p['ID Pedido']}</h3>
-                    <p style="margin:5px 0 0 0; font-size:14px; color:white; text-align:left;">Titular: <b>${p['Nombre'] || ''}</b></p>
-                  </div>
-                  <div id="icon-${p['ID Pedido']}" style="font-size:18px; color:var(--gold); font-weight:bold; padding: 10px;">▼</div>
-                </div>
+      return `
+        <div class="card product-card" style="text-align:left; padding: 15px;">
+          <div onclick="togglePedido('${p['ID Pedido']}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <h3 style="margin:0; font-family:'Metal Mania', cursive; font-size:22px; color:var(--gold); text-align:left;">${p['ID Pedido']}</h3>
+              <p style="margin:5px 0 0 0; font-size:14px; color:white; text-align:left;">Titular: <b>${p['Nombre'] || ''}</b></p>
+            </div>
+            <div id="icon-${p['ID Pedido']}" style="font-size:18px; color:var(--gold); font-weight:bold; padding: 10px;">▼</div>
+          </div>
 
-                <div id="detalles-${p['ID Pedido']}" class="hidden" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
-                  <div style="margin-bottom:15px;">${badgeDinero}</div>
-                  <p class="note" style="text-align:left; color:var(--muted); margin:0 0 10px 0;">
-                    Doc: ${p['Documento'] || ''} <br> Tel: ${p['Celular'] || ''}
-                  </p>
-                  <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
-                    ${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || ''}</li>`).join('')}
-                  </ul>
-                  <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold; border-bottom:1px solid #333; padding-bottom:10px;">
-                    <span>Total de la compra:</span>
-                    <span class="text-gold" style="font-size:18px;">${money(p['Total'])}</span>
-                  </div>
-                  ${mostrarAbonos}
-                  <div style="margin-top: 20px;">${botones}</div>
-                </div>
-              </div>`;
+          <div id="detalles-${p['ID Pedido']}" class="hidden" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
+            <div style="margin-bottom:15px;">${badgeDinero}</div>
+            <p class="note" style="text-align:left; color:var(--muted); margin:0 0 10px 0;">
+              Doc: ${p['Documento'] || ''} <br> Tel: ${p['Celular'] || ''}
+            </p>
+            <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
+              ${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || ''}</li>`).join('')}
+            </ul>
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold; border-bottom:1px solid #333; padding-bottom:10px;">
+              <span>Total de la compra:</span>
+              <span class="text-gold" style="font-size:18px;">${money(p['Total'])}</span>
+            </div>
+            ${mostrarAbonos}
+            <div style="margin-top: 20px;">${botones}</div>
+          </div>
+        </div>
+      `;
     }).join('');
-    
-  } catch(e) {
-    container.innerHTML = `<p class="note" style="color:var(--red);">Error cargando pedidos.</p>`;
+  } catch(e) { 
+    container.innerHTML = `<p class="note" style="color:var(--red);">Error cargando pedidos.</p>`; 
   }
 }
 
-// ----------------------------------------------------------------------------
-// FUNCIÓN BLINDADA PARA DESCARGAR PDF (PC y MÓVIL PWA) SIN CERRAR APP
-// ----------------------------------------------------------------------------
 function descargarPDFLocal(base64Data, fileName) {
   try {
     const byteCharacters = atob(base64Data);
     const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    
+    for (let i = 0; i < byteCharacters.length; i++) { 
+      byteNumbers[i] = byteCharacters.charCodeAt(i); 
     }
+    
     const byteArray = new Uint8Array(byteNumbers);
     const blob = new Blob([byteArray], {type: 'application/pdf'});
     const blobUrl = URL.createObjectURL(blob);
     
     const link = document.createElement('a');
-    link.href = blobUrl;
-    link.download = fileName;
-    document.body.appendChild(link);
+    link.href = blobUrl; 
+    link.download = fileName; 
+    document.body.appendChild(link); 
     link.click();
     
-    setTimeout(() => {
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(blobUrl);
+    setTimeout(() => { 
+      document.body.removeChild(link); 
+      window.URL.revokeObjectURL(blobUrl); 
     }, 250);
-  } catch (err) {
-    console.error(err);
-    mostrarAlerta('Error interno al generar el archivo en tu dispositivo.', 'error');
+  } catch (err) { 
+    mostrarAlerta('Error interno al generar el archivo.', 'error'); 
   }
 }
 
@@ -957,6 +1048,7 @@ async function cambiarEstadoPedido(idPedido, nuevoEstado) {
 
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas'); 
+  
   if (!tbody) return;
   
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando facturas...</td></tr>';
@@ -995,19 +1087,18 @@ function filtrarFacturas() {
       badge = `<span style="color:var(--muted); font-size: 12px;">Descargada Localmente en Caja</span>`;
     }
     
-    return `<tr>
-              <td>${f['ID Factura'] || ''}</td>
-              <td>${f['ID Pedido'] || ''}</td>
-              <td>${f['Documento'] || ''}</td>
-              <td>${f['Fecha'] || ''}</td>
-              <td>${badge}</td>
-            </tr>`;
+    return `
+      <tr>
+        <td>${f['ID Factura'] || ''}</td>
+        <td>${f['ID Pedido'] || ''}</td>
+        <td>${f['Documento'] || ''}</td>
+        <td>${f['Fecha'] || ''}</td>
+        <td>${badge}</td>
+      </tr>
+    `;
   }).join('');
 }
 
-// ----------------------------------------------------------------------------
-// MARKETING Y PROMOCIONES GLOBALES
-// ----------------------------------------------------------------------------
 async function guardarPromocion() {
   const btn = document.getElementById('btn-guardar-promo');
   const activa = document.getElementById('promo-activa').value;
@@ -1017,9 +1108,11 @@ async function guardarPromocion() {
   
   try {
     let base64Img = '';
+    
     if (tipo === 'imagen' && fileInput) {
       base64Img = await comprimirEnCanvas(fileInput);
     }
+    
     await apiCall('guardarPromocion', { activa, tipo, contenidoTxt, base64Img });
     mostrarAlerta('Promoción guardada.', 'success');
   } catch(e) { 
@@ -1045,18 +1138,15 @@ async function cargarPromocionGlobal() {
      } else { 
        banner.classList.add('hidden'); 
      }
-   } catch(e) {
-     console.error('Error cargando promoción', e);
+   } catch(e) { 
+     console.error('Error cargando promoción', e); 
    }
 }
 
-// ----------------------------------------------------------------------------
-// SERVICE WORKER PARA LA PWA
-// ----------------------------------------------------------------------------
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(err => {
-      console.log('Error al registrar Service Worker', err);
-    });
+  window.addEventListener('load', () => { 
+    navigator.serviceWorker.register('./sw.js').catch(err => { 
+      console.log('Error', err); 
+    }); 
   });
 }
