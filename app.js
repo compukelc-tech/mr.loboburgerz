@@ -721,8 +721,22 @@ async function eliminarEmpleado(documento) {
 }
 
 // ----------------------------------------------------------------------------
-// FLUJO Y CONTROL DE PEDIDOS
+// FLUJO Y CONTROL DE PEDIDOS (AHORA CON ACORDEÓN)
 // ----------------------------------------------------------------------------
+
+function togglePedido(id) {
+  const detalles = document.getElementById('detalles-' + id);
+  const icon = document.getElementById('icon-' + id);
+  if (detalles && icon) {
+    if (detalles.classList.contains('hidden')) {
+      detalles.classList.remove('hidden');
+      icon.textContent = '▲';
+    } else {
+      detalles.classList.add('hidden');
+      icon.textContent = '▼';
+    }
+  }
+}
 
 async function cargarPedidos(estadoFiltro, contenedorID) {
   const container = document.getElementById(contenedorID); 
@@ -780,9 +794,9 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       
       let abonosHtml = '';
       if (p['Historial Abonos'] && p['Historial Abonos'].length > 0) {
-        abonosHtml = '<div style="margin-top:10px; padding-top:10px; border-top:1px solid #333;"><strong>Comprobantes de pago:</strong><br>';
+        abonosHtml = '<div style="margin-top:10px; padding-top:10px; border-top:1px solid #333;"><strong>Comprobantes de pago guardados:</strong><br>';
         p['Historial Abonos'].forEach((abono, index) => {
-          abonosHtml += `<a href="${abono['URL Voucher']}" target="_blank" style="color:var(--gold); text-decoration:underline; font-size: 12px; margin-right: 10px; display:inline-block; margin-top:5px;">📄 Ver Voucher ${index + 1} (${money(abono['Monto'])})</a>`;
+          abonosHtml += `<a href="${abono['URL Voucher']}" target="_blank" style="color:var(--gold); text-decoration:underline; font-size: 13px; font-weight:bold; margin-right: 10px; display:inline-block; margin-top:8px;">📄 Ver Voucher ${index + 1} (${money(abono['Monto'])})</a>`;
         });
         abonosHtml += '</div>';
       }
@@ -796,22 +810,31 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
         botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`;
       }
           
-      return `<div class="card product-card" style="text-align:left; padding: 20px;">
-                <h3 style="margin-bottom:5px; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>
-                ${badgeDinero}
-                <p class="note" style="text-align:left; color:white; margin:10px 0;">
-                  Titular: <b>${p['Nombre'] || ''}</b><br>
-                  Doc: ${p['Documento'] || ''} | Tel: ${p['Celular'] || ''}
-                </p>
-                <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
-                  ${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || ''}</li>`).join('')}
-                </ul>
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
-                  <span>Total:</span>
-                  <span class="text-gold">${money(p['Total'])}</span>
+      // NUEVA ESTRUCTURA DE TARJETA COLAPSABLE
+      return `<div class="card product-card" style="text-align:left; padding: 15px;">
+                <div onclick="togglePedido('${p['ID Pedido']}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
+                  <div>
+                    <h3 style="margin:0; font-family:'Metal Mania', cursive; font-size:22px; color:var(--gold); text-align:left;">${p['ID Pedido']}</h3>
+                    <p style="margin:5px 0 0 0; font-size:14px; color:white; text-align:left;">Titular: <b>${p['Nombre'] || ''}</b></p>
+                  </div>
+                  <div id="icon-${p['ID Pedido']}" style="font-size:18px; color:var(--gold); font-weight:bold; padding: 10px;">▼</div>
                 </div>
-                ${mostrarAbonos}
-                <div style="margin-top: 15px;">${botones}</div>
+
+                <div id="detalles-${p['ID Pedido']}" class="hidden" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
+                  <div style="margin-bottom:15px;">${badgeDinero}</div>
+                  <p class="note" style="text-align:left; color:var(--muted); margin:0 0 10px 0;">
+                    Doc: ${p['Documento'] || ''} <br> Tel: ${p['Celular'] || ''}
+                  </p>
+                  <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
+                    ${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || ''}</li>`).join('')}
+                  </ul>
+                  <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold; border-bottom:1px solid #333; padding-bottom:10px;">
+                    <span>Total de la compra:</span>
+                    <span class="text-gold" style="font-size:18px;">${money(p['Total'])}</span>
+                  </div>
+                  ${mostrarAbonos}
+                  <div style="margin-top: 20px;">${botones}</div>
+                </div>
               </div>`;
     }).join('');
     
