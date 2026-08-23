@@ -1,7 +1,7 @@
 {
   "name": "Mr. Lobo Burgerz ERP",
   "short_name": "LoboERP",
-  "description": "Sistema de gestión para Mr. Lobo Burgerz",
+  "description": "Sistema de gestión escolar para Mr. Lobo Burgerz",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#050505",
