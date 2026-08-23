@@ -1,34 +1,9 @@
 // ============================================================================
-// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V11.0 DEFINITIVO
+// SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
 // CÓDIGO COMPLETO Y SIN COMPRIMIR
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxKGFrz9tyuXpeuI8c2MuNUKcNNsDpUpYYS3IkHR9y2WYjxr9y0U3j8dZ5jAoO5AGmxRg/exec";
-
-// ============================================================================
-// BUSTER DE ACTUALIZACIÓN AUTOMÁTICA PWA
-// ============================================================================
-const APP_VERSION = 'v11.0_Lobo_Update'; 
-(function checkPWAUpdate() {
-  const storedVersion = localStorage.getItem('lobo_pwa_version');
-  if (storedVersion !== APP_VERSION) {
-    localStorage.setItem('lobo_pwa_version', APP_VERSION);
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.getRegistrations().then(function(registrations) {
-        for(let r of registrations) { 
-          r.unregister(); 
-        }
-        caches.keys().then(keys => {
-          Promise.all(keys.map(key => caches.delete(key))).then(() => {
-            window.location.reload(true);
-          });
-        });
-      });
-    } else {
-      window.location.reload(true);
-    }
-  }
-})();
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
@@ -152,56 +127,46 @@ function entrarComoCliente() {
 }
 
 function configurarInterfazPorRol() {
-  const isCliente = sesionActual.rol === 'Cliente';
+  const rolSeguro = String(sesionActual.rol || '').toLowerCase();
+  const isCliente = rolSeguro === 'cliente';
+  
   const nav = document.getElementById('main-nav');
   const loginIcon = document.getElementById('btn-login-icon');
   const greeting = document.getElementById('user-greeting');
   
-  if (nav) {
-    nav.style.display = isCliente ? 'none' : 'flex';
-  }
-  if (loginIcon) {
-    loginIcon.style.display = isCliente ? 'block' : 'none';
-  }
-  if (greeting) {
-    greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
-  }
+  if (nav) nav.style.display = isCliente ? 'none' : 'flex';
+  if (loginIcon) loginIcon.style.display = isCliente ? 'block' : 'none';
+  if (greeting) greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
 
-  if (isCliente) {
-    return navegar('vitrina');
-  }
+  if (isCliente) return navegar('vitrina');
 
   document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
   const btnOutline = document.querySelector('.btn-outline');
   const btnUpdate = document.getElementById('btn-update-pwa');
   
-  if (btnOutline) {
-    btnOutline.style.display = 'block'; 
-  }
-  if (btnUpdate) {
-    btnUpdate.style.display = (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') ? 'block' : 'none';
-  }
+  if (btnOutline) btnOutline.style.display = 'block'; 
+  if (btnUpdate) btnUpdate.style.display = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') ? 'block' : 'none';
 
-  if (sesionActual.rol === 'Superadmin' || sesionActual.rol === 'Gerente') {
+  if (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'block');
     navegar('admin');
-  } else if (sesionActual.rol === 'Vitrina') {
+  } else if (rolSeguro === 'vitrina') {
     const navVit = document.getElementById('nav-vitrina'); 
     if (navVit) navVit.style.display = 'block'; 
     navegar('vitrina');
-  } else if (sesionActual.rol === 'Cartera') {
+  } else if (rolSeguro === 'cartera') {
     const navCart = document.getElementById('nav-cartera'); 
     if (navCart) navCart.style.display = 'block'; 
     navegar('cartera');
-  } else if (sesionActual.rol === 'Producción') {
+  } else if (rolSeguro === 'producción' || rolSeguro === 'produccion') {
     const navProd = document.getElementById('nav-produccion'); 
     if (navProd) navProd.style.display = 'block'; 
     navegar('produccion');
-  } else if (sesionActual.rol === 'Pedidos') {
+  } else if (rolSeguro === 'pedidos' || rolSeguro === 'despachos') {
     const navDespachados = document.getElementById('nav-despachados'); 
     if (navDespachados) navDespachados.style.display = 'block'; 
     navegar('despachados');
-  } else if (sesionActual.rol === 'Marketing') {
+  } else if (rolSeguro === 'marketing') {
     const navMark = document.getElementById('nav-marketing'); 
     if (navMark) navMark.style.display = 'block'; 
     navegar('marketing');
@@ -224,7 +189,7 @@ async function iniciarSesion() {
     if (!usuario) {
       return mostrarAlerta('Credenciales incorrectas');
     }
-    if (usuario['Estado'] === 'BLOQUEADO') {
+    if (String(usuario['Estado']).toUpperCase() === 'BLOQUEADO') {
       return mostrarAlerta('Cuenta bloqueada.');
     }
     
@@ -383,7 +348,7 @@ async function cargarCatalogoGlobal() {
     CATALOGO = [...CATALOGO_BASE]; 
   }
   
-  if(document.getElementById('view-vitrina')?.classList.contains('active') || sesionActual?.rol === 'Cliente') {
+  if(document.getElementById('view-vitrina')?.classList.contains('active') || String(sesionActual?.rol).toLowerCase() === 'cliente') {
     renderCatalogo();
   }
 }
@@ -702,7 +667,8 @@ async function cargarEmpleados() {
     const empleados = await apiCall('obtenerEmpleados', { rolSolicitante: sesionActual.rol });
     tbody.innerHTML = '';
     
-    const rolesPosibles = sesionActual.rol === 'Superadmin' 
+    const rolSeguro = String(sesionActual.rol || '').toLowerCase();
+    const rolesPosibles = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador') 
         ? ['Superadmin', 'Gerente', 'Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'] 
         : ['Vitrina', 'Cartera', 'Producción', 'Pedidos', 'Marketing'];
 
@@ -755,7 +721,7 @@ async function eliminarEmpleado(documento) {
 }
 
 // ----------------------------------------------------------------------------
-// FLUJO Y CONTROL DE PEDIDOS (CARTERA, PRODUCCIÓN, DESPACHOS)
+// FLUJO Y CONTROL DE PEDIDOS
 // ----------------------------------------------------------------------------
 
 async function cargarPedidos(estadoFiltro, contenedorID) {
@@ -801,104 +767,98 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       return;
     } 
 
-    if (contenedorID === 'lista-produccion') {
-       container.innerHTML = filtrados.map(p => {
-          return `<div class="card product-card" style="text-align:left; padding: 20px;">
+    container.innerHTML = filtrados.map(p => {
+      let itemsCart = [];
+      try { 
+        itemsCart = JSON.parse(p['Carrito (JSON)'] || '[]'); 
+      } catch(e) { 
+        itemsCart = []; 
+      }
+      
+      let saldo = Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0));
+      let badgeDinero = saldo === 0 ? `<span class="badge activo">TOTALMENTE PAGO</span>` : `<span class="badge pendiente">SALDO PENDIENTE: ${money(saldo)}</span>`;
+      
+      let abonosHtml = '';
+      if (p['Historial Abonos'] && p['Historial Abonos'].length > 0) {
+        abonosHtml = '<div style="margin-top:10px; padding-top:10px; border-top:1px solid #333;"><strong>Comprobantes de pago:</strong><br>';
+        p['Historial Abonos'].forEach((abono, index) => {
+          abonosHtml += `<a href="${abono['URL Voucher']}" target="_blank" style="color:var(--gold); text-decoration:underline; font-size: 12px; margin-right: 10px; display:inline-block; margin-top:5px;">📄 Ver Voucher ${index + 1} (${money(abono['Monto'])})</a>`;
+        });
+        abonosHtml += '</div>';
+      }
+      
+      let mostrarAbonos = (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') ? abonosHtml : '';
+      
+      let botones = '';
+      if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
+        botones = `<button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">Validar y Enviar a Cocina</button>`;
+      } else if (p['Estado'] === 'EN PRODUCCIÓN') {
+        botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`;
+      }
+          
+      return `<div class="card product-card" style="text-align:left; padding: 20px;">
                 <h3 style="margin-bottom:5px; font-family:'Metal Mania', cursive;">${p['ID Pedido']}</h3>
-                <span class="badge produccion">${p['Estado']}</span>
-                <p class="note" style="text-align:left; color:white; margin:10px 0;">Titular: <b>${p['Nombre'] || ''}</b></p>
-                <button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>
-              </div>`;
-       }).join('');
-       return;
-    }
-
-    // CARTERA: DISEÑO DE ACORDEÓN COMPLETO
-    if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') {
-        container.innerHTML = filtrados.map(p => {
-          let itemsCart = [];
-          try { 
-            itemsCart = JSON.parse(p['Carrito (JSON)'] || '[]'); 
-          } catch(e) { 
-            itemsCart = []; 
-          }
-          
-          let saldo = Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0));
-          let badgeDinero = saldo === 0 ? `<span class="badge activo">PAGO COMPLETO</span>` : `<span class="badge pendiente">SALDO: ${money(saldo)}</span>`;
-          
-          let abonosHtml = '';
-          if (p['Historial Abonos'] && p['Historial Abonos'].length > 0) {
-            abonosHtml = '<div style="margin-top:10px; padding:10px; background:#111; border-radius:10px;"><strong>Vouchers adjuntos:</strong><br>';
-            p['Historial Abonos'].forEach((abono, index) => {
-              abonosHtml += `<a href="${abono['URL Voucher']}" target="_blank" style="color:var(--gold); text-decoration:underline; font-size: 13px; margin-right: 10px; display:block; margin-top:5px;">📄 Ver Comprobante ${index + 1} (${money(abono['Monto'])})</a>`;
-            });
-            abonosHtml += '</div>';
-          }
-              
-          return `
-            <div class="acordeon-item" onclick="this.classList.toggle('expanded')">
-              <div class="acordeon-header">
-                <div>
-                  <h3>🎟️ ${p['ID Pedido']}</h3>
-                  <span class="cliente-nombre">${p['Nombre'] || 'Cliente'}</span>
-                </div>
-                <span class="toggle-icon">▼ Desplegar</span>
-              </div>
-              
-              <div class="acordeon-content" onclick="event.stopPropagation()">
                 ${badgeDinero}
                 <p class="note" style="text-align:left; color:white; margin:10px 0;">
+                  Titular: <b>${p['Nombre'] || ''}</b><br>
                   Doc: ${p['Documento'] || ''} | Tel: ${p['Celular'] || ''}
                 </p>
-                <ul style="font-size:13px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
+                <ul style="font-size:14px; color:var(--muted); padding-left:15px; margin-bottom:15px;">
                   ${itemsCart.map(i => `<li>${i.cant || 1}x ${i.nombre || ''}</li>`).join('')}
                 </ul>
-                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold; font-size: 16px;">
-                  <span>Total Pedido:</span>
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
+                  <span>Total:</span>
                   <span class="text-gold">${money(p['Total'])}</span>
                 </div>
-                ${abonosHtml}
-                <div style="margin-top: 15px;">
-                  <button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">✅ Validar Pago y Enviar a Producción</button>
-                </div>
-              </div>
-            </div>`;
-        }).join('');
-    }
+                ${mostrarAbonos}
+                <div style="margin-top: 15px;">${botones}</div>
+              </div>`;
+    }).join('');
     
   } catch(e) {
     container.innerHTML = `<p class="note" style="color:var(--red);">Error cargando pedidos.</p>`;
   }
 }
 
-async function aprobarPagoTotal(id) {
-  if(!confirm('¿Confirmas la validación de este pago? La orden pasará a producción y se generará la factura PDF automáticamente.')) return;
-  try { 
-    mostrarAlerta('Validando pago y generando PDF en segundo plano...', 'info');
-    const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
-    mostrarAlerta('Pago aprobado con éxito. Descargando factura...', 'success');
+// ----------------------------------------------------------------------------
+// FUNCIÓN BLINDADA PARA DESCARGAR PDF (PC y MÓVIL PWA) SIN CERRAR APP
+// ----------------------------------------------------------------------------
+function descargarPDFLocal(base64Data, fileName) {
+  try {
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], {type: 'application/pdf'});
+    const blobUrl = URL.createObjectURL(blob);
     
-    // Descarga automática del PDF en la memoria local
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    }, 250);
+  } catch (err) {
+    console.error(err);
+    mostrarAlerta('Error interno al generar el archivo en tu dispositivo.', 'error');
+  }
+}
+
+async function aprobarPagoTotal(id) {
+  if(!confirm('¿Confirmas la validación de este pago? La orden pasará a cocina y se generará la factura.')) return;
+  try { 
+    mostrarAlerta('Validando pago y generando PDF...', 'info');
+    const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
+    mostrarAlerta('Aprobado con éxito. Descargando factura...', 'success');
+    
     if (res.pdfBase64) {
-      const byteCharacters = atob(res.pdfBase64);
-      const byteNumbers = new Array(byteCharacters.length);
-      for (let i = 0; i < byteCharacters.length; i++) {
-        byteNumbers[i] = byteCharacters.charCodeAt(i);
-      }
-      const byteArray = new Uint8Array(byteNumbers);
-      const blob = new Blob([byteArray], {type: 'application/pdf'});
-      const blobUrl = URL.createObjectURL(blob);
-      
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = `Factura_MrLobo_${id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-      }, 250);
+      descargarPDFLocal(res.pdfBase64, `Factura_${id}.pdf`);
     }
     
     cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
@@ -914,19 +874,15 @@ async function cambiarEstadoPedido(idPedido, nuevoEstado) {
   } catch(e) {}
 }
 
-// ----------------------------------------------------------------------------
-// HISTORIAL DE FACTURAS (Buscador Global y Compartir en WhatsApp)
-// ----------------------------------------------------------------------------
-
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas'); 
   if (!tbody) return;
-  tbody.innerHTML = '<tr><td colspan="4" class="center">Cargando facturas...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando facturas...</td></tr>';
   try { 
     FACTURAS_GLOBAL = await apiCall('obtenerFacturas'); 
     filtrarFacturas(); 
   } catch(e) { 
-    tbody.innerHTML = `<tr><td colspan="4" class="center" style="color:var(--red);">Error al cargar historial</td></tr>`; 
+    tbody.innerHTML = `<tr><td colspan="5" class="center" style="color:var(--red);">Error al cargar historial</td></tr>`; 
   }
 }
 
@@ -936,120 +892,38 @@ function filtrarFacturas() {
   const tbody = document.getElementById('lista-facturas'); 
   if(!tbody) return;
   
-  let filtradas = FACTURAS_GLOBAL || [];
-  
-  if (query) {
-    filtradas = filtradas.filter(f => {
-      const p1 = String(f['ID Factura'] || '').toLowerCase();
-      const p2 = String(f['ID Pedido'] || '').toLowerCase();
-      const p3 = String(f['Documento'] || '').toLowerCase();
-      const p4 = String(f['Nombre'] || '').toLowerCase();
-      const p5 = String(f['Fecha'] || '').toLowerCase();
-      return p1.includes(query) || p2.includes(query) || p3.includes(query) || p4.includes(query) || p5.includes(query);
-    });
-  }
-  
-  // Limitar los resultados a los 10 más recientes
-  filtradas = filtradas.slice().reverse().slice(0, 10);
+  const filtradas = (FACTURAS_GLOBAL || []).filter(f => f && (String(f['Documento'] || '').toLowerCase().includes(query) || String(f['ID Pedido'] || '').toLowerCase().includes(query)));
   
   if(filtradas.length === 0) { 
-    tbody.innerHTML = '<tr><td colspan="4" class="center">No hay facturas que coincidan con la búsqueda.</td></tr>'; 
+    tbody.innerHTML = '<tr><td colspan="5" class="center">No hay facturas.</td></tr>'; 
     return; 
   }
   
   tbody.innerHTML = filtradas.map(f => {
     let url = String(f['URL PDF'] || '').trim();
-    let btnHtml = '';
+    let badge = '';
     
     if(url.startsWith('http')) {
-      btnHtml = `
-        <button class="small" style="background:transparent; border:1px solid var(--gold); color:var(--gold); margin-bottom:5px; width:100%;" onclick="accionFactura('${url}', '${f['ID Factura']}', 'descargar')">⬇️ Descargar</button>
-        <button class="small" style="background:#25D366; color:white; width:100%;" onclick="accionFactura('${url}', '${f['ID Factura']}', 'compartir')">📲 Compartir</button>
-      `;
+      badge = `<a href="${url}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF (Drive)</a>`;
+    } else if (url === 'ARCHIVO_LOCAL') {
+      badge = `<span style="color:var(--muted); font-size: 12px;">Descargada Localmente en Caja</span>`;
     } else {
-      btnHtml = `<span style="color:var(--muted); font-size: 11px;">Archivo Local</span>`;
+      badge = `<span style="color:var(--muted); font-size: 12px;">No disponible</span>`;
     }
     
     return `<tr>
-              <td>
-                <b>${f['ID Factura'] || ''}</b><br>
-                <span style="font-size:11px; color:var(--muted);">${f['ID Pedido'] || ''}</span>
-              </td>
-              <td>
-                ${f['Nombre'] || 'N/A'}<br>
-                <span style="font-size:11px; color:var(--muted);">${f['Documento'] || ''}</span>
-              </td>
-              <td>
-                <span style="font-size:12px;">${f['Fecha'] || ''}</span>
-              </td>
-              <td style="text-align:right; vertical-align:middle; width: 110px;">
-                ${btnHtml}
-              </td>
+              <td>${f['ID Factura'] || ''}</td>
+              <td>${f['ID Pedido'] || ''}</td>
+              <td>${f['Documento'] || ''}</td>
+              <td>${f['Fecha'] || ''}</td>
+              <td>${badge}</td>
             </tr>`;
   }).join('');
-}
-
-async function accionFactura(urlDrive, idFactura, accion) {
-  try {
-    mostrarAlerta(accion === 'descargar' ? 'Preparando PDF para descarga...' : 'Preparando archivo para compartir...', 'info');
-    
-    const base64 = await apiCall('obtenerBase64Factura', { urlDrive: urlDrive });
-    
-    const byteCharacters = atob(base64);
-    const byteNumbers = new Array(byteCharacters.length);
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i);
-    }
-    const byteArray = new Uint8Array(byteNumbers);
-    const blob = new Blob([byteArray], {type: 'application/pdf'});
-    const filename = `Factura_MrLobo_${idFactura}.pdf`;
-
-    if (accion === 'descargar') {
-      const blobUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = blobUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(blobUrl);
-      }, 250);
-      mostrarAlerta('Descarga completada', 'success');
-      
-    } else if (accion === 'compartir') {
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], filename, { type: 'application/pdf' });
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            title: 'Factura Mr. Lobo Burgerz',
-            text: 'Aquí tienes tu comprobante de compra en Mr. Lobo Burgerz. ¡Gracias por preferirnos!',
-            files: [file]
-          });
-          mostrarAlerta('Abriendo menú de compartir...', 'success');
-        } else {
-          throw new Error("El dispositivo no soporta compartir este tipo de archivo.");
-        }
-      } else {
-        throw new Error("Tu navegador no soporta la función de compartir.");
-      }
-    }
-  } catch(e) {
-    if (accion === 'compartir') {
-      mostrarAlerta('Tu celular no soporta compartir PDF directo. Descargando en su lugar...', 'warning');
-      setTimeout(() => {
-        accionFactura(urlDrive, idFactura, 'descargar');
-      }, 2000);
-    } else {
-      mostrarAlerta('Error extrayendo el documento. Intenta más tarde.', 'error');
-    }
-  }
 }
 
 // ----------------------------------------------------------------------------
 // MARKETING Y PROMOCIONES GLOBALES
 // ----------------------------------------------------------------------------
-
 async function guardarPromocion() {
   const btn = document.getElementById('btn-guardar-promo');
   const activa = document.getElementById('promo-activa').value;
