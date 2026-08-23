@@ -77,7 +77,7 @@ function forzarUpdatePWA() {
       }
       caches.keys().then(keys => {
         Promise.all(keys.map(key => caches.delete(key))).then(() => {
-          mostrarAlerta('Sistema actualizado y purgado exitosamente. Recargando...', 'success');
+          mostrarAlerta('Sistema actualizado exitosamente. Recargando...', 'success');
           setTimeout(() => window.location.reload(true), 1500);
         });
       });
@@ -134,18 +134,30 @@ function configurarInterfazPorRol() {
   const loginIcon = document.getElementById('btn-login-icon');
   const greeting = document.getElementById('user-greeting');
   
-  if (nav) nav.style.display = isCliente ? 'none' : 'flex';
-  if (loginIcon) loginIcon.style.display = isCliente ? 'block' : 'none';
-  if (greeting) greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
+  if (nav) {
+    nav.style.display = isCliente ? 'none' : 'flex';
+  }
+  if (loginIcon) {
+    loginIcon.style.display = isCliente ? 'block' : 'none';
+  }
+  if (greeting) {
+    greeting.textContent = isCliente ? 'Menú Principal' : `Hola, ${sesionActual.nombre} (${sesionActual.rol})`;
+  }
 
-  if (isCliente) return navegar('vitrina');
+  if (isCliente) {
+    return navegar('vitrina');
+  }
 
   document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'none');
   const btnOutline = document.querySelector('.btn-outline');
   const btnUpdate = document.getElementById('btn-update-pwa');
   
-  if (btnOutline) btnOutline.style.display = 'block'; 
-  if (btnUpdate) btnUpdate.style.display = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') ? 'block' : 'none';
+  if (btnOutline) {
+    btnOutline.style.display = 'block'; 
+  }
+  if (btnUpdate) {
+    btnUpdate.style.display = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') ? 'block' : 'none';
+  }
 
   if (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.style.display = 'block');
@@ -518,11 +530,13 @@ async function eliminarProducto(id) {
 function agregarAlCarrito(id) { 
   const prod = CATALOGO.find(p => p.id === id); 
   const item = carrito.find(i => i.id === id); 
+  
   if (item) {
     item.cant++; 
   } else {
     carrito.push({ ...prod, cant: 1 }); 
   }
+  
   renderCarrito(); 
 }
 
@@ -531,6 +545,7 @@ function quitarDelCarrito(id) {
     if (i.id === id) i.cant--; 
     return i.cant > 0; 
   }); 
+  
   renderCarrito(); 
 }
 
@@ -538,6 +553,7 @@ function renderCarrito() {
   const container = document.getElementById('carrito-items'); 
   const btnProcesar = document.getElementById('btn-procesar'); 
   const displayTotal = document.getElementById('carrito-total-precio');
+  
   if(!container) return;
   
   if (carrito.length === 0) { 
@@ -661,6 +677,7 @@ async function enviarPedido() {
 async function cargarEmpleados() {
   const tbody = document.getElementById('lista-empleados'); 
   if(!tbody) return;
+  
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando...</td></tr>';
   
   try {
@@ -701,6 +718,7 @@ async function cargarEmpleados() {
 async function cambiarRolYEstado(documento) {
   const nuevoRol = document.getElementById(`rol-${documento}`).value;
   const nuevoEstado = document.getElementById(`estado-${documento}`).value;
+  
   try { 
     await apiCall('actualizarRolEmpleado', { documento, nuevoRol, nuevoEstado }); 
     mostrarAlerta('Actualizado', 'success'); 
@@ -711,6 +729,7 @@ async function cambiarRolYEstado(documento) {
 
 async function eliminarEmpleado(documento) {
   if(!confirm('¿Seguro que deseas eliminar definitivamente a este empleado?')) return;
+  
   try {
     await apiCall('eliminarEmpleado', { documento });
     mostrarAlerta('Empleado eliminado exitosamente', 'success');
@@ -721,12 +740,23 @@ async function eliminarEmpleado(documento) {
 }
 
 // ----------------------------------------------------------------------------
-// FLUJO Y CONTROL DE PEDIDOS (AHORA CON ACORDEÓN)
+// FLUJO Y CONTROL DE PEDIDOS (TARJETAS TIPO ACORDEÓN)
 // ----------------------------------------------------------------------------
 
 function togglePedido(id) {
+  document.querySelectorAll('[id^="detalles-"]').forEach(el => {
+    if (el.id !== 'detalles-' + id && !el.classList.contains('hidden')) {
+      el.classList.add('hidden');
+      const iconId = el.id.replace('detalles-', 'icon-');
+      if (document.getElementById(iconId)) {
+        document.getElementById(iconId).textContent = '▼';
+      }
+    }
+  });
+
   const detalles = document.getElementById('detalles-' + id);
   const icon = document.getElementById('icon-' + id);
+  
   if (detalles && icon) {
     if (detalles.classList.contains('hidden')) {
       detalles.classList.remove('hidden');
@@ -738,25 +768,44 @@ function togglePedido(id) {
   }
 }
 
+// FUNCIÓN PARA ABRIR VOUCHERS BASE64 ANTIGUOS
+function verVoucherLocal(base64Data) {
+  const w = window.open("");
+  w.document.write(`
+    <title>Comprobante de Pago</title>
+    <div style="text-align:center; background:#000; height:100vh; display:flex; justify-content:center; align-items:center; margin:0;">
+      <img src="${base64Data}" style="max-width:100%; max-height:100vh; object-fit:contain;">
+    </div>
+  `);
+}
+
 async function cargarPedidos(estadoFiltro, contenedorID) {
   const container = document.getElementById(contenedorID); 
   if(!container) return;
   
   container.innerHTML = '<p class="note">Cargando pedidos...</p>';
+  
   try {
     const pedidos = await apiCall('obtenerPedidosConAbonos'); 
     const pedidosValidos = (pedidos || []).filter(p => p && p['ID Pedido'] && String(p['ID Pedido']).trim() !== '');
 
     let caja = 0, fiado = 0, total = 0;
+    
     pedidosValidos.forEach(p => { 
       total += Number(p['Total'] || 0); 
       caja += Number(p['Total Abonado'] || 0); 
       fiado += Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0)); 
     });
     
-    if(document.getElementById('stat-caja')) document.getElementById('stat-caja').textContent = money(caja);
-    if(document.getElementById('stat-fiado')) document.getElementById('stat-fiado').textContent = money(fiado);
-    if(document.getElementById('stat-total')) document.getElementById('stat-total').textContent = money(total);
+    if(document.getElementById('stat-caja')) {
+      document.getElementById('stat-caja').textContent = money(caja);
+    }
+    if(document.getElementById('stat-fiado')) {
+      document.getElementById('stat-fiado').textContent = money(fiado);
+    }
+    if(document.getElementById('stat-total')) {
+      document.getElementById('stat-total').textContent = money(total);
+    }
 
     const filtrados = pedidosValidos.filter(p => {
       let est = String(p['Estado'] || '').trim().toUpperCase();
@@ -772,12 +821,14 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
     }
     
     if (contenedorID === 'lista-despachados') {
-      container.innerHTML = filtrados.map(p => `<tr>
-        <td><b>${p['ID Pedido']}</b></td>
-        <td>${p['Nombre'] || ''}</td>
-        <td>${money(p['Total'])}</td>
-        <td><span class="badge despachado">${p['Estado']}</span></td>
-      </tr>`).join('');
+      container.innerHTML = filtrados.map(p => `
+        <tr>
+          <td><b>${p['ID Pedido']}</b></td>
+          <td>${p['Nombre'] || ''}</td>
+          <td>${money(p['Total'])}</td>
+          <td><span class="badge despachado">${p['Estado']}</span></td>
+        </tr>
+      `).join('');
       return;
     } 
 
@@ -795,9 +846,16 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       let abonosHtml = '';
       if (p['Historial Abonos'] && p['Historial Abonos'].length > 0) {
         abonosHtml = '<div style="margin-top:10px; padding-top:10px; border-top:1px solid #333;"><strong>Comprobantes de pago guardados:</strong><br>';
+        
         p['Historial Abonos'].forEach((abono, index) => {
-          abonosHtml += `<a href="${abono['URL Voucher']}" target="_blank" style="color:var(--gold); text-decoration:underline; font-size: 13px; font-weight:bold; margin-right: 10px; display:inline-block; margin-top:8px;">📄 Ver Voucher ${index + 1} (${money(abono['Monto'])})</a>`;
+          let vURL = abono['URL Voucher'] || '';
+          let action = vURL.startsWith('data:image') 
+            ? `href="javascript:void(0)" onclick="verVoucherLocal('${vURL}')"` 
+            : `href="${vURL}" target="_blank"`;
+          
+          abonosHtml += `<a ${action} style="color:var(--gold); text-decoration:underline; font-size: 13px; font-weight:bold; margin-right: 10px; display:inline-block; margin-top:8px;">📄 Ver Voucher ${index + 1} (${money(abono['Monto'])})</a>`;
         });
+        
         abonosHtml += '</div>';
       }
       
@@ -810,7 +868,6 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
         botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`;
       }
           
-      // NUEVA ESTRUCTURA DE TARJETA COLAPSABLE
       return `<div class="card product-card" style="text-align:left; padding: 15px;">
                 <div onclick="togglePedido('${p['ID Pedido']}')" style="cursor:pointer; display:flex; justify-content:space-between; align-items:center;">
                   <div>
@@ -875,10 +932,11 @@ function descargarPDFLocal(base64Data, fileName) {
 
 async function aprobarPagoTotal(id) {
   if(!confirm('¿Confirmas la validación de este pago? La orden pasará a cocina y se generará la factura.')) return;
+  
   try { 
-    mostrarAlerta('Validando pago y generando PDF...', 'info');
+    mostrarAlerta('Validando pago y guardando PDF en Drive...', 'info');
     const res = await apiCall('aprobarPagoCompleto', { idPedido: id }); 
-    mostrarAlerta('Aprobado con éxito. Descargando factura...', 'success');
+    mostrarAlerta('Aprobado con éxito. Descargando copia local...', 'success');
     
     if (res.pdfBase64) {
       descargarPDFLocal(res.pdfBase64, `Factura_${id}.pdf`);
@@ -900,7 +958,9 @@ async function cambiarEstadoPedido(idPedido, nuevoEstado) {
 async function cargarFacturas() {
   const tbody = document.getElementById('lista-facturas'); 
   if (!tbody) return;
+  
   tbody.innerHTML = '<tr><td colspan="5" class="center">Cargando facturas...</td></tr>';
+  
   try { 
     FACTURAS_GLOBAL = await apiCall('obtenerFacturas'); 
     filtrarFacturas(); 
@@ -913,6 +973,7 @@ function filtrarFacturas() {
   const buscador = document.getElementById('buscador-facturas');
   const query = buscador ? buscador.value.toLowerCase().trim() : ''; 
   const tbody = document.getElementById('lista-facturas'); 
+  
   if(!tbody) return;
   
   const filtradas = (FACTURAS_GLOBAL || []).filter(f => f && (String(f['Documento'] || '').toLowerCase().includes(query) || String(f['ID Pedido'] || '').toLowerCase().includes(query)));
@@ -928,10 +989,10 @@ function filtrarFacturas() {
     
     if(url.startsWith('http')) {
       badge = `<a href="${url}" target="_blank" style="color:var(--gold); text-decoration:underline;">Descargar PDF (Drive)</a>`;
-    } else if (url === 'ARCHIVO_LOCAL') {
-      badge = `<span style="color:var(--muted); font-size: 12px;">Descargada Localmente en Caja</span>`;
+    } else if (url.startsWith('ERROR')) {
+      badge = `<span style="color:var(--red); font-size: 12px;" title="${url}">Error en Drive</span>`;
     } else {
-      badge = `<span style="color:var(--muted); font-size: 12px;">No disponible</span>`;
+      badge = `<span style="color:var(--muted); font-size: 12px;">Descargada Localmente en Caja</span>`;
     }
     
     return `<tr>
@@ -970,6 +1031,7 @@ async function cargarPromocionGlobal() {
    try {
      const promo = await apiCall('obtenerPromocion');
      const banner = document.getElementById('sidebar-promo');
+     
      if(!banner) return;
      
      if(promo && promo.activa === 'SI') {
