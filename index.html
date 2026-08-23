@@ -387,10 +387,10 @@
         <div class="field"><label>Celular (WhatsApp) *</label><input type="number" id="fid-reg-celular"></div>
         <div class="field"><label>Correo Electrónico</label><input type="email" id="fid-reg-correo" placeholder="Opcional"></div>
         
-        <!-- CAMPO REFERIDO CON DATALIST EN FIDELIZACIÓN -->
+        <!-- CAMPO REFERIDO CON DATALIST INTELIGENTE EN FIDELIZACIÓN -->
         <div class="field">
           <label>Estudiante que te refirió *</label>
-          <input type="text" id="fid-reg-referido" list="lista-estudiantes" placeholder="Escribe para buscar estudiante...">
+          <input type="text" id="fid-reg-referido" placeholder="Escribe la inicial del nombre para buscar..." oninput="this.setAttribute('list', this.value.length > 0 ? 'lista-estudiantes' : '')">
         </div>
         
         <div class="field">
@@ -428,15 +428,29 @@
       <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
       <div class="field"><label>Nombre(s) *</label><input type="text" id="co-nombre"></div>
       <div class="field"><label>Apellidos *</label><input type="text" id="co-apellidos"></div>
-      <div class="field"><label>Jornada *</label><input type="text" id="co-jornada" placeholder="Ej: Mañana / Tarde"></div>
-      <div class="field"><label>Grado *</label><input type="text" id="co-grado" placeholder="Ej: 11A"></div>
+      
+      <!-- NUEVO SELECTOR PARA IDENTIFICAR SI ES ESTUDIANTE -->
+      <div class="field">
+        <label>¿Eres estudiante del colegio?</label>
+        <select id="co-es-estudiante" onchange="toggleCamposEstudiante()">
+          <option value="SI">Sí, soy estudiante</option>
+          <option value="NO">No (Padre de familia / Externo)</option>
+        </select>
+      </div>
+
+      <!-- CONTENEDOR OCULTABLE PARA JORNADA Y GRADO -->
+      <div id="campos-estudiante">
+        <div class="field"><label>Jornada *</label><input type="text" id="co-jornada" placeholder="Ej: Mañana / Tarde"></div>
+        <div class="field"><label>Grado *</label><input type="text" id="co-grado" placeholder="Ej: 11A"></div>
+      </div>
+      
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
       <div class="field hidden" id="co-correo-field"><label>Correo Electrónico</label><input type="email" id="co-correo"></div>
       
-      <!-- CAMPO REFERIDO CON DATALIST EN PEDIDO -->
+      <!-- CAMPO REFERIDO CON DATALIST INTELIGENTE EN PEDIDO -->
       <div class="field">
         <label>Estudiante que te refirió *</label>
-        <input type="text" id="co-referido" list="lista-estudiantes" placeholder="Escribe para buscar estudiante...">
+        <input type="text" id="co-referido" placeholder="Escribe la inicial del nombre para buscar..." oninput="this.setAttribute('list', this.value.length > 0 ? 'lista-estudiantes' : '')">
       </div>
       
       <hr style="border-color: #333; margin: 15px 0;">
