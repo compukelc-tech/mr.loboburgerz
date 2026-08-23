@@ -1,9 +1,9 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
-// CÓDIGO COMPLETO Y SIN COMPRIMIR - REFERIDOS OBLIGATORIOS Y LISTA DATALIST
+// CÓDIGO COMPLETO Y SIN COMPRIMIR - LÓGICA DE PADRES DE FAMILIA / EXTERNOS
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbzX4WSS0ph4sDkag5teboC5igIbsVVNp3lHVMmfHv9ZQAVXY18HnC8b3W500Hy5m6Xwjw/exec";
+const API_URL = "https://script.google.com/macros/s/TU_NUEVA_URL_AQUI/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
@@ -320,7 +320,6 @@ async function registrarFidelidad() {
     clave: document.getElementById('fid-reg-pass').value
   };
   
-  // VALIDACIÓN AÑADIDA: El campo referido ahora es estrictamente obligatorio
   if (!datos.documento || !datos.nombre || !datos.celular || !datos.referido || !datos.clave) {
     return mostrarAlerta('Faltan campos obligatorios, por favor selecciona el estudiante que te refirió.');
   }
@@ -659,6 +658,18 @@ function toggleCamposCliente() {
   document.getElementById('co-correo-field').classList.toggle('hidden', document.getElementById('co-tipo').value === 'Ocasional'); 
 }
 
+// NUEVA FUNCIÓN PARA OCULTAR/MOSTRAR CAMPOS DE ESTUDIANTE
+function toggleCamposEstudiante() {
+  const esEstudiante = document.getElementById('co-es-estudiante').value;
+  const contenedor = document.getElementById('campos-estudiante');
+  
+  if (esEstudiante === 'SI') {
+    contenedor.classList.remove('hidden');
+  } else {
+    contenedor.classList.add('hidden');
+  }
+}
+
 function toggleVoucherInput() { 
   document.getElementById('co-monto-abono-field').classList.toggle('hidden', document.getElementById('co-tipo-pago').value === 'Completo'); 
 }
@@ -669,17 +680,25 @@ async function enviarPedido() {
   const documento = document.getElementById('co-doc').value; 
   const nombre = document.getElementById('co-nombre').value; 
   const apellidos = document.getElementById('co-apellidos').value; 
-  const jornada = document.getElementById('co-jornada').value; 
-  const grado = document.getElementById('co-grado').value; 
+  
+  const esEstudiante = document.getElementById('co-es-estudiante').value; 
+  let jornada = document.getElementById('co-jornada').value; 
+  let grado = document.getElementById('co-grado').value; 
+  
   const celular = document.getElementById('co-celular').value; 
   const correo = document.getElementById('co-correo').value; 
   const referido = document.getElementById('co-referido').value; 
   const tipoPago = document.getElementById('co-tipo-pago').value; 
   const voucherInput = document.getElementById('co-voucher').files[0];
   
-  // VALIDACIÓN AÑADIDA: El campo referido ahora es estrictamente obligatorio
+  // SI ES EXTERNO, RELLENAMOS AUTOMÁTICAMENTE JORNADA Y GRADO PARA QUE NO FALLE
+  if (esEstudiante === 'NO') {
+    jornada = 'N/A (Externo)';
+    grado = 'N/A (Externo)';
+  }
+  
   if (!documento || !nombre || !apellidos || !jornada || !grado || !celular || !referido) {
-    return mostrarAlerta('Faltan datos obligatorios, por favor selecciona el estudiante que te refirió.');
+    return mostrarAlerta('Faltan datos obligatorios, por favor revisa los campos con asterisco (*).');
   }
   
   if (!voucherInput) {
