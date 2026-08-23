@@ -23,11 +23,11 @@
 <body>
 
   <!-- BOTÓN FLOTANTE FIDELIZACIÓN (CLUB DE LOBOS) -->
-  <div style="position: fixed; bottom: 25px; right: 25px; z-index: 999;">
-    <button onclick="abrirModalFidelidad()" style="background: var(--red); border-radius: 50%; width: 75px; height: 75px; padding: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.7); border: 2px solid var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; animation: pulse 2s infinite;">
-      <img src="icono.png" alt="VIP" style="width: 35px; height: 35px; border-radius: 50%;">
-      <span style="font-size: 10px; line-height: 1.2; margin-top: 3px; font-weight: 800; color: white;">SOY<br>CLIENTE</span>
+  <div style="position: fixed; bottom: 25px; right: 25px; z-index: 999; display: flex; flex-direction: column; align-items: center;">
+    <button onclick="abrirModalFidelidad()" style="background: var(--red); border-radius: 50%; width: 94px; height: 94px; padding: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.7); border: 2px solid var(--gold); overflow: hidden; animation: pulse 2s infinite; cursor: pointer; display: flex; justify-content: center; align-items: center;">
+      <img src="icono.png" alt="VIP" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
     </button>
+    <span style="font-size: 14px; font-weight: 900; color: white; margin-top: 8px; font-family: 'Montserrat', sans-serif; text-shadow: 1px 1px 3px black; letter-spacing: 1px;">CLIENTES</span>
   </div>
 
   <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
@@ -333,7 +333,6 @@
     </main>
   </div>
 
-  <!-- Footer con créditos originales y referencias a la empresa eliminadas -->
   <footer class="creditos-estudiantes">
     <div class="creditos-text">
       <span>🐺 PROYECTO ESCOLAR DESARROLLADO POR:</span> 
