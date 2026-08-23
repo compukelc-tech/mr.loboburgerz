@@ -1,9 +1,9 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
-// CÓDIGO COMPLETO Y SIN COMPRIMIR - ESTRUCTURA ORIGINAL RESTAURADA
+// CÓDIGO COMPLETO Y SIN COMPRIMIR - REFERIDOS OBLIGATORIOS Y LISTA DATALIST
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbz6med-rYVxbAgfUgxGDstg4zEfXrJ6Sd5kRbjsuYd1LZn56XIAEeVMfUue3Ck9JbxWug/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwXS1ypWqPrL9lKHgb0M2Xda-VwIhdiK9fsClBjLaYR6SXQzTDSFwREE3tjVbhzuMwwWg/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
@@ -320,8 +320,9 @@ async function registrarFidelidad() {
     clave: document.getElementById('fid-reg-pass').value
   };
   
-  if (!datos.documento || !datos.nombre || !datos.celular || !datos.clave) {
-    return mostrarAlerta('Faltan campos requeridos.');
+  // VALIDACIÓN AÑADIDA: El campo referido ahora es estrictamente obligatorio
+  if (!datos.documento || !datos.nombre || !datos.celular || !datos.referido || !datos.clave) {
+    return mostrarAlerta('Faltan campos obligatorios, por favor selecciona el estudiante que te refirió.');
   }
   
   try {
@@ -676,8 +677,9 @@ async function enviarPedido() {
   const tipoPago = document.getElementById('co-tipo-pago').value; 
   const voucherInput = document.getElementById('co-voucher').files[0];
   
-  if (!documento || !nombre || !apellidos || !jornada || !grado || !celular) {
-    return mostrarAlerta('Faltan datos obligatorios del cliente');
+  // VALIDACIÓN AÑADIDA: El campo referido ahora es estrictamente obligatorio
+  if (!documento || !nombre || !apellidos || !jornada || !grado || !celular || !referido) {
+    return mostrarAlerta('Faltan datos obligatorios, por favor selecciona el estudiante que te refirió.');
   }
   
   if (!voucherInput) {
