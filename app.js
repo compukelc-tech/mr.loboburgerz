@@ -3,7 +3,7 @@
 // CÓDIGO COMPLETO Y SIN COMPRIMIR - LÓGICA DE PADRES DE FAMILIA / EXTERNOS
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/TU_NUEVA_URL_AQUI/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbxSzX18DzUEEHXTjnK4jV6LJPdGlwTeB0Wbc1jKDlWGSnLcgLefjbVeKN7cmLirQPe5Cg/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
