@@ -72,7 +72,7 @@
         </div>
         
         <a href="https://maps.app.goo.gl/935e2Q99P8yymqtC8" target="_blank" class="address-link">
-          Av 2E # 13 - 10 B. Av. Libertadores <br>
+          Av 2E # 13 - 10 B. Caobos<br>
           Cúcuta, Norte de Santander<br>
           <b>🗺️ Clic aquí para ver indicaciones</b>
         </a>
@@ -101,6 +101,15 @@
             <div class="social-text">
               <b>WHATSAPP</b>
               <span>+57 3170949928</span>
+            </div>
+          </a>
+
+          <!-- NUEVO BOTÓN DE NEQUI EN EL SIDEBAR -->
+          <a href="https://pi.nequi.com.co/checkout?phone=3152701353" target="_blank" class="social-item" style="text-decoration: none; margin-top: 8px;">
+            <span class="social-icon" style="color: #ff33ff; background: #200020; border-radius: 50%; display: flex; justify-content: center; align-items: center; width: 28px; height: 28px; font-weight: bold; font-size: 14px;">N</span>
+            <div class="social-text">
+              <b>PAGA CON NEQUI</b>
+              <span>Cel: 3152701353</span>
             </div>
           </a>
         </div>
@@ -387,7 +396,6 @@
         <div class="field"><label>Celular (WhatsApp) *</label><input type="number" id="fid-reg-celular"></div>
         <div class="field"><label>Correo Electrónico</label><input type="email" id="fid-reg-correo" placeholder="Opcional"></div>
         
-        <!-- CAMPO REFERIDO CON DATALIST INTELIGENTE EN FIDELIZACIÓN -->
         <div class="field">
           <label>Estudiante que te refirió *</label>
           <input type="text" id="fid-reg-referido" placeholder="Escribe la inicial del nombre para buscar..." oninput="this.setAttribute('list', this.value.length > 0 ? 'lista-estudiantes' : '')">
@@ -429,7 +437,6 @@
       <div class="field"><label>Nombre(s) *</label><input type="text" id="co-nombre"></div>
       <div class="field"><label>Apellidos *</label><input type="text" id="co-apellidos"></div>
       
-      <!-- NUEVO SELECTOR PARA IDENTIFICAR SI ES ESTUDIANTE -->
       <div class="field">
         <label>¿Eres estudiante del colegio?</label>
         <select id="co-es-estudiante" onchange="toggleCamposEstudiante()">
@@ -438,7 +445,6 @@
         </select>
       </div>
 
-      <!-- CONTENEDOR OCULTABLE PARA JORNADA Y GRADO -->
       <div id="campos-estudiante">
         <div class="field"><label>Jornada *</label><input type="text" id="co-jornada" placeholder="Ej: Mañana / Tarde"></div>
         <div class="field"><label>Grado *</label><input type="text" id="co-grado" placeholder="Ej: 11A"></div>
@@ -447,7 +453,6 @@
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
       <div class="field hidden" id="co-correo-field"><label>Correo Electrónico</label><input type="email" id="co-correo"></div>
       
-      <!-- CAMPO REFERIDO CON DATALIST INTELIGENTE EN PEDIDO -->
       <div class="field">
         <label>Estudiante que te refirió *</label>
         <input type="text" id="co-referido" placeholder="Escribe la inicial del nombre para buscar..." oninput="this.setAttribute('list', this.value.length > 0 ? 'lista-estudiantes' : '')">
@@ -462,11 +467,21 @@
           <option value="Abono">Abono Parcial (Fiado)</option>
         </select>
       </div>
+      
       <div class="field hidden" id="co-monto-abono-field">
         <label>Monto a Abonar en este momento</label>
         <input type="number" id="co-monto-abono">
       </div>
-      <div class="field">
+
+      <!-- NUEVO BOTÓN DE ACCESO DIRECTO A NEQUI DESDE EL CHECKOUT -->
+      <div class="field" style="margin-top: 15px; text-align: center;">
+        <a href="https://pi.nequi.com.co/checkout?phone=3152701353" target="_blank" style="display: block; background: #200020; color: #ff33ff; border: 1px solid #ff33ff; padding: 12px; border-radius: 8px; font-weight: bold; text-decoration: none; font-size: 15px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5);">
+          💜 Pagar directamente por Nequi (Cel: 3152701353)
+        </a>
+        <small class="note" style="display: block; margin-top: 5px; color: #aaa;">Haz clic, paga en tu app de Nequi el valor exacto de tu pedido y vuelve aquí a subir el comprobante abajo.</small>
+      </div>
+
+      <div class="field" style="margin-top: 15px;">
         <label>Sube el comprobante de pago *</label>
         <input type="file" id="co-voucher" accept="image/*">
         <canvas id="canvas-compresion" style="display:none;"></canvas>
