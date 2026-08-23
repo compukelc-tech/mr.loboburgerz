@@ -189,6 +189,25 @@
       </section>
 
       <section id="view-admin" class="view">
+        <!-- SECCIÓN DE REFERIDOS PARA EL GERENTE -->
+        <div class="card" style="margin-bottom: 25px;">
+          <h2>📊 Ranking de Referidos</h2>
+          <p class="note" style="text-align: left;">Muestra qué estudiantes han traído clientes mediante membresías y pedidos de vitrina.</p>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nombre del Estudiante Referente</th>
+                  <th>Total Referidos</th>
+                </tr>
+              </thead>
+              <tbody id="lista-referidos">
+                <tr><td colspan="2" class="center note">Cargando datos...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         <div class="card">
           <h2>👑 Panel Maestro - Personal</h2>
           <p class="note" style="text-align: left;">Recuerda: Los roles superiores pueden asignar permisos inferiores.</p>
@@ -370,6 +389,9 @@
         <div class="field"><label>Nombre Completo *</label><input type="text" id="fid-reg-nombre"></div>
         <div class="field"><label>Celular (WhatsApp) *</label><input type="number" id="fid-reg-celular"></div>
         <div class="field"><label>Correo Electrónico</label><input type="email" id="fid-reg-correo" placeholder="Opcional"></div>
+        <!-- NUEVO CAMPO: REFERIDO EN FIDELIZACIÓN -->
+        <div class="field"><label>Estudiante que te refirió (Opcional)</label><input type="text" id="fid-reg-referido" placeholder="Ingresa el nombre del estudiante"></div>
+        
         <div class="field">
           <label>Crea una clave segura *</label>
           <div class="password-wrapper">
@@ -400,10 +422,20 @@
           <option value="Continuo">Miembro Club (Fidelizado)</option>
         </select>
       </div>
+      
       <div class="field"><label>Documento de Identidad *</label><input type="number" id="co-doc"></div>
-      <div class="field"><label>Nombre Completo *</label><input type="text" id="co-nombre"></div>
+      <div class="field"><label>Nombre(s) *</label><input type="text" id="co-nombre"></div>
+      
+      <!-- NUEVOS CAMPOS: APELLIDOS, JORNADA, GRADO -->
+      <div class="field"><label>Apellidos *</label><input type="text" id="co-apellidos"></div>
+      <div class="field"><label>Jornada *</label><input type="text" id="co-jornada" placeholder="Ej: Mañana / Tarde"></div>
+      <div class="field"><label>Grado *</label><input type="text" id="co-grado" placeholder="Ej: 11A"></div>
+      
       <div class="field"><label>Celular *</label><input type="number" id="co-celular"></div>
       <div class="field hidden" id="co-correo-field"><label>Correo Electrónico</label><input type="email" id="co-correo"></div>
+      
+      <!-- NUEVO CAMPO: REFERIDO EN PEDIDO -->
+      <div class="field"><label>Estudiante que te refirió (Opcional)</label><input type="text" id="co-referido" placeholder="Ingresa el nombre del estudiante"></div>
       
       <hr style="border-color: #333; margin: 15px 0;">
       
