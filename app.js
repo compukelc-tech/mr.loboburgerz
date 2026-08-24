@@ -412,9 +412,12 @@ function renderCatalogo() {
     CATALOGO.filter(p => p.categoria === cat).forEach(prod => {
       const botonHTML = prod.agotado ? `<button class="btn-outline full-width" disabled>Agotado</button>` : `<button class="primary full-width" onclick="agregarAlCarrito('${prod.id}')">+ Añadir a pedido</button>`;
       
+      // Corrección aplicada: se valida correctamente la existencia de la imagen o se omite el contenedor si está vacía
+      const imagenHTML = (prod.urlImagen && prod.urlImagen.trim() !== '') ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : '';
+      
       html += `
         <div class="product-card" style="${prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
-          ${prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : ''}`
+          ${imagenHTML}
           <h3>${prod.nombre}</h3>
           <p>${prod.desc}</p>
           <span class="price">${money(prod.precio)}</span>
@@ -658,7 +661,6 @@ function toggleCamposCliente() {
   document.getElementById('co-correo-field').classList.toggle('hidden', document.getElementById('co-tipo').value === 'Ocasional'); 
 }
 
-// NUEVA FUNCIÓN PARA OCULTAR/MOSTRAR CAMPOS DE ESTUDIANTE
 function toggleCamposEstudiante() {
   const esEstudiante = document.getElementById('co-es-estudiante').value;
   const contenedor = document.getElementById('campos-estudiante');
@@ -691,7 +693,6 @@ async function enviarPedido() {
   const tipoPago = document.getElementById('co-tipo-pago').value; 
   const voucherInput = document.getElementById('co-voucher').files[0];
   
-  // SI ES EXTERNO, RELLENAMOS AUTOMÁTICAMENTE JORNADA Y GRADO PARA QUE NO FALLE
   if (esEstudiante === 'NO') {
     jornada = 'N/A (Externo)';
     grado = 'N/A (Externo)';
