@@ -414,7 +414,7 @@ function renderCatalogo() {
       
       html += `
         <div class="product-card" style="${prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
-          ${prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : ''}
+          ${prod.urlImagen ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : ''}`
           <h3>${prod.nombre}</h3>
           <p>${prod.desc}</p>
           <span class="price">${money(prod.precio)}</span>
