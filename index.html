@@ -1,6 +1,10 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+  <!-- ========================================== -->
+  <!-- 🚀 ZONA CRÍTICA: METADATOS Y CACHÉ (PRODUCCIÓN) -->
+  <!-- Modificar aquí los colores del tema, iconos y control de caché -->
+  <!-- ========================================== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mr. Lobo Burgerz - ERP</title>
@@ -22,7 +26,9 @@
 </head>
 <body>
 
-  <!-- BOTÓN FLOTANTE FIDELIZACIÓN (CLUB DE LOBOS) -->
+  <!-- ========================================== -->
+  <!-- 🎯 ZONA CRÍTICA: BOTÓN FLOTANTE FIDELIZACIÓN -->
+  <!-- ========================================== -->
   <div style="position: fixed; bottom: 25px; right: 25px; z-index: 999; display: flex; flex-direction: column; align-items: center;">
     <button onclick="abrirModalFidelidad()" style="background: var(--red); border-radius: 50%; width: 94px; height: 94px; padding: 0; box-shadow: 0 8px 20px rgba(0,0,0,0.7); border: 2px solid var(--gold); overflow: hidden; animation: pulse 2s infinite; cursor: pointer; display: flex; justify-content: center; align-items: center;">
       <img src="icono.png" alt="VIP" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
@@ -30,6 +36,9 @@
     <span style="font-size: 14px; font-weight: 900; color: white; margin-top: 8px; font-family: 'Montserrat', sans-serif; text-shadow: 1px 1px 3px black; letter-spacing: 1px;">CLIENTES</span>
   </div>
 
+  <!-- ========================================== -->
+  <!-- 🖼️ ZONA CRÍTICA: CABECERA Y LOGO -->
+  <!-- ========================================== -->
   <header style="display: flex; justify-content: space-between; align-items: flex-start; padding: 20px;">
     <div style="flex: 1;"></div>
     <div style="flex: 2; text-align: center;">
@@ -44,6 +53,10 @@
     </div>
   </header>
   
+  <!-- ========================================== -->
+  <!-- 🧭 ZONA CRÍTICA: NAVEGACIÓN PRINCIPAL (MENÚ) -->
+  <!-- Configuración de botones de navegación interna -->
+  <!-- ========================================== -->
   <nav id="main-nav" style="display: none; justify-content: center; margin-top: 10px;">
     <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
     <button onclick="navegar('cartera')" class="nav-btn" id="nav-cartera">💰 Cartera</button>
@@ -62,21 +75,29 @@
     <aside class="left-banner">
       <div id="sidebar-promo" class="sidebar-promo hidden"></div>
 
+      <!-- ========================================== -->
+      <!-- 🗺️ ZONA CRÍTICA: UBICACIÓN Y MAPA (CORREGIDO) -->
+      <!-- Contiene la corrección del iFrame de Google Maps -->
+      <!-- ========================================== -->
       <div class="contact-info">
         <h4 style="color: var(--gold); margin-bottom: 12px; font-family: 'Metal Mania', cursive; font-size: 16px; letter-spacing: 1px;">📍 ¿DÓNDE ESTAMOS?</h4>
         
         <div class="map-container">
-          <a href="https://www.google.com/maps/place/7%C2%B054'32.7%22N+72%C2%B029'09.9%22W/@7.8984898,-72.4743622,10935m/data=!3m1!1e3!4m4!3m3!8m2!3d7.9090833!4d-72.4860833?hl=es&entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" title="Abrir en Google Maps">
-            <iframe src="https://https://www.google.com/maps/place/7%C2%B054'32.7%22N+72%C2%B029'09.9%22W/@7.9090788,-72.4886633,17z/data=!3m1!4b1!4m4!3m3!8m2!3d7.9090788!4d-72.4860884?hl=es&entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" style="pointer-events: none;"></iframe>
+          <a href="https://maps.app.goo.gl/FbTnX98zyXfrV5C88?g_st=aw" target="_blank" title="Abrir en Google Maps">
+            <iframe src="https://maps.google.com/maps?q=7.9090833,-72.4860833&hl=es&z=16&output=embed" width="100%" height="200" style="border:0; pointer-events: none; border-radius: 8px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
           </a>
         </div>
         
-        <a href="https://www.google.com/maps/place/7%C2%B054'32.7%22N+72%C2%B029'09.9%22W/@7.8984898,-72.4743622,10935m/data=!3m1!1e3!4m4!3m3!8m2!3d7.9090833!4d-72.4860833?hl=es&entry=ttu&g_ep=EgoyMDI2MDgxOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" class="address-link">
+        <a href="https://maps.app.goo.gl/FbTnX98zyXfrV5C88?g_st=aw" target="_blank" class="address-link">
           Av 2E # 13 - 10 Av. Libertadores<br>
           Cúcuta, Norte de Santander<br>
           <b>🗺️ Clic aquí para ver indicaciones</b>
         </a>
 
+        <!-- ========================================== -->
+        <!-- 📱 ZONA CRÍTICA: REDES SOCIALES Y PAGOS -->
+        <!-- Enlaces de contacto y cuenta bancaria -->
+        <!-- ========================================== -->
         <div class="social-links">
           <a href="https://www.instagram.com/mrloboburgerz?igsh=MTRkcnpldGNqMjV6Mw==" target="_blank" class="social-item" style="text-decoration: none;">
             <span class="social-icon" style="color: #E1306C;">
@@ -118,6 +139,9 @@
     <main class="main-content">
       <div id="alert-box" class="alert hidden"></div>
 
+      <!-- ========================================== -->
+      <!-- 🛒 VISTA: VITRINA (CATÁLOGO Y CARRITO) -->
+      <!-- ========================================== -->
       <section id="view-vitrina" class="view active">
         <div class="vitrina-container">
           <div class="menu-list">
@@ -140,6 +164,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 🔐 VISTA: LOGIN DE EMPLEADOS -->
+      <!-- ========================================== -->
       <section id="view-login" class="view">
         <div class="card card-center">
           <h2>Acceso Empleados</h2>
@@ -162,6 +189,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 📝 VISTA: REGISTRO DE EMPLEADOS -->
+      <!-- ========================================== -->
       <section id="view-registro" class="view">
         <div class="card card-center">
           <h2>Registro de Personal</h2>
@@ -194,6 +224,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 👑 VISTA: PANEL MAESTRO (ADMIN) -->
+      <!-- ========================================== -->
       <section id="view-admin" class="view">
         <div class="card" style="margin-bottom: 25px;">
           <h2>📊 Ranking de Referidos</h2>
@@ -233,6 +266,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 📸 VISTA: MARKETING Y GESTIÓN DE MENÚ -->
+      <!-- ========================================== -->
       <section id="view-marketing" class="view">
         <div class="card" style="margin-bottom: 25px;">
           <h2>📣 Gestor de Promoción Lateral</h2>
@@ -283,6 +319,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 💰 VISTA: CARTERA Y FINANZAS -->
+      <!-- ========================================== -->
       <section id="view-cartera" class="view">
         <div class="card">
           <h2>💰 Control Financiero (Cartera)</h2>
@@ -305,6 +344,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 🍳 VISTA: PRODUCCIÓN (COCINA) -->
+      <!-- ========================================== -->
       <section id="view-produccion" class="view">
         <div class="card">
           <h2>🍳 Comandas Pagadas (Cocina)</h2>
@@ -312,6 +354,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- ✅ VISTA: DESPACHOS Y ENTREGAS -->
+      <!-- ========================================== -->
       <section id="view-despachados" class="view">
         <div class="card">
           <h2>✅ Historial de Entregas (Despachos)</h2>
@@ -331,6 +376,9 @@
         </div>
       </section>
 
+      <!-- ========================================== -->
+      <!-- 🧾 VISTA: FACTURACIÓN -->
+      <!-- ========================================== -->
       <section id="view-facturas" class="view">
         <div class="card">
           <h2>🧾 Buscador de Facturas PDF</h2>
@@ -364,7 +412,9 @@
     </div>
   </footer>
 
-  <!-- MODAL DE FIDELIDAD -->
+  <!-- ========================================== -->
+  <!-- 🐺 COMPONENTE MODAL: FIDELIDAD (CLUB LOBOS) -->
+  <!-- ========================================== -->
   <div class="modal" id="modal-fidelidad">
     <div class="invoice">
       <div class="modal-header">
@@ -416,7 +466,9 @@
     </div>
   </div>
 
-  <!-- MODAL DE CHECKOUT (COMPLETAR PEDIDO) -->
+  <!-- ========================================== -->
+  <!-- 💳 COMPONENTE MODAL: CHECKOUT DE PEDIDOS -->
+  <!-- ========================================== -->
   <div class="modal" id="modal-checkout">
     <div class="invoice">
       <div class="modal-header">
@@ -474,6 +526,7 @@
         <input type="number" id="co-monto-abono">
       </div>
 
+      <!-- ZONA DE CAMBIO DE NÚMERO NEQUI DE PRODUCCIÓN -->
       <div class="field" style="margin-top: 15px; background: rgba(32, 0, 32, 0.8); border: 1px solid #ff33ff; padding: 12px; border-radius: 8px; text-align: center;">
         <b style="color: #ff33ff; font-size: 15px; display: block; margin-bottom: 4px;">💜 TRANSFIERE A NEQUI</b>
         <span style="color: #fff; font-size: 18px; font-weight: bold; letter-spacing: 1px; display: block;">315 270 1353</span>
@@ -492,6 +545,9 @@
     </div>
   </div>
 
+  <!-- ========================================== -->
+  <!-- 🍔 COMPONENTE MODAL: AÑADIR/EDITAR PRODUCTO -->
+  <!-- ========================================== -->
   <div class="modal" id="modal-producto">
     <div class="invoice">
       <div class="modal-header">
@@ -529,7 +585,9 @@
     </div>
   </div>
 
-  <!-- BASE DE DATOS DE ESTUDIANTES PARA EL BUSCADOR (DATALIST) -->
+  <!-- ========================================== -->
+  <!-- 📚 BASE DE DATOS: REFERIDOS (DATALIST) -->
+  <!-- ========================================== -->
   <datalist id="lista-estudiantes">
     <option value="Maria Fernanda Aragón">
     <option value="Naily Bustos">
@@ -572,6 +630,10 @@
     <option value="Katherin Zambrano">
   </datalist>
 
+  <!-- ========================================== -->
+  <!-- ⚙️ ZONA CRÍTICA: SCRIPTS Y VERSIÓN -->
+  <!-- Modificar la llamada a app.js y control de versión -->
+  <!-- ========================================== -->
   <script>
     document.write('<script src="app.js?v=' + new Date().getTime() + '"><\/script>');
   </script>
