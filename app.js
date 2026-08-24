@@ -3,7 +3,7 @@
 // CÓDIGO COMPLETO Y SIN COMPRIMIR - BLINDAJE CONTRA IMÁGENES ROTAS
 // ============================================================================
 
-const API_URL = "https://script.google.com/macros/s/AKfycbxSzX18DzUEEHXTjnK4jV6LJPdGlwTeB0Wbc1jKDlWGSnLcgLefjbVeKN7cmLirQPe5Cg/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycby7trChx3zSA_l-lG-OGKs3hQ31ZwolSb3plP9iMfQXQoxQuPOIf-IEgBuYrp5c3m7Xmw/exec";
 
 let sesionActual = null; 
 let clienteFidelizado = null; 
