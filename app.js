@@ -1,6 +1,6 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
-// CÓDIGO COMPLETO Y SIN COMPRIMIR - LÓGICA DE PADRES DE FAMILIA / EXTERNOS
+// CÓDIGO COMPLETO Y SIN COMPRIMIR - BLINDAJE CONTRA IMÁGENES ROTAS
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycbxSzX18DzUEEHXTjnK4jV6LJPdGlwTeB0Wbc1jKDlWGSnLcgLefjbVeKN7cmLirQPe5Cg/exec";
@@ -412,8 +412,13 @@ function renderCatalogo() {
     CATALOGO.filter(p => p.categoria === cat).forEach(prod => {
       const botonHTML = prod.agotado ? `<button class="btn-outline full-width" disabled>Agotado</button>` : `<button class="primary full-width" onclick="agregarAlCarrito('${prod.id}')">+ Añadir a pedido</button>`;
       
-      // Corrección aplicada: se valida correctamente la existencia de la imagen o se omite el contenedor si está vacía
-      const imagenHTML = (prod.urlImagen && prod.urlImagen.trim() !== '') ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}"></div>` : '';
+      // EL BLINDAJE DEFINITIVO: 
+      // 1. Verifica que haya texto
+      // 2. Verifica que no diga "ERROR"
+      // 3. Si la imagen falla al cargar (ej: enlace de Drive privado), el atributo 'onerror' borra la caja entera.
+      const imagenHTML = (prod.urlImagen && prod.urlImagen.trim() !== '' && !prod.urlImagen.includes('ERROR')) 
+        ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}" onerror="this.parentElement.style.display='none';"></div>` 
+        : '';
       
       html += `
         <div class="product-card" style="${prod.agotado ? 'opacity: 0.5; filter: grayscale(1);' : ''}">
@@ -438,9 +443,14 @@ function cargarGestorMenu() {
   tbody.innerHTML = '';
   
   CATALOGO.forEach(p => {
+    // Aquí también añadimos el onerror para que no se vea rota en el panel de marketing
+    const miniFoto = (p.urlImagen && !p.urlImagen.includes('ERROR')) 
+      ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;" onerror="this.style.display='none';">` 
+      : 'Sin foto';
+
     tbody.innerHTML += `
       <tr>
-        <td>${p.urlImagen ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">` : 'Sin foto'}</td>
+        <td>${miniFoto}</td>
         <td>${p.categoria}</td>
         <td><b>${p.nombre}</b></td>
         <td>${money(p.precio)}</td>
