@@ -3,7 +3,6 @@
 <head>
   <!-- ========================================== -->
   <!-- 🚀 ZONA CRÍTICA: METADATOS Y CACHÉ (PRODUCCIÓN) -->
-  <!-- Modificar aquí los colores del tema, iconos y control de caché -->
   <!-- ========================================== -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -55,7 +54,6 @@
   
   <!-- ========================================== -->
   <!-- 🧭 ZONA CRÍTICA: NAVEGACIÓN PRINCIPAL (MENÚ) -->
-  <!-- Configuración de botones de navegación interna -->
   <!-- ========================================== -->
   <nav id="main-nav" style="display: none; justify-content: center; margin-top: 10px;">
     <button onclick="navegar('vitrina')" class="nav-btn" id="nav-vitrina">🍔 Vitrina</button>
@@ -65,7 +63,7 @@
     <button onclick="navegar('marketing')" class="nav-btn" id="nav-marketing">📸 Marketing</button>
     <button onclick="navegar('facturas')" class="nav-btn" id="nav-facturas">🧾 Facturas</button>
     <button onclick="navegar('admin')" class="nav-btn purple" id="nav-admin">👑 Panel Maestro</button>
-    
+    <button onclick="abrirModalPreventa()" class="nav-btn" id="nav-preventa" style="background: var(--gold); color: black;">📊 Estado Preventa</button>
     <button onclick="forzarUpdatePWA()" class="nav-btn" id="btn-update-pwa" style="background: #113859; display: none;">🔄 Actualizar Sistema</button>
     <button onclick="cerrarSesion()" class="nav-btn btn-outline">Cerrar Sesión</button>
   </nav>
@@ -76,8 +74,7 @@
       <div id="sidebar-promo" class="sidebar-promo hidden"></div>
 
       <!-- ========================================== -->
-      <!-- 🗺️ ZONA CRÍTICA: UBICACIÓN Y MAPA (CORREGIDO) -->
-      <!-- Contiene la corrección del iFrame de Google Maps -->
+      <!-- 🗺️ ZONA CRÍTICA: UBICACIÓN Y MAPA -->
       <!-- ========================================== -->
       <div class="contact-info">
         <h4 style="color: var(--gold); margin-bottom: 12px; font-family: 'Metal Mania', cursive; font-size: 16px; letter-spacing: 1px;">📍 ¿DÓNDE ESTAMOS?</h4>
@@ -96,7 +93,6 @@
 
         <!-- ========================================== -->
         <!-- 📱 ZONA CRÍTICA: REDES SOCIALES Y PAGOS -->
-        <!-- Enlaces de contacto y cuenta bancaria -->
         <!-- ========================================== -->
         <div class="social-links">
           
@@ -115,7 +111,7 @@
             </div>
           </a>
 
-          <!-- TIKTOK (NUEVO) -->
+          <!-- TIKTOK -->
           <a href="https://www.tiktok.com/@mrloboburgerz0?_r=1&_t=ZS-999nX0nms3p" target="_blank" class="social-item" style="text-decoration: none;">
             <span class="social-icon" style="color: #FFFFFF;">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -341,6 +337,7 @@
       <section id="view-cartera" class="view">
         <div class="card">
           <h2>💰 Control Financiero (Cartera)</h2>
+          <button class="btn-outline" style="border-color: var(--red); color: var(--red); margin-bottom: 15px;" onclick="abrirModalDevoluciones()" id="btn-devoluciones-nav">📥 Ver Devoluciones Pendientes</button>
           <div class="stats" style="margin: 20px 0; display:flex; gap:15px; text-align:center; flex-wrap: wrap;">
             <div class="stat card" style="flex:1; min-width:150px; padding: 15px;">
               <small>Dinero en Caja (Aprobado)</small><br>
@@ -602,6 +599,49 @@
   </div>
 
   <!-- ========================================== -->
+  <!-- 📊 COMPONENTE MODAL: ESTADO DE PREVENTA -->
+  <!-- ========================================== -->
+  <div class="modal" id="modal-preventa">
+    <div class="invoice">
+      <div class="modal-header">
+        <span style="font-family: 'Montserrat', sans-serif;">Estado de Preventa en Vivo</span>
+        <button onclick="cerrarModal('modal-preventa')">✕</button>
+      </div>
+      <div id="preventa-content">
+        <p class="note">Calculando estadísticas en tiempo real...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 📥 COMPONENTE MODAL: DEVOLUCIONES -->
+  <!-- ========================================== -->
+  <div class="modal" id="modal-devoluciones">
+    <div class="invoice" style="max-width: 600px;">
+      <div class="modal-header">
+        <span style="font-family: 'Montserrat', sans-serif; color: var(--red);">Devoluciones Pendientes</span>
+        <button onclick="cerrarModal('modal-devoluciones')">✕</button>
+      </div>
+      <p class="note" style="text-align: left;">Muestra las órdenes anuladas que alcanzaron a registrar dinero en el sistema compukelc.</p>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Ticket</th>
+              <th>Cliente</th>
+              <th>A Devolver</th>
+              <th>Acción</th>
+            </tr>
+          </thead>
+          <tbody id="lista-devoluciones">
+            <tr><td colspan="4" class="center">Buscando devoluciones...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
   <!-- 📚 BASE DE DATOS: REFERIDOS (DATALIST) -->
   <!-- ========================================== -->
   <datalist id="lista-estudiantes">
@@ -648,7 +688,6 @@
 
   <!-- ========================================== -->
   <!-- ⚙️ ZONA CRÍTICA: SCRIPTS Y VERSIÓN -->
-  <!-- Modificar la llamada a app.js y control de versión -->
   <!-- ========================================== -->
   <script>
     document.write('<script src="app.js?v=' + new Date().getTime() + '"><\/script>');
