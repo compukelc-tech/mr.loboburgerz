@@ -1,7 +1,7 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
 // CÓDIGO COMPLETO Y SIN COMPRIMIR - BLINDAJE CONTRA IMÁGENES ROTAS
-// INCLUYE MODULO DE PREVENTA Y DEVOLUCIONES DE compukelc
+// INCLUYE MODULO DE PREVENTA Y DEVOLUCIONES
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycby7trChx3zSA_l-lG-OGKs3hQ31ZwolSb3plP9iMfQXQoxQuPOIf-IEgBuYrp5c3m7Xmw/exec";
