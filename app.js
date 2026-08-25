@@ -1,6 +1,7 @@
 // ============================================================================
 // SISTEMA ERP: MR. LOBO BURGERZ - FRONTEND (JAVASCRIPT) V10.0 DEFINITIVO
 // CÓDIGO COMPLETO Y SIN COMPRIMIR - BLINDAJE CONTRA IMÁGENES ROTAS
+// INCLUYE MODULO DE PREVENTA Y DEVOLUCIONES DE compukelc
 // ============================================================================
 
 const API_URL = "https://script.google.com/macros/s/AKfycby7trChx3zSA_l-lG-OGKs3hQ31ZwolSb3plP9iMfQXQoxQuPOIf-IEgBuYrp5c3m7Xmw/exec";
@@ -161,6 +162,8 @@ function configurarInterfazPorRol() {
   
   const btnOutline = document.querySelector('.btn-outline');
   const btnUpdate = document.getElementById('btn-update-pwa');
+  const btnDev = document.getElementById('btn-devoluciones-nav');
+  const btnPreventa = document.getElementById('nav-preventa');
   
   if (btnOutline) {
     btnOutline.style.display = 'block'; 
@@ -168,6 +171,14 @@ function configurarInterfazPorRol() {
   
   if (btnUpdate) {
     btnUpdate.style.display = (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') ? 'block' : 'none';
+  }
+  
+  if (btnDev) {
+    btnDev.style.display = (['superadmin', 'superadministrador', 'gerente', 'cartera'].includes(rolSeguro)) ? 'inline-block' : 'none';
+  }
+
+  if (btnPreventa) {
+      btnPreventa.style.display = 'block';
   }
 
   if (rolSeguro === 'superadmin' || rolSeguro === 'superadministrador' || rolSeguro === 'gerente') {
@@ -412,10 +423,6 @@ function renderCatalogo() {
     CATALOGO.filter(p => p.categoria === cat).forEach(prod => {
       const botonHTML = prod.agotado ? `<button class="btn-outline full-width" disabled>Agotado</button>` : `<button class="primary full-width" onclick="agregarAlCarrito('${prod.id}')">+ Añadir a pedido</button>`;
       
-      // EL BLINDAJE DEFINITIVO: 
-      // 1. Verifica que haya texto
-      // 2. Verifica que no diga "ERROR"
-      // 3. Si la imagen falla al cargar (ej: enlace de Drive privado), el atributo 'onerror' borra la caja entera.
       const imagenHTML = (prod.urlImagen && prod.urlImagen.trim() !== '' && !prod.urlImagen.includes('ERROR')) 
         ? `<div class="product-img-container"><img src="${prod.urlImagen}" alt="${prod.nombre}" onerror="this.parentElement.style.display='none';"></div>` 
         : '';
@@ -443,7 +450,6 @@ function cargarGestorMenu() {
   tbody.innerHTML = '';
   
   CATALOGO.forEach(p => {
-    // Aquí también añadimos el onerror para que no se vea rota en el panel de marketing
     const miniFoto = (p.urlImagen && !p.urlImagen.includes('ERROR')) 
       ? `<img src="${p.urlImagen}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;" onerror="this.style.display='none';">` 
       : 'Sin foto';
@@ -916,6 +922,8 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
     let caja = 0, fiado = 0, total = 0;
     
     pedidosValidos.forEach(p => { 
+      // Ignorar cancelados en los totales de caja
+      if (String(p['Estado'] || '').toUpperCase() === 'CANCELADO' || String(p['Estado'] || '').toUpperCase() === 'REEMBOLSADO') return;
       total += Number(p['Total'] || 0); 
       caja += Number(p['Total Abonado'] || 0); 
       fiado += Math.max(0, Number(p['Total'] || 0) - Number(p['Total Abonado'] || 0)); 
@@ -986,8 +994,14 @@ async function cargarPedidos(estadoFiltro, contenedorID) {
       let mostrarAbonos = (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') ? abonosHtml : '';
       let botones = '';
       
+      const rolSeguro = String(sesionActual?.rol || '').toLowerCase();
+      const puedeAnular = ['superadmin', 'superadministrador', 'gerente', 'cartera'].includes(rolSeguro);
+      
       if (contenedorID === 'lista-cartera' || contenedorID === 'lista-admin') { 
         botones = `<button class="primary full-width" onclick="aprobarPagoTotal('${p['ID Pedido']}')">Validar y Enviar a Cocina</button>`; 
+        if (puedeAnular) {
+          botones += `<button class="btn-outline full-width" style="margin-top:10px; border-color:var(--red); color:var(--red);" onclick="anularPedido('${p['ID Pedido']}')">🚫 Anular Pedido</button>`;
+        }
       } else if (p['Estado'] === 'EN PRODUCCIÓN') { 
         botones = `<button class="purple full-width" onclick="cambiarEstadoPedido('${p['ID Pedido']}', 'DESPACHADO')">Marcar Pedido Despachado</button>`; 
       }
@@ -1181,4 +1195,127 @@ if ('serviceWorker' in navigator) {
       console.log('Error', err); 
     }); 
   });
+}
+
+// ----------------------------------------------------------------------------
+// SISTEMA DE PREVENTA EN VIVO
+// ----------------------------------------------------------------------------
+async function abrirModalPreventa() {
+    document.getElementById('modal-preventa').classList.add('active');
+    const container = document.getElementById('preventa-content');
+    container.innerHTML = '<p class="note">Calculando estadísticas...</p>';
+    
+    try {
+        const pedidosData = await apiCall('obtenerPedidosConAbonos');
+        let totalPedidos = 0, pagos = 0, fiados = 0;
+        let conteoProductos = {};
+        
+        (pedidosData || []).forEach(p => {
+            const est = String(p['Estado'] || '').toUpperCase();
+            if(est === 'CANCELADO' || est === 'REEMBOLSADO') return; 
+            
+            totalPedidos++;
+            const abonado = Number(p['Total Abonado'] || 0);
+            const total = Number(p['Total'] || 0);
+            
+            if(abonado >= total && total > 0) pagos++;
+            else fiados++;
+            
+            try {
+                const items = JSON.parse(p['Carrito (JSON)'] || '[]');
+                items.forEach(item => {
+                    if(!conteoProductos[item.nombre]) conteoProductos[item.nombre] = 0;
+                    conteoProductos[item.nombre] += (item.cant || 1);
+                });
+            } catch(e){}
+        });
+        
+        const ranking = Object.entries(conteoProductos).sort((a, b) => b[1] - a[1]);
+        let productoEstrella = ranking.length > 0 ? ranking[0] : ['Ninguno', 0];
+        let restoInventario = ranking.slice(1).map(r => `<li style="margin-bottom:5px;"><b>${r[0]}:</b> ${r[1]} unidades</li>`).join('');
+        if(!restoInventario) restoInventario = '<li>No hay más productos registrados</li>';
+        
+        container.innerHTML = `
+            <h3 style="color:var(--gold); margin-bottom:15px; text-align:left; font-size: 18px;">📈 RESUMEN GENERAL</h3>
+            <ul style="list-style:none; padding:0; margin:0 0 20px 0; font-size:15px;">
+                <li style="margin-bottom:8px;"><b>Total de Pedidos Registrados:</b> ${totalPedidos} tickets</li>
+                <li style="margin-bottom:8px; color:var(--success-text);">✅ <b>Totalmente Pagos:</b> ${pagos} pedidos</li>
+                <li style="color:var(--warning-text);">⏳ <b>Fiados / Pendientes:</b> ${fiados} pedidos</li>
+            </ul>
+            
+            <hr style="border-color:var(--border); margin:15px 0;">
+            
+            <h3 style="color:var(--gold); margin-bottom:15px; text-align:left; font-size: 18px;">🏆 PRODUCTO ESTRELLA</h3>
+            <div style="background:var(--card-hover); padding:15px; border-radius:10px; text-align:center; border:1px solid var(--gold); margin-bottom:20px;">
+                <span style="font-size:24px; display:block; margin-bottom:5px; color:white;">🍔 <b>${productoEstrella[0]}</b></span>
+                <span style="color:var(--muted);">Unidades vendidas: ${productoEstrella[1]}</span>
+            </div>
+            
+            <hr style="border-color:var(--border); margin:15px 0;">
+            
+            <h3 style="color:var(--gold); margin-bottom:15px; text-align:left; font-size: 18px;">📋 RESTO DEL INVENTARIO</h3>
+            <ul style="padding-left:20px; font-size:14px; color:var(--muted); line-height:1.6;">
+                ${restoInventario}
+            </ul>
+        `;
+    } catch(e) {
+        container.innerHTML = '<p class="note" style="color:var(--red);">Error al calcular preventa.</p>';
+    }
+}
+
+// ----------------------------------------------------------------------------
+// SISTEMA DE DEVOLUCIONES Y ANULACIONES
+// ----------------------------------------------------------------------------
+async function anularPedido(idPedido) {
+    const motivo = prompt('¿Escribe un breve motivo de la anulación? (Ej: Cliente desistió)');
+    if (motivo === null) return; 
+    
+    mostrarAlerta('Anulando pedido...', 'info');
+    try {
+        await apiCall('cambiarEstadoPedido', { idPedido, nuevoEstado: 'CANCELADO' });
+        mostrarAlerta('Pedido anulado con éxito', 'success');
+        cargarPedidos('ESPERA DE VERIFICACIÓN', 'lista-cartera');
+    } catch(e) {
+        mostrarAlerta(e.message);
+    }
+}
+
+async function abrirModalDevoluciones() {
+    document.getElementById('modal-devoluciones').classList.add('active');
+    const container = document.getElementById('lista-devoluciones');
+    container.innerHTML = '<tr><td colspan="4" class="center">Buscando devoluciones...</td></tr>';
+    
+    try {
+        const pedidosData = await apiCall('obtenerPedidosConAbonos');
+        const cancelados = (pedidosData || []).filter(p => String(p['Estado']).toUpperCase() === 'CANCELADO' && Number(p['Total Abonado'] || 0) > 0);
+        
+        if (cancelados.length === 0) {
+            container.innerHTML = '<tr><td colspan="4" class="center">No hay devoluciones de dinero pendientes.</td></tr>';
+            return;
+        }
+        
+        container.innerHTML = cancelados.map(p => `
+            <tr>
+                <td><b>${p['ID Pedido']}</b></td>
+                <td style="font-size: 13px;">${p['Nombre']}<br><b style="color:var(--gold);">${p['Celular']}</b></td>
+                <td style="color:var(--red); font-weight:bold;">${money(p['Total Abonado'])}</td>
+                <td><button class="primary small" onclick="confirmarReembolso('${p['ID Pedido']}')">Marcar Reembolsado</button></td>
+            </tr>
+        `).join('');
+    } catch (e) {
+        container.innerHTML = '<tr><td colspan="4" class="center" style="color:var(--red);">Error cargando datos.</td></tr>';
+    }
+}
+
+async function confirmarReembolso(idPedido) {
+    if (!confirm('¿Confirmas que ya hiciste la devolución del dinero al cliente? Esta acción cerrará el caso para siempre.')) return;
+    
+    mostrarAlerta('Procesando reembolso...', 'info');
+    try {
+        await apiCall('cambiarEstadoPedido', { idPedido, nuevoEstado: 'REEMBOLSADO' });
+        mostrarAlerta('Reembolso completado y caso archivado', 'success');
+        abrirModalDevoluciones(); 
+    } catch(e) {
+        mostrarAlerta('Error al intentar reembolsar.');
+    }
 }
